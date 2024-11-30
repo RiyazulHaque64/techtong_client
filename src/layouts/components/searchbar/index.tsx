@@ -143,7 +143,7 @@ export function Searchbar({ data: navItems = [], sx, ...other }: SearchbarProps)
           display: { xs: 'none', sm: 'inline-flex' },
         }}
       >
-        ⌘K
+        Search Menu
       </Label>
     </Box>
   );

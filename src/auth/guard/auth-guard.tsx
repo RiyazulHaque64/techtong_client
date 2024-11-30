@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
+import { paths } from 'src/routes/paths';
 import { useRouter, usePathname, useSearchParams } from 'src/routes/hooks';
 
 import { SplashScreen } from 'src/components/loading-screen';
@@ -34,7 +35,7 @@ export function AuthGuard({ children }: Props) {
 
   const checkPermissions = async (): Promise<void> => {
     if (!authenticated) {
-      const signInPath = '/';
+      const signInPath = paths.auth.login;
       const href = `${signInPath}?${createQueryString('returnTo', pathname)}`;
       router.replace(href);
       return;

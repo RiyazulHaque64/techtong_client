@@ -56,7 +56,6 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
           src={workspace?.logo}
           sx={{ width: 24, height: 24, borderRadius: '50%' }}
         />
-
         <Box
           component="span"
           sx={{
@@ -66,7 +65,6 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
         >
           {workspace?.name}
         </Box>
-
         <Label
           color={workspace?.plan === 'Free' ? 'default' : 'info'}
           sx={{
@@ -76,7 +74,6 @@ export function WorkspacesPopover({ data = [], sx, ...other }: WorkspacesPopover
         >
           {workspace?.plan}
         </Label>
-
         <Iconify width={16} icon="carbon:chevron-sort" sx={{ color: 'text.disabled' }} />
       </ButtonBase>
 

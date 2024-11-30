@@ -7,44 +7,29 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
-import { alpha as hexAlpha } from '@mui/material/styles';
+import { useTheme, alpha as hexAlpha } from '@mui/material/styles';
 
-import { paths } from 'src/routes/paths';
+import { formatRole } from 'src/utils/helper';
 
 import { CONFIG } from 'src/config-global';
+import { useAppSelector } from 'src/redux/hooks';
+import avatar from 'src/assets/images/avatar-17.webp';
 import { varAlpha, bgGradient } from 'src/theme/styles';
-
-import { Label } from 'src/components/label';
-
-import { useMockedUser } from 'src/auth/hooks';
+import { selectCurrentUser } from 'src/redux/features/auth/authSlice';
 
 // ----------------------------------------------------------------------
 
-export function NavUpgrade({ sx, ...other }: StackProps) {
-  const { user } = useMockedUser();
+export function NavUser({ sx, ...other }: StackProps) {
+  const user = useAppSelector(selectCurrentUser);
+  const theme = useTheme();
 
   return (
     <Stack sx={{ px: 2, py: 5, textAlign: 'center', ...sx }} {...other}>
       <Stack alignItems="center">
-        <Box sx={{ position: 'relative' }}>
-          <Avatar src={user?.photoURL} alt={user?.displayName} sx={{ width: 48, height: 48 }}>
-            {user?.displayName?.charAt(0).toUpperCase()}
+        <Box>
+          <Avatar src={user?.profile_pic || avatar} alt={user?.name} sx={{ width: 48, height: 48 }}>
+            {user?.name?.charAt(0).toUpperCase()}
           </Avatar>
-
-          <Label
-            color="success"
-            variant="filled"
-            sx={{
-              top: -6,
-              px: 0.5,
-              left: 40,
-              height: 20,
-              position: 'absolute',
-              borderBottomLeftRadius: 2,
-            }}
-          >
-            Free
-          </Label>
         </Box>
 
         <Stack spacing={0.5} sx={{ mb: 2, mt: 1.5, width: 1 }}>
@@ -53,7 +38,7 @@ export function NavUpgrade({ sx, ...other }: StackProps) {
             noWrap
             sx={{ color: 'var(--layout-nav-text-primary-color)' }}
           >
-            {user?.displayName}
+            {user?.name}
           </Typography>
 
           <Typography
@@ -63,11 +48,28 @@ export function NavUpgrade({ sx, ...other }: StackProps) {
           >
             {user?.email}
           </Typography>
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{ color: 'var(--layout-nav-text-disabled-color)' }}
+          >
+            {user?.contact_number}
+          </Typography>
         </Stack>
-
-        <Button variant="contained" href={paths.minimalStore} target="_blank" rel="noopener">
-          Upgrade to Pro
-        </Button>
+        <Typography
+          noWrap
+          component="span"
+          sx={{
+            backgroundColor: theme.palette.primary.lighter,
+            color: theme.palette.primary.main,
+            padding: '8px 20px',
+            fontSize: 14,
+            borderRadius: 8,
+            fontWeight: 600,
+          }}
+        >
+          {formatRole(user?.role || 'USER')}
+        </Typography>
       </Stack>
     </Stack>
   );

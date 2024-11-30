@@ -128,3 +128,16 @@ export const merge = (target: any, ...sources: any[]): any => {
 
   return merge(target, ...sources);
 };
+
+export const formatRole = (role: string) => {
+  switch (role) {
+    case 'SUPER_ADMIN':
+      return 'SUPER ADMIN';
+    case 'ADMIN':
+      return 'ADMIN';
+    case 'RETAILER':
+      return 'RETAILER';
+    default:
+      return 'USER';
+  }
+};

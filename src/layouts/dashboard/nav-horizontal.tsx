@@ -30,7 +30,6 @@ export function NavHorizontal({ data, layoutQuery, sx, ...other }: NavHorizontal
       <Divider
         sx={{ top: 0, left: 0, width: 1, zIndex: 9, position: 'absolute', borderStyle: 'dashed' }}
       />
-
       <Box
         sx={{
           px: 1.5,

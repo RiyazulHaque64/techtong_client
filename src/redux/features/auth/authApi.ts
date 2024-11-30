@@ -30,7 +30,25 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: api_endpoint.auth.change_password,
+        method: 'POST',
+        body: data,
+      }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const { data: responseData } = await queryFulfilled;
+          const {
+            data: { access_token, ...remainingData },
+          } = responseData;
+          dispatch(setUser({ token: access_token, user: remainingData }));
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation, useForgotPasswordMutation } = authApi;
+export const { useLoginMutation, useForgotPasswordMutation, useChangePasswordMutation } = authApi;

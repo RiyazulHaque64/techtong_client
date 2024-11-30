@@ -4,11 +4,11 @@ import { createSlice } from '@reduxjs/toolkit';
 
 export type TUser = {
   id: string;
-  contact_number: string;
+  name: string;
   email: string;
+  contact_number: string;
+  profile_pic?: string;
   role: 'SUPER_ADMIN' | 'ADMIN' | 'RETAILER' | 'USER';
-  iat: number;
-  exp: number;
 };
 
 type TAuthState = {
