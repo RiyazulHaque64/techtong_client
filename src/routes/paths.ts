@@ -11,7 +11,7 @@ export const paths = {
   // DASHBOARD
   dashboard: {
     root: '/',
-    two: `/two`,
+    media: `/media`,
     three: `/three`,
     group: {
       root: `/group`,

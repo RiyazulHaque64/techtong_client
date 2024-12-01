@@ -13,7 +13,7 @@ import { paths } from '../paths';
 // ----------------------------------------------------------------------
 
 const IndexPage = lazy(() => import('src/pages/dashboard/one'));
-const PageTwo = lazy(() => import('src/pages/dashboard/two'));
+const Media = lazy(() => import('src/pages/dashboard/media'));
 const ChangePassword = lazy(() => import('src/pages/account/change-password'));
 const UpdateProfile = lazy(() => import('src/pages/account/update-profile'));
 const PageThree = lazy(() => import('src/pages/dashboard/three'));
@@ -39,7 +39,7 @@ export const dashboardRoutes = [
       { element: <IndexPage />, index: true },
       { path: paths.auth.change_password, element: <ChangePassword /> },
       { path: paths.auth.update_profile, element: <UpdateProfile /> },
-      { path: 'two', element: <PageTwo /> },
+      { path: paths.dashboard.media, element: <Media /> },
       { path: 'three', element: <PageThree /> },
       {
         path: 'group',
