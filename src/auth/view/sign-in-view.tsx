@@ -58,15 +58,13 @@ export function SignInView() {
 
   const stateMessage = location?.state?.message;
 
-  console.log('location state: ', location.state);
-
   const [errorMsg, setErrorMsg] = useState('');
 
   const password = useBoolean();
 
   const defaultValues = {
     email_or_contact_number: 'riyazulhaque64@gmail.com',
-    password: 'DfzyER',
+    password: 'abc123',
   };
 
   const methods = useForm<SignInSchemaType>({
@@ -83,9 +81,6 @@ export function SignInView() {
     try {
       setErrorMsg('');
       const res = await login(data);
-      if (res?.data) {
-        console.log('Response data', res?.data);
-      }
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
       }

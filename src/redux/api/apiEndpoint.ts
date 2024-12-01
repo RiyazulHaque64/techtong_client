@@ -1,5 +1,6 @@
 const features = {
   auth: '/auth',
+  user: '/user',
 };
 
 const api_endpoint = {
@@ -7,6 +8,9 @@ const api_endpoint = {
     login: `${features.auth}/login`,
     forgot_password: `${features.auth}/forgot-password`,
     change_password: `${features.auth}/reset-password`,
+  },
+  user: {
+    update_profile: `${features.user}/update-profile`,
   },
 };
 

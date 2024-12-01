@@ -48,7 +48,28 @@ const authApi = baseApi.injectEndpoints({
         }
       },
     }),
+    updateProfile: builder.mutation({
+      query: (data: FormData) => ({
+        url: api_endpoint.user.update_profile,
+        method: 'PATCH',
+        body: data,
+      }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const { data: responseData } = await queryFulfilled;
+
+          dispatch(setUser({ token: 'prev', user: responseData.data }));
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation, useForgotPasswordMutation, useChangePasswordMutation } = authApi;
+export const {
+  useLoginMutation,
+  useForgotPasswordMutation,
+  useChangePasswordMutation,
+  useUpdateProfileMutation,
+} = authApi;

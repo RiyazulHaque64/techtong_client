@@ -3,11 +3,11 @@ import { Helmet } from 'react-helmet-async';
 import { useAppSelector } from 'src/redux/hooks';
 import { selectCurrentUser } from 'src/redux/features/auth/authSlice';
 
-import { ChangePasswordView } from 'src/sections/account/change-password-view';
+import { UpdateProfileView } from 'src/sections/account/update-profile-view';
 
 // ----------------------------------------------------------------------
 
-const metadata = { title: `Change password` };
+const metadata = { title: `Update profile` };
 
 export default function Page() {
   const user = useAppSelector(selectCurrentUser);
@@ -19,7 +19,7 @@ export default function Page() {
         </title>
       </Helmet>
 
-      <ChangePasswordView />
+      <UpdateProfileView />
     </>
   );
 }
