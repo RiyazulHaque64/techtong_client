@@ -8,7 +8,8 @@ import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import TableContainer from '@mui/material/TableContainer';
-import { tableCellClasses } from '@mui/material/TableCell';
+import { TableRow, CircularProgress } from '@mui/material';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { tablePaginationClasses } from '@mui/material/TablePagination';
 
 import { Iconify } from 'src/components/iconify';
@@ -19,21 +20,16 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 
-import { FileManagerTableRow } from './media-table-row';
+import { MediaTableRow } from './media-table-row';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
+  { id: 'path', label: 'Image', width: 90 },
   { id: 'name', label: 'Name' },
   { id: 'size', label: 'Size', width: 120 },
   { id: 'type', label: 'Type', width: 120 },
-  { id: 'modifiedAt', label: 'Modified', width: 140 },
-  {
-    id: 'shared',
-    label: 'Shared',
-    align: 'right',
-    width: 140,
-  },
+  { id: 'created_at', label: 'Uploaded on', width: 140 },
   { id: '', width: 88 },
 ];
 
@@ -146,18 +142,32 @@ export function MediaTable({
             />
 
             <TableBody>
-              {dataFiltered
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => (
-                  <FileManagerTableRow
+              {dataFiltered?.length ? (
+                dataFiltered.map((row) => (
+                  <MediaTableRow
                     key={row.id}
                     row={row}
                     selected={selected.includes(row.id)}
                     onSelectRow={() => onSelectRow(row.id)}
                     onDeleteRow={() => onDeleteRow(row.id)}
                   />
-                ))}
-
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} align="center">
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100px',
+                      }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              )}
               <TableNoData
                 notFound={notFound}
                 sx={{

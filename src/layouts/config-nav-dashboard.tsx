@@ -11,6 +11,7 @@ const icon = (name: string) => (
 );
 
 const ICONS = {
+  media: icon('ic-media'),
   job: icon('ic-job'),
   blog: icon('ic-blog'),
   chat: icon('ic-chat'),
@@ -49,7 +50,7 @@ export const navData = [
     subheader: 'Overview 6.0.0',
     items: [
       { title: 'One', path: paths.dashboard.root, icon: ICONS.dashboard },
-      { title: 'Media', path: paths.dashboard.media, icon: ICONS.ecommerce },
+      { title: 'Media', path: paths.dashboard.media, icon: ICONS.media },
       { title: 'Three', path: paths.dashboard.three, icon: ICONS.analytics },
     ],
   },

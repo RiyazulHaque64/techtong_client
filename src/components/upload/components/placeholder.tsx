@@ -20,9 +20,9 @@ export function UploadPlaceholder({ sx, ...other }: BoxProps) {
       <UploadIllustration hideBackground sx={{ width: 200 }} />
 
       <Stack spacing={1} sx={{ textAlign: 'center' }}>
-        <Box sx={{ typography: 'h6' }}>Drop or select file</Box>
+        <Box sx={{ typography: 'h6' }}>Drop or select image</Box>
         <Box sx={{ typography: 'body2', color: 'text.secondary' }}>
-          Drop files here or click to
+          Drop images here or click to
           <Box
             component="span"
             sx={{ mx: 0.5, color: 'primary.main', textDecoration: 'underline' }}
@@ -30,6 +30,9 @@ export function UploadPlaceholder({ sx, ...other }: BoxProps) {
             browse
           </Box>
           through your machine.
+        </Box>
+        <Box sx={{ typography: 'body2', color: 'text.secondary' }}>
+          Allowed only *.webp, *.jpeg, *.jpg, *.png, *.gif, *.ico, *.svg
         </Box>
       </Stack>
     </Box>

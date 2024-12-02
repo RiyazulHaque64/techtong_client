@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react';
 
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
@@ -15,7 +14,6 @@ import Typography from '@mui/material/Typography';
 import ListItemText from '@mui/material/ListItemText';
 import TableRow, { tableRowClasses } from '@mui/material/TableRow';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import AvatarGroup, { avatarGroupClasses } from '@mui/material/AvatarGroup';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useDoubleClick } from 'src/hooks/use-double-click';
@@ -44,7 +42,7 @@ type Props = {
   onDeleteRow: () => void;
 };
 
-export function FileManagerTableRow({ row, selected, onSelectRow, onDeleteRow }: Props) {
+export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow }: Props) {
   const theme = useTheme();
 
   const { copy } = useCopyToClipboard();
@@ -122,7 +120,11 @@ export function FileManagerTableRow({ row, selected, onSelectRow, onDeleteRow }:
         <TableCell onClick={handleClick}>
           <Stack direction="row" alignItems="center" spacing={2}>
             <FileThumbnail file={row.type} />
+          </Stack>
+        </TableCell>
 
+        <TableCell onClick={handleClick}>
+          <Stack direction="row" alignItems="center" spacing={2}>
             <Typography
               noWrap
               variant="inherit"
@@ -154,39 +156,7 @@ export function FileManagerTableRow({ row, selected, onSelectRow, onDeleteRow }:
           />
         </TableCell>
 
-        <TableCell align="right" onClick={handleClick}>
-          <AvatarGroup
-            max={4}
-            sx={{
-              display: 'inline-flex',
-              [`& .${avatarGroupClasses.avatar}`]: {
-                width: 24,
-                height: 24,
-                '&:first-of-type': { fontSize: 12 },
-              },
-            }}
-          >
-            {row.shared &&
-              row.shared.map((person) => (
-                <Avatar key={person.id} alt={person.name} src={person.avatarUrl} />
-              ))}
-          </AvatarGroup>
-        </TableCell>
-
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
-          <Checkbox
-            color="warning"
-            icon={<Iconify icon="eva:star-outline" />}
-            checkedIcon={<Iconify icon="eva:star-fill" />}
-            checked={favorite.value}
-            onChange={favorite.onToggle}
-            sx={{ p: 0.75 }}
-            inputProps={{
-              id: `favorite-${row.id}`,
-              'aria-label': 'Favorite checkbox',
-            }}
-          />
-
           <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>

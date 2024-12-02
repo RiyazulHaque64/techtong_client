@@ -9,6 +9,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import { CONFIG } from 'src/config-global';
 
+import { tagTypes } from '../constants/tag-types';
 import { logout, setUser } from '../features/auth/authSlice';
 
 import type { RootState } from '../store';
@@ -58,5 +59,5 @@ export const baseApi = createApi({
     errorType: IErrorResponse;
   },
   endpoints: () => ({}),
-  tagTypes: [],
+  tagTypes,
 });

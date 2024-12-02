@@ -5,7 +5,6 @@ import { useRef, useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 
 import { useBoolean } from 'src/hooks/use-boolean';
@@ -14,7 +13,6 @@ import { Iconify } from 'src/components/iconify';
 
 import { MediaPanel } from './media-panel';
 import { MediaFileItem } from './media-file-item';
-import { MediaFolderItem } from './media-folder-item';
 import { MediaShareDialog } from './media-share-dialog';
 import { MediaActionSelected } from './media-action-selected';
 import { MediaNewFolderDialog } from './media-new-folder-dialog';
@@ -37,13 +35,7 @@ export function MediaGridView({ table, dataFiltered, onDeleteItem, onOpenConfirm
 
   const upload = useBoolean();
 
-  const folders = useBoolean();
-
-  const newFolder = useBoolean();
-
   const containerRef = useRef(null);
-
-  const [folderName, setFolderName] = useState('');
 
   const [inviteEmail, setInviteEmail] = useState('');
 
@@ -51,49 +43,9 @@ export function MediaGridView({ table, dataFiltered, onDeleteItem, onOpenConfirm
     setInviteEmail(event.target.value);
   }, []);
 
-  const handleChangeFolderName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setFolderName(event.target.value);
-  }, []);
-
   return (
     <>
       <Box ref={containerRef}>
-        <MediaPanel
-          title="Folders"
-          subtitle={`${dataFiltered.filter((item) => item.type === 'folder').length} folders`}
-          onOpen={newFolder.onTrue}
-          collapse={folders.value}
-          onCollapse={folders.onToggle}
-        />
-
-        <Collapse in={!folders.value} unmountOnExit>
-          <Box
-            gap={3}
-            display="grid"
-            gridTemplateColumns={{
-              xs: 'repeat(1, 1fr)',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)',
-              lg: 'repeat(4, 1fr)',
-            }}
-          >
-            {dataFiltered
-              .filter((i) => i.type === 'folder')
-              .map((folder) => (
-                <MediaFolderItem
-                  key={folder.id}
-                  folder={folder}
-                  selected={selected.includes(folder.id)}
-                  onSelect={() => onSelectItem(folder.id)}
-                  onDelete={() => onDeleteItem(folder.id)}
-                  sx={{ maxWidth: 'auto' }}
-                />
-              ))}
-          </Box>
-        </Collapse>
-
-        <Divider sx={{ my: 5, borderStyle: 'dashed' }} />
-
         <MediaPanel
           title="Files"
           subtitle={`${dataFiltered.filter((item) => item.type !== 'folder').length} files`}
@@ -101,7 +53,6 @@ export function MediaGridView({ table, dataFiltered, onDeleteItem, onOpenConfirm
           collapse={files.value}
           onCollapse={files.onToggle}
         />
-
         <Collapse in={!files.value} unmountOnExit>
           <Box
             display="grid"
@@ -127,7 +78,6 @@ export function MediaGridView({ table, dataFiltered, onDeleteItem, onOpenConfirm
               ))}
           </Box>
         </Collapse>
-
         {!!selected?.length && (
           <MediaActionSelected
             numSelected={selected.length}
@@ -178,19 +128,6 @@ export function MediaGridView({ table, dataFiltered, onDeleteItem, onOpenConfirm
       />
 
       <MediaNewFolderDialog open={upload.value} onClose={upload.onFalse} />
-
-      <MediaNewFolderDialog
-        open={newFolder.value}
-        onClose={newFolder.onFalse}
-        title="New Folder"
-        onCreate={() => {
-          newFolder.onFalse();
-          setFolderName('');
-          console.info('CREATE NEW FOLDER', folderName);
-        }}
-        folderName={folderName}
-        onChangeFolderName={handleChangeFolderName}
-      />
     </>
   );
 }

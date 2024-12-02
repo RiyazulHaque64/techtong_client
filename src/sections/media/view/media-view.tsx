@@ -15,6 +15,7 @@ import { fIsAfter, fIsBetween } from 'src/utils/format-time';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import { _allFiles, FILE_TYPE_OPTIONS } from 'src/_mock';
+import { useGetImagesQuery } from 'src/redux/features/image/imageApi';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -33,6 +34,22 @@ import { MediaNewFolderDialog } from '../media-new-folder-dialog';
 
 export function MediaView() {
   const table = useTable({ defaultRowsPerPage: 10 });
+
+  const queryParams = [
+    { name: 'page', value: table.page },
+    { name: 'limit', value: table.rowsPerPage },
+    {
+      name: 'sortBy',
+      value: table.orderBy,
+    },
+    {
+      name: 'sortOrder',
+      value: table.order,
+    },
+  ];
+
+  const { data: images } = useGetImagesQuery(queryParams);
+  console.log(images);
 
   const openDateRange = useBoolean();
 
@@ -144,7 +161,7 @@ export function MediaView() {
     <>
       <DashboardContent>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="h4">File manager</Typography>
+          <Typography variant="h4">Media</Typography>
           <Button
             variant="contained"
             startIcon={<Iconify icon="eva:cloud-upload-fill" />}

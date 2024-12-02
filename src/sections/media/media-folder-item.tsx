@@ -88,7 +88,6 @@ export function MediaFolderItem({ sx, folder, selected, onSelect, onDelete, ...o
           'aria-label': 'Checkbox favorite',
         }}
       />
-
       <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
         <Iconify icon="eva:more-vertical-fill" />
       </IconButton>

@@ -30,11 +30,13 @@ export function Upload({
   onRemoveAll,
   className,
   multiple = false,
+  accept = {},
   ...other
 }: UploadProps) {
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
     multiple,
     disabled,
+    accept,
     ...other,
   });
 

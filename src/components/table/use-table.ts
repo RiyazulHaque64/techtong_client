@@ -20,9 +20,9 @@ export function useTable(props?: UseTableProps): UseTableReturn {
 
   const [page, setPage] = useState(props?.defaultCurrentPage || 0);
 
-  const [orderBy, setOrderBy] = useState(props?.defaultOrderBy || 'name');
-
   const [rowsPerPage, setRowsPerPage] = useState(props?.defaultRowsPerPage || 5);
+
+  const [orderBy, setOrderBy] = useState(props?.defaultOrderBy || 'created_at');
 
   const [order, setOrder] = useState<'asc' | 'desc'>(props?.defaultOrder || 'asc');
 

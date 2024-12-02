@@ -1,6 +1,7 @@
 const features = {
   auth: '/auth',
   user: '/user',
+  image: '/image',
 };
 
 const api_endpoint = {
@@ -11,6 +12,10 @@ const api_endpoint = {
   },
   user: {
     update_profile: `${features.user}/update-profile`,
+  },
+  image: {
+    upload_images: `${features.image}/upload-images`,
+    get_images: `${features.image}`,
   },
 };
 
