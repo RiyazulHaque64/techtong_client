@@ -37,7 +37,6 @@ export type AccountDrawerProps = IconButtonProps & {
 };
 
 export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
-  console.log('In the account drawer');
   const theme = useTheme();
 
   const router = useRouter();

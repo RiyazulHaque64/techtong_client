@@ -1,3 +1,4 @@
+import { CONFIG } from 'src/config-global';
 import { baseApi } from 'src/redux/api/baseApi';
 import api_endpoint from 'src/redux/api/apiEndpoint';
 
@@ -17,7 +18,15 @@ const authApi = baseApi.injectEndpoints({
           const {
             data: { access_token, ...remainingData },
           } = responseData;
-          dispatch(setUser({ token: access_token, user: remainingData }));
+          dispatch(
+            setUser({
+              token: access_token,
+              user: {
+                ...remainingData,
+                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.name}/${remainingData.profile_pic}`,
+              },
+            })
+          );
         } catch (error) {
           console.log(error);
         }
@@ -42,7 +51,15 @@ const authApi = baseApi.injectEndpoints({
           const {
             data: { access_token, ...remainingData },
           } = responseData;
-          dispatch(setUser({ token: access_token, user: remainingData }));
+          dispatch(
+            setUser({
+              token: access_token,
+              user: {
+                ...remainingData,
+                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.name}/${remainingData.profile_pic}`,
+              },
+            })
+          );
         } catch (error) {
           console.log(error);
         }
@@ -58,7 +75,15 @@ const authApi = baseApi.injectEndpoints({
         try {
           const { data: responseData } = await queryFulfilled;
 
-          dispatch(setUser({ token: 'prev', user: responseData.data }));
+          dispatch(
+            setUser({
+              token: 'prev',
+              user: {
+                ...responseData?.data,
+                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.name}/${responseData?.data?.profile_pic}`,
+              },
+            })
+          );
         } catch (error) {
           console.log(error);
         }

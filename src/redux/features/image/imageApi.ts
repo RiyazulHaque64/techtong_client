@@ -1,4 +1,5 @@
-import type { TQueryParam } from 'src/types/common';
+import type { IImage } from 'src/types/image';
+import type { TQueryParam, TReduxResponse } from 'src/redux/interfaces/common';
 
 import { baseApi } from 'src/redux/api/baseApi';
 import api_endpoint from 'src/redux/api/apiEndpoint';
@@ -29,8 +30,33 @@ const authApi = baseApi.injectEndpoints({
         };
       },
       providesTags: [tags.image],
+      transformResponse: (response: TReduxResponse<IImage[]>) => ({
+        data: response.data,
+        meta: response.meta,
+      }),
+    }),
+    deleteImages: builder.mutation({
+      query: (data: { images_path: string[] }) => ({
+        url: api_endpoint.image.delete_image,
+        method: 'DELETE',
+        body: data,
+      }),
+      invalidatesTags: [tags.image],
+    }),
+    updateImage: builder.mutation({
+      query: (paylaod: { data: Record<string, string>; id: string }) => ({
+        url: `${api_endpoint.image.update_image}/${paylaod.id}`,
+        method: 'PATCH',
+        body: paylaod.data,
+      }),
+      invalidatesTags: [tags.image],
     }),
   }),
 });
 
-export const { useUploadImagesMutation, useGetImagesQuery } = authApi;
+export const {
+  useUploadImagesMutation,
+  useGetImagesQuery,
+  useDeleteImagesMutation,
+  useUpdateImageMutation,
+} = authApi;

@@ -1,4 +1,4 @@
-import type { IFile } from 'src/types/file';
+import type { IImage } from 'src/types/image';
 import type { BoxProps } from '@mui/material/Box';
 import type { TableProps } from 'src/components/table';
 
@@ -8,8 +8,7 @@ import Tooltip from '@mui/material/Tooltip';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import TableContainer from '@mui/material/TableContainer';
-import { TableRow, CircularProgress } from '@mui/material';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import { tableCellClasses } from '@mui/material/TableCell';
 import { tablePaginationClasses } from '@mui/material/TablePagination';
 
 import { Iconify } from 'src/components/iconify';
@@ -28,8 +27,8 @@ const TABLE_HEAD = [
   { id: 'path', label: 'Image', width: 90 },
   { id: 'name', label: 'Name' },
   { id: 'size', label: 'Size', width: 120 },
-  { id: 'type', label: 'Type', width: 120 },
-  { id: 'created_at', label: 'Uploaded on', width: 140 },
+  { id: 'type', label: 'Format', width: 120 },
+  { id: 'created_at', label: 'Uploaded on', width: 150 },
   { id: '', width: 88 },
 ];
 
@@ -38,9 +37,10 @@ const TABLE_HEAD = [
 type Props = BoxProps & {
   table: TableProps;
   notFound: boolean;
-  dataFiltered: IFile[];
+  dataFiltered: IImage[];
   onOpenConfirm: () => void;
-  onDeleteRow: (id: string) => void;
+  onDeleteRow: (path: string, close: () => void) => void;
+  deleteLoading: boolean;
 };
 
 export function MediaTable({
@@ -50,6 +50,7 @@ export function MediaTable({
   onDeleteRow,
   dataFiltered,
   onOpenConfirm,
+  deleteLoading,
   ...other
 }: Props) {
   const {
@@ -90,19 +91,11 @@ export function MediaTable({
             )
           }
           action={
-            <>
-              <Tooltip title="Share">
-                <IconButton color="primary">
-                  <Iconify icon="solar:share-bold" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Delete">
-                <IconButton color="primary" onClick={onOpenConfirm}>
-                  <Iconify icon="solar:trash-bin-trash-bold" />
-                </IconButton>
-              </Tooltip>
-            </>
+            <Tooltip title="Delete">
+              <IconButton color="primary" onClick={onOpenConfirm}>
+                <Iconify icon="solar:trash-bin-trash-bold" />
+              </IconButton>
+            </Tooltip>
           }
           sx={{
             pl: 1,
@@ -118,7 +111,7 @@ export function MediaTable({
         <TableContainer sx={{ px: { md: 3 } }}>
           <Table
             size={dense ? 'small' : 'medium'}
-            sx={{ minWidth: 960, borderCollapse: 'separate', borderSpacing: '0 16px' }}
+            sx={{ minWidth: 960, borderCollapse: 'separate', borderSpacing: '0 6px' }}
           >
             <TableHeadCustom
               order={order}
@@ -142,32 +135,16 @@ export function MediaTable({
             />
 
             <TableBody>
-              {dataFiltered?.length ? (
-                dataFiltered.map((row) => (
-                  <MediaTableRow
-                    key={row.id}
-                    row={row}
-                    selected={selected.includes(row.id)}
-                    onSelectRow={() => onSelectRow(row.id)}
-                    onDeleteRow={() => onDeleteRow(row.id)}
-                  />
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} align="center">
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '100px',
-                      }}
-                    >
-                      <CircularProgress />
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              )}
+              {dataFiltered.map((row) => (
+                <MediaTableRow
+                  key={row.id}
+                  row={row}
+                  selected={selected.includes(row.id)}
+                  onSelectRow={() => onSelectRow(row.id)}
+                  onDeleteRow={onDeleteRow}
+                  deleteLoading={deleteLoading}
+                />
+              ))}
               <TableNoData
                 notFound={notFound}
                 sx={{

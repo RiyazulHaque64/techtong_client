@@ -1,9 +1,9 @@
-import type { IFileManager } from 'src/types/file';
+import type { IImage } from 'src/types/image';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 
+import { Button } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
@@ -20,48 +20,39 @@ import { useDoubleClick } from 'src/hooks/use-double-click';
 import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard';
 
 import { fData } from 'src/utils/format-number';
+import { formatFileType } from 'src/utils/helper';
 import { fDate, fTime } from 'src/utils/format-time';
 
+import { CONFIG } from 'src/config-global';
 import { varAlpha } from 'src/theme/styles';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
-import { FileThumbnail } from 'src/components/file-thumbnail';
 import { usePopover, CustomPopover } from 'src/components/custom-popover';
 
-import { MediaShareDialog } from './media-share-dialog';
 import { MediaFileDetails } from './media-file-details';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  row: IFileManager;
+  row: IImage;
   selected: boolean;
   onSelectRow: () => void;
-  onDeleteRow: () => void;
+  onDeleteRow: (path: string, close: () => void) => void;
+  deleteLoading: boolean;
 };
 
-export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow }: Props) {
+export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow, deleteLoading }: Props) {
   const theme = useTheme();
 
   const { copy } = useCopyToClipboard();
 
-  const [inviteEmail, setInviteEmail] = useState('');
-
-  const favorite = useBoolean(row.isFavorited);
-
   const details = useBoolean();
-
-  const share = useBoolean();
 
   const confirm = useBoolean();
 
   const popover = usePopover();
-
-  const handleChangeInvite = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setInviteEmail(event.target.value);
-  }, []);
 
   const handleClick = useDoubleClick({
     click: () => {
@@ -72,8 +63,8 @@ export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow }: Props
 
   const handleCopy = useCallback(() => {
     toast.success('Copied!');
-    copy(row.url);
-  }, [copy, row.url]);
+    copy(`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${row.path}`);
+  }, [copy, row.path]);
 
   const defaultStyles = {
     borderTop: `solid 1px ${varAlpha(theme.vars.palette.grey['500Channel'], 0.16)}`,
@@ -119,7 +110,11 @@ export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow }: Props
 
         <TableCell onClick={handleClick}>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <FileThumbnail file={row.type} />
+            <img
+              src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${row.path}`}
+              alt={row.alt_text || row.name}
+              style={{ borderRadius: '4px' }}
+            />
           </Stack>
         </TableCell>
 
@@ -144,13 +139,13 @@ export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow }: Props
         </TableCell>
 
         <TableCell onClick={handleClick} sx={{ whiteSpace: 'nowrap' }}>
-          {row.type}
+          {formatFileType(row.type)}
         </TableCell>
 
         <TableCell onClick={handleClick} sx={{ whiteSpace: 'nowrap' }}>
           <ListItemText
-            primary={fDate(row.modifiedAt)}
-            secondary={fTime(row.modifiedAt)}
+            primary={fDate(row.created_at)}
+            secondary={fTime(row.created_at)}
             primaryTypographyProps={{ typography: 'body2' }}
             secondaryTypographyProps={{ mt: 0.5, component: 'span', typography: 'caption' }}
           />
@@ -181,13 +176,13 @@ export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow }: Props
           </MenuItem>
 
           <MenuItem
-            onClick={() => {
+            onClick={(e) => {
               popover.onClose();
-              share.onTrue();
+              handleClick(e);
             }}
           >
-            <Iconify icon="solar:share-bold" />
-            Share
+            <Iconify icon="tabler:list-details" />
+            Details
           </MenuItem>
 
           <Divider sx={{ borderStyle: 'dashed' }} />
@@ -207,24 +202,11 @@ export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow }: Props
 
       <MediaFileDetails
         item={row}
-        favorited={favorite.value}
-        onFavorite={favorite.onToggle}
         onCopyLink={handleCopy}
         open={details.value}
         onClose={details.onFalse}
         onDelete={onDeleteRow}
-      />
-
-      <MediaShareDialog
-        open={share.value}
-        shared={row.shared}
-        inviteEmail={inviteEmail}
-        onChangeInvite={handleChangeInvite}
-        onCopyLink={handleCopy}
-        onClose={() => {
-          share.onFalse();
-          setInviteEmail('');
-        }}
+        deleteLoading={deleteLoading}
       />
 
       <ConfirmDialog
@@ -233,8 +215,13 @@ export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow }: Props
         title="Delete"
         content="Are you sure want to delete?"
         action={
-          <Button variant="contained" color="error" onClick={onDeleteRow}>
-            Delete
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => onDeleteRow(row.path, confirm.onFalse)}
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? 'Deleting...' : 'Delete'}
           </Button>
         }
       />

@@ -1,7 +1,7 @@
-import type { IFile } from 'src/types/file';
+import type { IImage } from 'src/types/image';
 import type { TableProps } from 'src/components/table';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,7 +13,6 @@ import { Iconify } from 'src/components/iconify';
 
 import { MediaPanel } from './media-panel';
 import { MediaFileItem } from './media-file-item';
-import { MediaShareDialog } from './media-share-dialog';
 import { MediaActionSelected } from './media-action-selected';
 import { MediaNewFolderDialog } from './media-new-folder-dialog';
 
@@ -21,27 +20,26 @@ import { MediaNewFolderDialog } from './media-new-folder-dialog';
 
 type Props = {
   table: TableProps;
-  dataFiltered: IFile[];
+  dataFiltered: IImage[];
   onOpenConfirm: () => void;
-  onDeleteItem: (id: string) => void;
+  onDeleteItem: (path: string, close: () => void) => void;
+  deleteLoading: boolean;
 };
 
-export function MediaGridView({ table, dataFiltered, onDeleteItem, onOpenConfirm }: Props) {
+export function MediaGridView({
+  table,
+  dataFiltered,
+  onDeleteItem,
+  onOpenConfirm,
+  deleteLoading,
+}: Props) {
   const { selected, onSelectRow: onSelectItem, onSelectAllRows: onSelectAllItems } = table;
-
-  const share = useBoolean();
 
   const files = useBoolean();
 
   const upload = useBoolean();
 
   const containerRef = useRef(null);
-
-  const [inviteEmail, setInviteEmail] = useState('');
-
-  const handleChangeInvite = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setInviteEmail(event.target.value);
-  }, []);
 
   return (
     <>
@@ -72,8 +70,9 @@ export function MediaGridView({ table, dataFiltered, onDeleteItem, onOpenConfirm
                   file={file}
                   selected={selected.includes(file.id)}
                   onSelect={() => onSelectItem(file.id)}
-                  onDelete={() => onDeleteItem(file.id)}
+                  onDelete={onDeleteItem}
                   sx={{ maxWidth: 'auto' }}
+                  deleteLoading={deleteLoading}
                 />
               ))}
           </Box>
@@ -90,43 +89,20 @@ export function MediaGridView({ table, dataFiltered, onDeleteItem, onOpenConfirm
               )
             }
             action={
-              <>
-                <Button
-                  size="small"
-                  color="error"
-                  variant="contained"
-                  startIcon={<Iconify icon="solar:trash-bin-trash-bold" />}
-                  onClick={onOpenConfirm}
-                  sx={{ mr: 1 }}
-                >
-                  Delete
-                </Button>
-
-                <Button
-                  color="primary"
-                  size="small"
-                  variant="contained"
-                  startIcon={<Iconify icon="solar:share-bold" />}
-                  onClick={share.onTrue}
-                >
-                  Share
-                </Button>
-              </>
+              <Button
+                size="small"
+                color="error"
+                variant="contained"
+                startIcon={<Iconify icon="solar:trash-bin-trash-bold" />}
+                onClick={onOpenConfirm}
+                sx={{ mr: 1 }}
+              >
+                Delete
+              </Button>
             }
           />
         )}
       </Box>
-
-      <MediaShareDialog
-        open={share.value}
-        inviteEmail={inviteEmail}
-        onChangeInvite={handleChangeInvite}
-        onClose={() => {
-          share.onFalse();
-          setInviteEmail('');
-        }}
-      />
-
       <MediaNewFolderDialog open={upload.value} onClose={upload.onFalse} />
     </>
   );

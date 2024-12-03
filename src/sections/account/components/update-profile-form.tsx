@@ -76,12 +76,12 @@ export function UpdateProfileForm() {
         formData.append('profile_pic', data.profile_pic);
       }
 
-      const res = await updateProfile(formData).unwrap();
+      const res = await updateProfile(formData);
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
+      } else {
+        toast.success('Profile updated successfully');
       }
-
-      toast.success('Profile updated successfully');
     } catch (error) {
       console.error(error);
     }

@@ -16,6 +16,8 @@ const api_endpoint = {
   image: {
     upload_images: `${features.image}/upload-images`,
     get_images: `${features.image}`,
+    update_image: `${features.image}/update`,
+    delete_image: `${features.image}/delete-images`,
   },
 };
 

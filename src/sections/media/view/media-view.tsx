@@ -1,4 +1,5 @@
 import type { IFile, IFileFilters } from 'src/types/file';
+import type { IErrorResponse } from 'src/redux/interfaces/common';
 
 import { useState, useCallback } from 'react';
 
@@ -15,7 +16,7 @@ import { fIsAfter, fIsBetween } from 'src/utils/format-time';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import { _allFiles, FILE_TYPE_OPTIONS } from 'src/_mock';
-import { useGetImagesQuery } from 'src/redux/features/image/imageApi';
+import { useGetImagesQuery, useDeleteImagesMutation } from 'src/redux/features/image/imageApi';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -33,7 +34,7 @@ import { MediaNewFolderDialog } from '../media-new-folder-dialog';
 // ----------------------------------------------------------------------
 
 export function MediaView() {
-  const table = useTable({ defaultRowsPerPage: 10 });
+  const table = useTable({ defaultRowsPerPage: 10, defaultOrder: 'desc' });
 
   const queryParams = [
     { name: 'page', value: table.page },
@@ -48,8 +49,8 @@ export function MediaView() {
     },
   ];
 
+  const [deleteImages, { isLoading: deleteLoading }] = useDeleteImagesMutation();
   const { data: images } = useGetImagesQuery(queryParams);
-  console.log(images);
 
   const openDateRange = useBoolean();
 
@@ -84,7 +85,7 @@ export function MediaView() {
     filters.state.type.length > 0 ||
     (!!filters.state.startDate && !!filters.state.endDate);
 
-  const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
+  const notFound = (!images?.data?.length && canReset) || !images?.data?.length;
 
   const handleChangeView = useCallback(
     (event: React.MouseEvent<HTMLElement>, newView: string | null) => {
@@ -96,16 +97,20 @@ export function MediaView() {
   );
 
   const handleDeleteItem = useCallback(
-    (id: string) => {
-      const deleteRow = tableData.filter((row) => row.id !== id);
-
-      toast.success('Delete success!');
-
-      setTableData(deleteRow);
-
-      table.onUpdatePageDeleteRow(dataInPage.length);
+    async (path: string, close: () => void) => {
+      try {
+        const res = await deleteImages({ images_path: [path] });
+        if (res?.error) {
+          toast.error((res?.error as IErrorResponse)?.data?.message || 'Failed to delete!');
+        } else {
+          toast.success('Delete success!');
+        }
+        close();
+      } catch (err) {
+        toast.error((typeof err === 'string' ? err : err.message) || 'Failed to delete!');
+      }
     },
-    [dataInPage.length, table, tableData]
+    [deleteImages]
   );
 
   const handleDeleteItems = useCallback(() => {
@@ -184,17 +189,19 @@ export function MediaView() {
             {view === 'list' ? (
               <MediaTable
                 table={table}
-                dataFiltered={dataFiltered}
+                dataFiltered={images?.data}
                 onDeleteRow={handleDeleteItem}
                 notFound={notFound}
                 onOpenConfirm={confirm.onTrue}
+                deleteLoading={deleteLoading}
               />
             ) : (
               <MediaGridView
                 table={table}
-                dataFiltered={dataFiltered}
+                dataFiltered={images?.data}
                 onDeleteItem={handleDeleteItem}
                 onOpenConfirm={confirm.onTrue}
+                deleteLoading={deleteLoading}
               />
             )}
           </>

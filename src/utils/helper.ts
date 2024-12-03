@@ -141,3 +141,8 @@ export const formatRole = (role: string) => {
       return 'USER';
   }
 };
+
+export const formatFileType = (type: string) => {
+  const formattedType = type.split('/')[1];
+  return formattedType;
+};

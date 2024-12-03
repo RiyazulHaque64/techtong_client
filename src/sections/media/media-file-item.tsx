@@ -1,20 +1,18 @@
-import type { IFileManager } from 'src/types/file';
+import type { IImage } from 'src/types/image';
 import type { CardProps } from '@mui/material/Card';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import AvatarGroup, { avatarGroupClasses } from '@mui/material/AvatarGroup';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard';
@@ -22,29 +20,34 @@ import { useCopyToClipboard } from 'src/hooks/use-copy-to-clipboard';
 import { fData } from 'src/utils/format-number';
 import { fDateTime } from 'src/utils/format-time';
 
-import { maxLine } from 'src/theme/styles';
+import { CONFIG } from 'src/config-global';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
-import { FileThumbnail } from 'src/components/file-thumbnail';
 import { usePopover, CustomPopover } from 'src/components/custom-popover';
 
 import { MediaFileDetails } from './media-file-details';
-import { MediaShareDialog } from './media-share-dialog';
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
   selected?: boolean;
-  file: IFileManager;
-  onDelete: () => void;
+  file: IImage;
+  onDelete: (path: string, close: () => void) => void;
   onSelect?: () => void;
+  deleteLoading: boolean;
 };
 
-export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other }: Props) {
-  const share = useBoolean();
-
+export function MediaFileItem({
+  file,
+  selected,
+  onSelect,
+  onDelete,
+  sx,
+  deleteLoading,
+  ...other
+}: Props) {
   const confirm = useBoolean();
 
   const details = useBoolean();
@@ -55,26 +58,23 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
 
   const { copy } = useCopyToClipboard();
 
-  const favorite = useBoolean(file.isFavorited);
-
-  const [inviteEmail, setInviteEmail] = useState('');
-
-  const handleChangeInvite = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setInviteEmail(event.target.value);
-  }, []);
-
   const handleCopy = useCallback(() => {
     toast.success('Copied!');
-    copy(file.url);
-  }, [copy, file.url]);
+    copy(`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${file.path}`);
+  }, [copy, file.path]);
 
-  const renderIcon = (
-    <Box
-      onMouseEnter={checkbox.onTrue}
-      onMouseLeave={checkbox.onFalse}
-      sx={{ display: 'inline-flex', width: 36, height: 36 }}
+  const renderAction = (
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      sx={{ top: 0, right: 0, position: 'absolute', width: '100%', p: 1 }}
     >
-      {(checkbox.value || selected) && onSelect ? (
+      <Box
+        onMouseEnter={checkbox.onTrue}
+        onMouseLeave={checkbox.onFalse}
+        sx={{ display: 'inline-flex', width: 36, height: 36 }}
+      >
         <Checkbox
           checked={selected}
           onClick={onSelect}
@@ -83,23 +83,7 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
           inputProps={{ id: `item-checkbox-${file.id}`, 'aria-label': `Item checkbox` }}
           sx={{ width: 1, height: 1 }}
         />
-      ) : (
-        <FileThumbnail file={file.type} sx={{ width: 1, height: 1 }} />
-      )}
-    </Box>
-  );
-
-  const renderAction = (
-    <Stack direction="row" alignItems="center" sx={{ top: 8, right: 8, position: 'absolute' }}>
-      <Checkbox
-        color="warning"
-        icon={<Iconify icon="eva:star-outline" />}
-        checkedIcon={<Iconify icon="eva:star-fill" />}
-        checked={favorite.value}
-        onChange={favorite.onToggle}
-        inputProps={{ id: `favorite-checkbox-${file.id}`, 'aria-label': `Favorite checkbox` }}
-      />
-
+      </Box>
       <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
         <Iconify icon="eva:more-vertical-fill" />
       </IconButton>
@@ -107,20 +91,18 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
   );
 
   const renderText = (
-    <>
+    <Box sx={{ width: '100%', p: 2 }}>
       <Typography
         variant="subtitle2"
-        onClick={details.onTrue}
-        sx={(theme) => ({
-          ...maxLine({ line: 2, persistent: theme.typography.subtitle2 }),
-          mt: 2,
-          mb: 0.5,
+        sx={{
+          mb: '4px',
           width: 1,
-        })}
+          cursor: 'pointer',
+        }}
+        onClick={details.onTrue}
       >
         {file.name}
       </Typography>
-
       <Stack
         direction="row"
         alignItems="center"
@@ -132,7 +114,6 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
         }}
       >
         {fData(file.size)}
-
         <Box
           component="span"
           sx={{
@@ -145,28 +126,10 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
           }}
         />
         <Typography noWrap component="span" variant="caption">
-          {fDateTime(file.modifiedAt)}
+          {fDateTime(file.created_at)}
         </Typography>
       </Stack>
-    </>
-  );
-
-  const renderAvatar = (
-    <AvatarGroup
-      max={3}
-      sx={{
-        mt: 1,
-        [`& .${avatarGroupClasses.avatar}`]: {
-          width: 24,
-          height: 24,
-          '&:first-of-type': { fontSize: 12 },
-        },
-      }}
-    >
-      {file.shared?.map((person) => (
-        <Avatar key={person.id} alt={person.name} src={person.avatarUrl} />
-      ))}
-    </AvatarGroup>
+    </Box>
   );
 
   return (
@@ -174,10 +137,9 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
       <Paper
         variant="outlined"
         sx={{
-          p: 2.5,
+          p: 0,
           display: 'flex',
-          borderRadius: 2,
-          cursor: 'pointer',
+          borderRadius: '8px',
           position: 'relative',
           bgcolor: 'transparent',
           flexDirection: 'column',
@@ -190,12 +152,21 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
         }}
         {...other}
       >
-        {renderIcon}
-
+        <Box
+          component="img"
+          sx={{
+            display: 'block',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            width: '100%',
+            borderRadius: '8px 8px 0px 0px',
+            height: '250px',
+            objectFit: 'cover',
+          }}
+          src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${file.path}`}
+          alt={file.alt_text || file.name}
+        />
         {renderText}
-
-        {renderAvatar}
-
         {renderAction}
       </Paper>
 
@@ -217,13 +188,13 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
           </MenuItem>
 
           <MenuItem
-            onClick={() => {
+            onClick={(e) => {
               popover.onClose();
-              share.onTrue();
+              details.onTrue();
             }}
           >
-            <Iconify icon="solar:share-bold" />
-            Share
+            <Iconify icon="tabler:list-details" />
+            Details
           </MenuItem>
 
           <Divider sx={{ borderStyle: 'dashed' }} />
@@ -243,27 +214,14 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
 
       <MediaFileDetails
         item={file}
-        favorited={favorite.value}
-        onFavorite={favorite.onToggle}
         onCopyLink={handleCopy}
         open={details.value}
         onClose={details.onFalse}
         onDelete={() => {
           details.onFalse();
-          onDelete();
+          onDelete(file.path, details.onFalse);
         }}
-      />
-
-      <MediaShareDialog
-        open={share.value}
-        shared={file.shared}
-        inviteEmail={inviteEmail}
-        onChangeInvite={handleChangeInvite}
-        onCopyLink={handleCopy}
-        onClose={() => {
-          share.onFalse();
-          setInviteEmail('');
-        }}
+        deleteLoading={deleteLoading}
       />
 
       <ConfirmDialog
@@ -272,8 +230,13 @@ export function MediaFileItem({ file, selected, onSelect, onDelete, sx, ...other
         title="Delete"
         content="Are you sure want to delete?"
         action={
-          <Button variant="contained" color="error" onClick={onDelete}>
-            Delete
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => onDelete(file.path, confirm.onFalse)}
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? 'Deleting...' : 'Delete'}
           </Button>
         }
       />
