@@ -1,9 +1,10 @@
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 
+import { Iconify } from '../iconify';
 import { fileThumbnailClasses } from './classes';
-import { fileData, fileThumb, fileFormat } from './utils';
 import { RemoveButton, DownloadButton } from './action-buttons';
+import { iconSrc, fileData, fileThumb, fileFormat, fileThumbnailIconColor } from './utils';
 
 import type { FileThumbnailProps } from './types';
 
@@ -12,6 +13,7 @@ import type { FileThumbnailProps } from './types';
 export function FileThumbnail({
   sx,
   file,
+  type,
   tooltip,
   onRemove,
   imageView,
@@ -42,12 +44,18 @@ export function FileThumbnail({
   );
 
   const renderIcon = (
-    <Box
-      component="img"
-      src={fileThumb(format)}
-      className={fileThumbnailClasses.icon}
-      sx={{ width: 1, height: 1, ...slotProps?.icon }}
-    />
+    <>
+      {type && type === 'icon' && typeof file === 'string' ? (
+        <Iconify icon={iconSrc(file)} sx={{ color: fileThumbnailIconColor(file) }} />
+      ) : (
+        <Box
+          component="img"
+          src={fileThumb(format)}
+          className={fileThumbnailClasses.icon}
+          sx={{ width: 1, height: 1, ...slotProps?.icon }}
+        />
+      )}
+    </>
   );
 
   const renderContent = (

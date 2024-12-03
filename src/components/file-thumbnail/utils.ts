@@ -154,3 +154,41 @@ export function fileData(file: File | string) {
     lastModifiedDate: (file as ExtendFile).lastModifiedDate,
   };
 }
+
+export function iconSrc(type: string) {
+  switch (type) {
+    case 'image/jpeg':
+      return 'iconoir:jpeg-format';
+    case 'image/webp':
+      return 'iconoir:webp-format';
+    case 'image/png':
+      return 'teenyicons:png-outline';
+    case 'image/gif':
+      return 'teenyicons:gif-outline';
+    case 'image/svg+xml':
+      return 'teenyicons:svg-outline';
+    case 'image/vnd.microsoft.icon':
+      return 'tdesign:file-icon';
+    default:
+      return 'material-symbols:image-outline';
+  }
+}
+
+export function fileThumbnailIconColor(type: string) {
+  switch (type) {
+    case 'image/jpeg':
+      return '#ee233e';
+    case 'image/webp':
+      return '#088EFF';
+    case 'image/png':
+      return '#60D150';
+    case 'image/gif':
+      return '#A053DF';
+    case 'image/svg+xml':
+      return '#0BAC';
+    case 'image/vnd.microsoft.icon':
+      return '#EE714A';
+    default:
+      return '#000000';
+  }
+}

@@ -1,4 +1,4 @@
-import type { IFileFilters } from 'src/types/file';
+import type { IImageFilters } from 'src/types/file';
 import type { Theme, SxProps } from '@mui/material/styles';
 import type { UseSetStateReturn } from 'src/hooks/use-set-state';
 
@@ -16,13 +16,13 @@ type Props = {
   totalResults: number;
   sx?: SxProps<Theme>;
   onResetPage: () => void;
-  filters: UseSetStateReturn<IFileFilters>;
+  filters: UseSetStateReturn<IImageFilters>;
 };
 
 export function MediaFiltersResult({ filters, onResetPage, totalResults, sx }: Props) {
   const handleRemoveKeyword = useCallback(() => {
     onResetPage();
-    filters.setState({ name: '' });
+    filters.setState({ searchTerm: '' });
   }, [filters, onResetPage]);
 
   const handleRemoveTypes = useCallback(
@@ -37,7 +37,7 @@ export function MediaFiltersResult({ filters, onResetPage, totalResults, sx }: P
 
   const handleRemoveDate = useCallback(() => {
     onResetPage();
-    filters.setState({ startDate: null, endDate: null });
+    filters.setState({ fromDate: null, toDate: null });
   }, [filters, onResetPage]);
 
   const handleReset = useCallback(() => {
@@ -59,19 +59,16 @@ export function MediaFiltersResult({ filters, onResetPage, totalResults, sx }: P
         ))}
       </FiltersBlock>
 
-      <FiltersBlock
-        label="Date:"
-        isShow={Boolean(filters.state.startDate && filters.state.endDate)}
-      >
+      <FiltersBlock label="Date:" isShow={Boolean(filters.state.fromDate && filters.state.toDate)}>
         <Chip
           {...chipProps}
-          label={fDateRangeShortLabel(filters.state.startDate, filters.state.endDate)}
+          label={fDateRangeShortLabel(filters.state.fromDate, filters.state.toDate)}
           onDelete={handleRemoveDate}
         />
       </FiltersBlock>
 
-      <FiltersBlock label="Keyword:" isShow={!!filters.state.name}>
-        <Chip {...chipProps} label={filters.state.name} onDelete={handleRemoveKeyword} />
+      <FiltersBlock label="Keyword:" isShow={!!filters.state.searchTerm}>
+        <Chip {...chipProps} label={filters.state.searchTerm} onDelete={handleRemoveKeyword} />
       </FiltersBlock>
     </FiltersResult>
   );

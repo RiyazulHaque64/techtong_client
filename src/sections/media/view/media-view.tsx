@@ -1,7 +1,7 @@
-import type { IFile, IFileFilters } from 'src/types/file';
+import type { IFile, IImageFilters } from 'src/types/file';
 import type { IErrorResponse } from 'src/redux/interfaces/common';
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -12,23 +12,23 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useSetState } from 'src/hooks/use-set-state';
 
-import { fIsAfter, fIsBetween } from 'src/utils/format-time';
+import { fIsAfter } from 'src/utils/format-time';
 
+import { _allFiles } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { _allFiles, FILE_TYPE_OPTIONS } from 'src/_mock';
 import { useGetImagesQuery, useDeleteImagesMutation } from 'src/redux/features/image/imageApi';
 
 import { toast } from 'src/components/snackbar';
+import { useTable } from 'src/components/table';
 import { Iconify } from 'src/components/iconify';
-import { fileFormat } from 'src/components/file-thumbnail';
 import { EmptyContent } from 'src/components/empty-content';
 import { ConfirmDialog } from 'src/components/custom-dialog';
-import { useTable, rowInPage, getComparator } from 'src/components/table';
 
 import { MediaTable } from '../media-table';
 import { MediaFilters } from '../media-filters';
 import { MediaGridView } from '../media-grid-view';
 import { MediaFiltersResult } from '../media-filters-result';
+import { MEDIA_FILTER_OPTIONS } from '../media-filters-options';
 import { MediaNewFolderDialog } from '../media-new-folder-dialog';
 
 // ----------------------------------------------------------------------
@@ -62,31 +62,25 @@ export function MediaView() {
 
   const [tableData, setTableData] = useState<IFile[]>(_allFiles);
 
-  const filters = useSetState<IFileFilters>({
-    name: '',
+  const filters = useSetState<IImageFilters>({
+    searchTerm: '',
     type: [],
-    startDate: null,
-    endDate: null,
+    fromDate: null,
+    toDate: null,
   });
 
-  const dateError = fIsAfter(filters.state.startDate, filters.state.endDate);
+  console.log(filters.state);
 
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(table.order, table.orderBy),
-    filters: filters.state,
-    dateError,
-  });
-
-  const dataInPage = rowInPage(dataFiltered, table.page, table.rowsPerPage);
+  const dateError = fIsAfter(filters.state.fromDate, filters.state.toDate);
 
   const canReset =
-    !!filters.state.name ||
+    !!filters.state.searchTerm ||
     filters.state.type.length > 0 ||
-    (!!filters.state.startDate && !!filters.state.endDate);
+    (!!filters.state.fromDate && !!filters.state.toDate);
 
   const notFound = (!images?.data?.length && canReset) || !images?.data?.length;
 
+  // Handler
   const handleChangeView = useCallback(
     (event: React.MouseEvent<HTMLElement>, newView: string | null) => {
       if (newView !== null) {
@@ -119,13 +113,12 @@ export function MediaView() {
     toast.success('Delete success!');
 
     setTableData(deleteRows);
+  }, [table.selected, tableData]);
 
-    table.onUpdatePageDeleteRows({
-      totalRowsInPage: dataInPage.length,
-      totalRowsFiltered: dataFiltered.length,
-    });
-  }, [dataFiltered.length, dataInPage.length, table, tableData]);
+  // Effect
+  useEffect(() => {}, []);
 
+  // JSX
   const renderFilters = (
     <Stack
       spacing={2}
@@ -139,7 +132,7 @@ export function MediaView() {
         openDateRange={openDateRange.value}
         onOpenDateRange={openDateRange.onTrue}
         onCloseDateRange={openDateRange.onFalse}
-        options={{ types: FILE_TYPE_OPTIONS }}
+        options={{ types: MEDIA_FILTER_OPTIONS }}
       />
 
       <ToggleButtonGroup size="small" value={view} exclusive onChange={handleChangeView}>
@@ -155,11 +148,7 @@ export function MediaView() {
   );
 
   const renderResults = (
-    <MediaFiltersResult
-      filters={filters}
-      totalResults={dataFiltered.length}
-      onResetPage={table.onResetPage}
-    />
+    <MediaFiltersResult filters={filters} totalResults={2} onResetPage={table.onResetPage} />
   );
 
   return (
@@ -234,45 +223,4 @@ export function MediaView() {
       />
     </>
   );
-}
-
-// ----------------------------------------------------------------------
-
-type ApplyFilterProps = {
-  dateError: boolean;
-  inputData: IFile[];
-  filters: IFileFilters;
-  comparator: (a: any, b: any) => number;
-};
-
-function applyFilter({ inputData, comparator, filters, dateError }: ApplyFilterProps) {
-  const { name, type, startDate, endDate } = filters;
-
-  const stabilizedThis = inputData.map((el, index) => [el, index] as const);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
-
-  if (name) {
-    inputData = inputData.filter(
-      (file) => file.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
-    );
-  }
-
-  if (type.length) {
-    inputData = inputData.filter((file) => type.includes(fileFormat(file.type)));
-  }
-
-  if (!dateError) {
-    if (startDate && endDate) {
-      inputData = inputData.filter((file) => fIsBetween(file.createdAt, startDate, endDate));
-    }
-  }
-
-  return inputData;
 }

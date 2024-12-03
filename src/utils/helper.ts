@@ -143,6 +143,16 @@ export const formatRole = (role: string) => {
 };
 
 export const formatFileType = (type: string) => {
-  const formattedType = type.split('/')[1];
+  let formattedType = type.split('/')[1];
+  switch (formattedType) {
+    case 'vnd.microsoft.icon':
+      formattedType = 'ico';
+      break;
+    case 'svg+xml':
+      formattedType = 'svg';
+      break;
+    default:
+      break;
+  }
   return formattedType;
 };

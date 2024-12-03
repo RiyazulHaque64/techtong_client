@@ -1,4 +1,4 @@
-import type { IFileFilters } from 'src/types/file';
+import type { IImageFilters } from 'src/types/file';
 import type { IDatePickerControl } from 'src/types/common';
 import type { UseSetStateReturn } from 'src/hooks/use-set-state';
 
@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField';
 import CardActionArea from '@mui/material/CardActionArea';
 import InputAdornment from '@mui/material/InputAdornment';
 
+import { formatFileType } from 'src/utils/helper';
 import { fDateRangeShortLabel } from 'src/utils/format-time';
 
 import { varAlpha } from 'src/theme/styles';
@@ -29,7 +30,7 @@ type Props = {
   onResetPage: () => void;
   onOpenDateRange: () => void;
   onCloseDateRange: () => void;
-  filters: UseSetStateReturn<IFileFilters>;
+  filters: UseSetStateReturn<IImageFilters>;
   options: {
     types: string[];
   };
@@ -53,7 +54,7 @@ export function MediaFilters({
   const handleFilterName = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onResetPage();
-      filters.setState({ name: event.target.value });
+      filters.setState({ searchTerm: event.target.value });
     },
     [filters, onResetPage]
   );
@@ -61,14 +62,14 @@ export function MediaFilters({
   const handleFilterStartDate = useCallback(
     (newValue: IDatePickerControl) => {
       onResetPage();
-      filters.setState({ startDate: newValue });
+      filters.setState({ fromDate: newValue });
     },
     [filters, onResetPage]
   );
 
   const handleFilterEndDate = useCallback(
     (newValue: IDatePickerControl) => {
-      filters.setState({ endDate: newValue });
+      filters.setState({ toDate: newValue });
     },
     [filters]
   );
@@ -91,7 +92,7 @@ export function MediaFilters({
 
   const renderFilterName = (
     <TextField
-      value={filters.state.name}
+      value={filters.state.searchTerm}
       onChange={handleFilterName}
       placeholder="Search..."
       InputProps={{
@@ -163,8 +164,8 @@ export function MediaFilters({
                       ...(selected && { fontWeight: 'fontWeightSemiBold' }),
                     }}
                   >
-                    <FileThumbnail file={type} sx={{ width: 24, height: 24 }} />
-                    {type}
+                    <FileThumbnail file={type} sx={{ width: 24, height: 24 }} type="icon" />
+                    {formatFileType(type)}
                   </Stack>
                 </CardActionArea>
               );
@@ -197,20 +198,20 @@ export function MediaFilters({
           />
         }
       >
-        {!!filters.state.startDate && !!filters.state.endDate
-          ? fDateRangeShortLabel(filters.state.startDate, filters.state.endDate)
+        {!!filters.state.fromDate && !!filters.state.toDate
+          ? fDateRangeShortLabel(filters.state.fromDate, filters.state.toDate)
           : 'Select date'}
       </Button>
 
       <CustomDateRangePicker
         variant="calendar"
-        startDate={filters.state.startDate}
-        endDate={filters.state.endDate}
+        startDate={filters.state.fromDate}
+        endDate={filters.state.toDate}
         onChangeStartDate={handleFilterStartDate}
         onChangeEndDate={handleFilterEndDate}
         open={openDateRange}
         onClose={onCloseDateRange}
-        selected={!!filters.state.startDate && !!filters.state.endDate}
+        selected={!!filters.state.fromDate && !!filters.state.toDate}
         error={dateError}
       />
     </>
@@ -224,7 +225,6 @@ export function MediaFilters({
       sx={{ width: 1 }}
     >
       {renderFilterName}
-
       <Stack spacing={1} direction="row" alignItems="center" justifyContent="flex-end" flexGrow={1}>
         {renderFilterDate}
 

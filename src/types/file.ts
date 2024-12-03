@@ -2,11 +2,11 @@ import type { IDateValue, IDatePickerControl } from './common';
 
 // ----------------------------------------------------------------------
 
-export type IFileFilters = {
-  name: string;
+export type IImageFilters = {
+  searchTerm: string;
   type: string[];
-  startDate: IDatePickerControl;
-  endDate: IDatePickerControl;
+  fromDate: IDatePickerControl;
+  toDate: IDatePickerControl;
 };
 
 export type IFileShared = {

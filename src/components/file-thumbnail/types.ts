@@ -12,6 +12,7 @@ export interface ExtendFile extends File {
 export type FileThumbnailProps = BoxProps & {
   tooltip?: boolean;
   file: File | string;
+  type?: 'icon' | undefined | null;
   imageView?: boolean;
   sx?: SxProps<Theme>;
   onDownload?: () => void;
