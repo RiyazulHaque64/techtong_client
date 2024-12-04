@@ -157,17 +157,17 @@ export function fileData(file: File | string) {
 
 export function iconSrc(type: string) {
   switch (type) {
-    case 'image/jpeg':
+    case 'jpeg':
       return 'iconoir:jpeg-format';
-    case 'image/webp':
+    case 'webp':
       return 'iconoir:webp-format';
-    case 'image/png':
+    case 'png':
       return 'teenyicons:png-outline';
-    case 'image/gif':
+    case 'gif':
       return 'teenyicons:gif-outline';
-    case 'image/svg+xml':
+    case 'svg':
       return 'teenyicons:svg-outline';
-    case 'image/vnd.microsoft.icon':
+    case 'ico':
       return 'tdesign:file-icon';
     default:
       return 'material-symbols:image-outline';
@@ -176,17 +176,17 @@ export function iconSrc(type: string) {
 
 export function fileThumbnailIconColor(type: string) {
   switch (type) {
-    case 'image/jpeg':
+    case 'jpeg':
       return '#ee233e';
-    case 'image/webp':
+    case 'webp':
       return '#088EFF';
-    case 'image/png':
+    case 'png':
       return '#60D150';
-    case 'image/gif':
+    case 'gif':
       return '#A053DF';
-    case 'image/svg+xml':
+    case 'svg':
       return '#0BAC';
-    case 'image/vnd.microsoft.icon':
+    case 'ico':
       return '#EE714A';
     default:
       return '#000000';

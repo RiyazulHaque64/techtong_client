@@ -27,7 +27,7 @@ export type UseDateRangePickerReturn = {
 };
 
 export type UseDatePickerReturn = {
-  date: IDatePickerControl;
+  date: IDatePickerControl | null;
   onChangeDate: (newValue: IDatePickerControl) => void;
   //
   open: boolean;

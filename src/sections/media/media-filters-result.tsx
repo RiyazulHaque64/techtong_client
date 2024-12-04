@@ -1,12 +1,12 @@
-import type { IImageFilters } from 'src/types/file';
+import type { Dispatch, SetStateAction } from 'react';
 import type { Theme, SxProps } from '@mui/material/styles';
-import type { UseSetStateReturn } from 'src/hooks/use-set-state';
+import type { TQueryParam } from 'src/redux/interfaces/common';
 
 import { useCallback } from 'react';
 
 import Chip from '@mui/material/Chip';
 
-import { fDateRangeShortLabel } from 'src/utils/format-time';
+import { fDate } from 'src/utils/format-time';
 
 import { chipProps, FiltersBlock, FiltersResult } from 'src/components/filters-result';
 
@@ -16,39 +16,61 @@ type Props = {
   totalResults: number;
   sx?: SxProps<Theme>;
   onResetPage: () => void;
-  filters: UseSetStateReturn<IImageFilters>;
+  types: string[];
+  setTypes: Dispatch<SetStateAction<string[]>>;
+  queryParams: TQueryParam[];
+  setQueryparams: Dispatch<SetStateAction<TQueryParam[]>>;
+  searchText: string;
+  setSearchText: Dispatch<SetStateAction<string>>;
 };
 
-export function MediaFiltersResult({ filters, onResetPage, totalResults, sx }: Props) {
-  const handleRemoveKeyword = useCallback(() => {
+export function MediaFiltersResult({
+  types,
+  setTypes,
+  queryParams,
+  setQueryparams,
+  searchText,
+  onResetPage,
+  totalResults,
+  setSearchText,
+  sx,
+}: Props) {
+  const handleRemoveSearch = useCallback(() => {
     onResetPage();
-    filters.setState({ searchTerm: '' });
-  }, [filters, onResetPage]);
+    setSearchText('');
+  }, [onResetPage, setSearchText]);
 
   const handleRemoveTypes = useCallback(
     (inputValue: string) => {
-      const newValue = filters.state.type.filter((item) => item !== inputValue);
-
       onResetPage();
-      filters.setState({ type: newValue });
+      setTypes((prev) => prev.filter((item) => item !== inputValue));
     },
-    [filters, onResetPage]
+    [setTypes, onResetPage]
   );
 
-  const handleRemoveDate = useCallback(() => {
+  const handleRemoveFromDate = useCallback(() => {
     onResetPage();
-    filters.setState({ fromDate: null, toDate: null });
-  }, [filters, onResetPage]);
+    setQueryparams((prev) => prev.filter((param) => param.name !== 'fromDate'));
+  }, [setQueryparams, onResetPage]);
+
+  const handleRemoveToDate = useCallback(() => {
+    onResetPage();
+    setQueryparams((prev) => prev.filter((param) => param.name !== 'toDate'));
+  }, [setQueryparams, onResetPage]);
 
   const handleReset = useCallback(() => {
     onResetPage();
-    filters.onResetState();
-  }, [filters, onResetPage]);
+    setSearchText('');
+    setTypes([]);
+    setQueryparams((prev) =>
+      prev.filter((param) => param.name !== 'fromDate' && param.name !== 'toDate')
+    );
+  }, [setSearchText, setTypes, setQueryparams, onResetPage]);
 
   return (
     <FiltersResult totalResults={totalResults} onReset={handleReset} sx={sx}>
-      <FiltersBlock label="Types:" isShow={!!filters.state.type.length}>
-        {filters.state.type.map((item) => (
+      <FiltersBlock label="Types:" isShow={!!types.length}>
+        {types.map((item) => (
           <Chip
             {...chipProps}
             key={item}
@@ -59,16 +81,30 @@ export function MediaFiltersResult({ filters, onResetPage, totalResults, sx }: P
         ))}
       </FiltersBlock>
 
-      <FiltersBlock label="Date:" isShow={Boolean(filters.state.fromDate && filters.state.toDate)}>
+      <FiltersBlock
+        label="From:"
+        isShow={!!queryParams.find((param) => param.name === 'fromDate')?.value}
+      >
         <Chip
           {...chipProps}
-          label={fDateRangeShortLabel(filters.state.fromDate, filters.state.toDate)}
-          onDelete={handleRemoveDate}
+          label={fDate(queryParams.find((param) => param.name === 'fromDate')?.value)}
+          onDelete={handleRemoveFromDate}
         />
       </FiltersBlock>
 
-      <FiltersBlock label="Keyword:" isShow={!!filters.state.searchTerm}>
-        <Chip {...chipProps} label={filters.state.searchTerm} onDelete={handleRemoveKeyword} />
+      <FiltersBlock
+        label="To:"
+        isShow={!!queryParams.find((param) => param.name === 'toDate')?.value}
+      >
+        <Chip
+          {...chipProps}
+          label={fDate(queryParams.find((param) => param.name === 'toDate')?.value)}
+          onDelete={handleRemoveToDate}
+        />
+      </FiltersBlock>
+
+      <FiltersBlock label="Keyword:" isShow={!!searchText}>
+        <Chip {...chipProps} label={searchText} onDelete={handleRemoveSearch} />
       </FiltersBlock>
     </FiltersResult>
   );

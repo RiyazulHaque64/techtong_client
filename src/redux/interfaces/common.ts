@@ -1,12 +1,14 @@
 import type { BaseQueryApi } from '@reduxjs/toolkit/query';
 
+export type TErrorData = {
+  success: boolean;
+  message: string;
+  errorSources: { path: string; message: string }[];
+};
+
 export interface IErrorResponse {
   status: number;
-  data: {
-    success: boolean;
-    message: string;
-    errorSources: { path: string; message: string }[];
-  };
+  data: TErrorData;
 }
 
 export type TQueryParam = {

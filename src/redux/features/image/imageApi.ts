@@ -1,5 +1,5 @@
 import type { IImage } from 'src/types/image';
-import type { TQueryParam, TReduxResponse } from 'src/redux/interfaces/common';
+import type { TMeta, TQueryParam, TReduxResponse } from 'src/redux/interfaces/common';
 
 import { baseApi } from 'src/redux/api/baseApi';
 import api_endpoint from 'src/redux/api/apiEndpoint';
@@ -32,7 +32,7 @@ const authApi = baseApi.injectEndpoints({
       providesTags: [tags.image],
       transformResponse: (response: TReduxResponse<IImage[]>) => ({
         data: response.data,
-        meta: response.meta,
+        meta: response.meta as TMeta,
       }),
     }),
     deleteImages: builder.mutation({

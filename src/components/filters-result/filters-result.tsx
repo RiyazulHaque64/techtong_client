@@ -24,9 +24,9 @@ export function FiltersResult({ totalResults, onReset, sx, children }: FiltersRe
   return (
     <Box sx={sx}>
       <Box sx={{ mb: 1.5, typography: 'body2' }}>
-        <strong>{totalResults}</strong>
+        <strong>{totalResults !== 0 && totalResults}</strong>
         <Box component="span" sx={{ color: 'text.secondary', ml: 0.25 }}>
-          results found
+          {`${totalResults === 0 ? 'No result' : totalResults === 0 ? 'result' : 'results'} found`}
         </Box>
       </Box>
 

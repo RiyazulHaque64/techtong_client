@@ -1,6 +1,7 @@
 import type { IImage } from 'src/types/image';
 import type { BoxProps } from '@mui/material/Box';
 import type { TableProps } from 'src/components/table';
+import type { TMeta } from 'src/redux/interfaces/common';
 
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -35,6 +36,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 type Props = BoxProps & {
+  meta: TMeta;
   table: TableProps;
   notFound: boolean;
   dataFiltered: IImage[];
@@ -44,6 +46,7 @@ type Props = BoxProps & {
 };
 
 export function MediaTable({
+  meta,
   sx,
   table,
   notFound,
@@ -58,7 +61,6 @@ export function MediaTable({
     page,
     order,
     orderBy,
-    rowsPerPage,
     //
     selected,
     onSelectRow,
@@ -123,7 +125,7 @@ export function MediaTable({
               onSelectAllRows={(checked) =>
                 onSelectAllRows(
                   checked,
-                  dataFiltered.map((row) => row.id)
+                  dataFiltered.map((row) => row.path)
                 )
               }
               sx={{
@@ -139,8 +141,8 @@ export function MediaTable({
                 <MediaTableRow
                   key={row.id}
                   row={row}
-                  selected={selected.includes(row.id)}
-                  onSelectRow={() => onSelectRow(row.id)}
+                  selected={selected.includes(row.path)}
+                  onSelectRow={() => onSelectRow(row.path)}
                   onDeleteRow={onDeleteRow}
                   deleteLoading={deleteLoading}
                 />
@@ -161,8 +163,8 @@ export function MediaTable({
       <TablePaginationCustom
         page={page}
         dense={dense}
-        rowsPerPage={rowsPerPage}
-        count={dataFiltered.length}
+        rowsPerPage={meta.limit}
+        count={meta.total}
         onPageChange={onChangePage}
         onChangeDense={onChangeDense}
         onRowsPerPageChange={onChangeRowsPerPage}
