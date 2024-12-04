@@ -1,7 +1,7 @@
 import type { IFile, IImageFilters } from 'src/types/file';
-import type { IErrorResponse } from 'src/redux/interfaces/common';
+import type { TQueryParam, IErrorResponse } from 'src/redux/interfaces/common';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -10,9 +10,8 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 import { useBoolean } from 'src/hooks/use-boolean';
+import { useDebounce } from 'src/hooks/use-debounce';
 import { useSetState } from 'src/hooks/use-set-state';
-
-import { fIsAfter } from 'src/utils/format-time';
 
 import { _allFiles } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -35,8 +34,15 @@ import { MediaNewFolderDialog } from '../media-new-folder-dialog';
 
 export function MediaView() {
   const table = useTable({ defaultRowsPerPage: 10, defaultOrder: 'desc' });
+  const filters = useSetState<IImageFilters>({
+    searchTerm: '',
+    type: [],
+    fromDate: null,
+    toDate: null,
+  });
+  const searchTerm = useDebounce(filters.state.searchTerm, 500);
 
-  const queryParams = [
+  const [queryParams, setQueryParams] = useState<TQueryParam[]>([
     { name: 'page', value: table.page },
     { name: 'limit', value: table.rowsPerPage },
     {
@@ -47,12 +53,17 @@ export function MediaView() {
       name: 'sortOrder',
       value: table.order,
     },
-  ];
+  ]);
+
+  console.log(queryParams);
 
   const [deleteImages, { isLoading: deleteLoading }] = useDeleteImagesMutation();
-  const { data: images } = useGetImagesQuery(queryParams);
+  const { data: images } = useGetImagesQuery([...queryParams]);
 
-  const openDateRange = useBoolean();
+  console.log(images?.data);
+
+  const openFromDate = useBoolean();
+  const openToDate = useBoolean();
 
   const confirm = useBoolean();
 
@@ -61,17 +72,6 @@ export function MediaView() {
   const [view, setView] = useState('list');
 
   const [tableData, setTableData] = useState<IFile[]>(_allFiles);
-
-  const filters = useSetState<IImageFilters>({
-    searchTerm: '',
-    type: [],
-    fromDate: null,
-    toDate: null,
-  });
-
-  console.log(filters.state);
-
-  const dateError = fIsAfter(filters.state.fromDate, filters.state.toDate);
 
   const canReset =
     !!filters.state.searchTerm ||
@@ -116,7 +116,12 @@ export function MediaView() {
   }, [table.selected, tableData]);
 
   // Effect
-  useEffect(() => {}, []);
+  // useEffect(() => {
+  //   if (filters.state?.fromDate) {
+
+  //     setQueryParams((prev) => [...prev, { name: 'searchTerm', value: filters.state.searchTerm }]);
+  //   }
+  // }, [filters.state.fromDate]);
 
   // JSX
   const renderFilters = (
@@ -126,12 +131,15 @@ export function MediaView() {
       alignItems={{ xs: 'flex-end', md: 'center' }}
     >
       <MediaFilters
+        setQueryparams={setQueryParams}
         filters={filters}
-        dateError={dateError}
         onResetPage={table.onResetPage}
-        openDateRange={openDateRange.value}
-        onOpenDateRange={openDateRange.onTrue}
-        onCloseDateRange={openDateRange.onFalse}
+        openFromDate={openFromDate.value}
+        onOpenFromDate={openFromDate.onTrue}
+        onCloseFromDate={openFromDate.onFalse}
+        openToDate={openToDate.value}
+        onOpenToDate={openToDate.onTrue}
+        onCloseToDate={openToDate.onFalse}
         options={{ types: MEDIA_FILTER_OPTIONS }}
       />
 

@@ -1,8 +1,10 @@
 import type { IImageFilters } from 'src/types/file';
+import type { Dispatch, SetStateAction } from 'react';
 import type { IDatePickerControl } from 'src/types/common';
+import type { TQueryParam } from 'src/redux/interfaces/common';
 import type { UseSetStateReturn } from 'src/hooks/use-set-state';
 
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -12,7 +14,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { formatFileType } from 'src/utils/helper';
-import { fDateRangeShortLabel } from 'src/utils/format-time';
+import { fDate, fIsAfter, fDateTime } from 'src/utils/format-time';
 
 import { varAlpha } from 'src/theme/styles';
 
@@ -20,37 +22,48 @@ import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 import { FileThumbnail } from 'src/components/file-thumbnail';
 import { usePopover, CustomPopover } from 'src/components/custom-popover';
-import { CustomDateRangePicker } from 'src/components/custom-date-range-picker';
+import { CustomDatePicker } from 'src/components/custom-date-picker/custom-date-picker';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  dateError: boolean;
-  openDateRange: boolean;
   onResetPage: () => void;
-  onOpenDateRange: () => void;
-  onCloseDateRange: () => void;
+  openFromDate: boolean;
+  onOpenFromDate: () => void;
+  onCloseFromDate: () => void;
+  openToDate: boolean;
+  onOpenToDate: () => void;
+  onCloseToDate: () => void;
   filters: UseSetStateReturn<IImageFilters>;
   options: {
     types: string[];
   };
+  setQueryparams: Dispatch<SetStateAction<TQueryParam[]>>;
 };
 
 export function MediaFilters({
   filters,
   options,
-  dateError,
   onResetPage,
-  openDateRange,
-  onOpenDateRange,
-  onCloseDateRange,
+  setQueryparams,
+  openFromDate,
+  onOpenFromDate,
+  onCloseFromDate,
+  openToDate,
+  onOpenToDate,
+  onCloseToDate,
 }: Props) {
   const popover = usePopover();
+
+  const [fromDate, setFromDate] = useState<IDatePickerControl | null>(null);
+  const [toDate, setToDate] = useState<IDatePickerControl | null>(null);
+  const [dateError, setDateError] = useState<string>('');
 
   const renderLabel = filters.state.type.length
     ? filters.state.type.slice(0, 2).join(',')
     : 'All type';
 
+  // Handler
   const handleFilterName = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onResetPage();
@@ -59,19 +72,44 @@ export function MediaFilters({
     [filters, onResetPage]
   );
 
-  const handleFilterStartDate = useCallback(
+  const handleFromDate = useCallback(
     (newValue: IDatePickerControl) => {
-      onResetPage();
-      filters.setState({ fromDate: newValue });
+      if (fIsAfter(newValue, new Date())) {
+        setDateError('From date not be later than today');
+      } else if (toDate && fIsAfter(newValue, toDate)) {
+        setDateError('From date must be before than to date');
+      } else {
+        setFromDate(newValue);
+        onResetPage();
+        const from_date = fDateTime(newValue, 'YYYY-MM-DD') as string;
+        setQueryparams((prev) => {
+          const othersQueries = prev.filter((query) => query.name !== 'fromDate');
+          return [...othersQueries, { name: 'fromDate', value: from_date }];
+        });
+        onCloseFromDate();
+        setDateError('');
+      }
     },
-    [filters, onResetPage]
+    [onResetPage, setQueryparams, onCloseFromDate, toDate]
   );
 
-  const handleFilterEndDate = useCallback(
+  const handleToDate = useCallback(
     (newValue: IDatePickerControl) => {
-      filters.setState({ toDate: newValue });
+      if (fromDate && fIsAfter(fromDate, newValue)) {
+        setDateError('To date must be later than start date');
+      } else {
+        setToDate(newValue);
+        onResetPage();
+        const to_date = fDateTime(newValue, 'YYYY-MM-DD') as string;
+        setQueryparams((prev) => {
+          const othersQueries = prev.filter((query) => query.name !== 'toDate');
+          return [...othersQueries, { name: 'toDate', value: to_date }];
+        });
+        onCloseToDate();
+        setDateError('');
+      }
     },
-    [filters]
+    [onResetPage, setQueryparams, onCloseToDate, fromDate]
   );
 
   const handleFilterType = useCallback(
@@ -90,6 +128,7 @@ export function MediaFilters({
     filters.setState({ type: [] });
   }, [filters, popover]);
 
+  // JSX
   const renderFilterName = (
     <TextField
       value={filters.state.searchTerm}
@@ -104,6 +143,66 @@ export function MediaFilters({
       }}
       sx={{ width: { xs: 1, md: 260 } }}
     />
+  );
+
+  const renderFromDate = (
+    <>
+      <Button
+        color="inherit"
+        onClick={() => {
+          setDateError('');
+          onOpenFromDate();
+        }}
+        endIcon={
+          <Iconify
+            icon={openFromDate ? 'eva:arrow-ios-upward-fill' : 'eva:arrow-ios-downward-fill'}
+            sx={{ ml: -0.5 }}
+          />
+        }
+      >
+        {fromDate ? fDate(fromDate) : 'From date'}
+      </Button>
+
+      <CustomDatePicker
+        title="Select from date"
+        date={fromDate}
+        onChangeDate={handleFromDate}
+        open={openFromDate}
+        onClose={onCloseFromDate}
+        selected={!!fromDate}
+        error={dateError}
+      />
+    </>
+  );
+
+  const renderToDate = (
+    <>
+      <Button
+        color="inherit"
+        onClick={() => {
+          setDateError('');
+          onOpenToDate();
+        }}
+        endIcon={
+          <Iconify
+            icon={openFromDate ? 'eva:arrow-ios-upward-fill' : 'eva:arrow-ios-downward-fill'}
+            sx={{ ml: -0.5 }}
+          />
+        }
+      >
+        {toDate ? fDate(toDate) : 'To date'}
+      </Button>
+
+      <CustomDatePicker
+        title="Select to date"
+        date={toDate}
+        onChangeDate={handleToDate}
+        open={openToDate}
+        onClose={onCloseToDate}
+        selected={!!toDate}
+        error={dateError}
+      />
+    </>
   );
 
   const renderFilterType = (
@@ -186,37 +285,6 @@ export function MediaFilters({
     </>
   );
 
-  const renderFilterDate = (
-    <>
-      <Button
-        color="inherit"
-        onClick={onOpenDateRange}
-        endIcon={
-          <Iconify
-            icon={openDateRange ? 'eva:arrow-ios-upward-fill' : 'eva:arrow-ios-downward-fill'}
-            sx={{ ml: -0.5 }}
-          />
-        }
-      >
-        {!!filters.state.fromDate && !!filters.state.toDate
-          ? fDateRangeShortLabel(filters.state.fromDate, filters.state.toDate)
-          : 'Select date'}
-      </Button>
-
-      <CustomDateRangePicker
-        variant="calendar"
-        startDate={filters.state.fromDate}
-        endDate={filters.state.toDate}
-        onChangeStartDate={handleFilterStartDate}
-        onChangeEndDate={handleFilterEndDate}
-        open={openDateRange}
-        onClose={onCloseDateRange}
-        selected={!!filters.state.fromDate && !!filters.state.toDate}
-        error={dateError}
-      />
-    </>
-  );
-
   return (
     <Stack
       spacing={1}
@@ -226,8 +294,8 @@ export function MediaFilters({
     >
       {renderFilterName}
       <Stack spacing={1} direction="row" alignItems="center" justifyContent="flex-end" flexGrow={1}>
-        {renderFilterDate}
-
+        {renderFromDate}
+        {renderToDate}
         {renderFilterType}
       </Stack>
     </Stack>
