@@ -3,8 +3,8 @@ import type { IErrorResponse } from 'src/redux/interfaces/common';
 import { z as zod } from 'zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useLocation } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -55,6 +55,7 @@ export const SignInSchema = zod.object({
 export function SignInView() {
   const [login] = useLoginMutation();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const stateMessage = location?.state?.message;
 
@@ -83,6 +84,8 @@ export function SignInView() {
       const res = await login(data);
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
+      } else {
+        navigate('/', { replace: true });
       }
     } catch (err) {
       setErrorMsg(typeof err === 'string' ? err : err.message);
