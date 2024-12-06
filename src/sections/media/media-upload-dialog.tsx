@@ -29,7 +29,7 @@ type Props = DialogProps & {
   onChangeFolderName?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export function MediaNewFolderDialog({
+export function MediaUploadDialog({
   open,
   onClose,
   onCreate,

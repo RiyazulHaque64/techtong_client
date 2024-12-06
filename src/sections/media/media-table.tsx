@@ -1,7 +1,6 @@
 import type { IImage } from 'src/types/image';
 import type { BoxProps } from '@mui/material/Box';
 import type { TableProps } from 'src/components/table';
-import type { TMeta } from 'src/redux/interfaces/common';
 
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -10,15 +9,9 @@ import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import TableContainer from '@mui/material/TableContainer';
 import { tableCellClasses } from '@mui/material/TableCell';
-import { tablePaginationClasses } from '@mui/material/TablePagination';
 
 import { Iconify } from 'src/components/iconify';
-import {
-  TableNoData,
-  TableHeadCustom,
-  TableSelectedAction,
-  TablePaginationCustom,
-} from 'src/components/table';
+import { TableNoData, TableHeadCustom, TableSelectedAction } from 'src/components/table';
 
 import { MediaTableRow } from './media-table-row';
 
@@ -36,29 +29,25 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 type Props = BoxProps & {
-  meta: TMeta;
-  table: TableProps;
   notFound: boolean;
   dataFiltered: IImage[];
   onOpenConfirm: () => void;
   onDeleteRow: (path: string, close: () => void) => void;
   deleteLoading: boolean;
+  table: TableProps;
 };
 
 export function MediaTable({
-  meta,
   sx,
-  table,
   notFound,
   onDeleteRow,
   dataFiltered,
   onOpenConfirm,
   deleteLoading,
+  table,
   ...other
 }: Props) {
   const {
-    dense,
-    page,
     order,
     orderBy,
     //
@@ -67,109 +56,92 @@ export function MediaTable({
     onSelectAllRows,
     //
     onSort,
-    onChangeDense,
-    onChangePage,
-    onChangeRowsPerPage,
   } = table;
 
   return (
-    <>
-      <Box
+    <Box
+      sx={{
+        position: 'relative',
+        m: (theme) => ({ md: theme.spacing(-2, -3, 0, -3) }),
+        ...sx,
+      }}
+      {...other}
+    >
+      <TableSelectedAction
+        numSelected={selected.length}
+        rowCount={dataFiltered.length}
+        onSelectAllRows={(checked) =>
+          onSelectAllRows(
+            checked,
+            dataFiltered.map((row) => row.id)
+          )
+        }
+        action={
+          <Tooltip title="Delete">
+            <IconButton color="primary" onClick={onOpenConfirm}>
+              <Iconify icon="solar:trash-bin-trash-bold" />
+            </IconButton>
+          </Tooltip>
+        }
         sx={{
-          position: 'relative',
-          m: (theme) => ({ md: theme.spacing(-2, -3, 0, -3) }),
-          ...sx,
+          pl: 1,
+          pr: 2,
+          top: 16,
+          left: 24,
+          right: 24,
+          width: 'auto',
+          borderRadius: 1.5,
         }}
-        {...other}
-      >
-        <TableSelectedAction
-          dense={dense}
-          numSelected={selected.length}
-          rowCount={dataFiltered.length}
-          onSelectAllRows={(checked) =>
-            onSelectAllRows(
-              checked,
-              dataFiltered.map((row) => row.id)
-            )
-          }
-          action={
-            <Tooltip title="Delete">
-              <IconButton color="primary" onClick={onOpenConfirm}>
-                <Iconify icon="solar:trash-bin-trash-bold" />
-              </IconButton>
-            </Tooltip>
-          }
-          sx={{
-            pl: 1,
-            pr: 2,
-            top: 16,
-            left: 24,
-            right: 24,
-            width: 'auto',
-            borderRadius: 1.5,
-          }}
-        />
+      />
 
-        <TableContainer sx={{ px: { md: 3 } }}>
-          <Table
-            size={dense ? 'small' : 'medium'}
-            sx={{ minWidth: 960, borderCollapse: 'separate', borderSpacing: '0 6px' }}
-          >
-            <TableHeadCustom
-              order={order}
-              orderBy={orderBy}
-              headLabel={TABLE_HEAD}
-              rowCount={dataFiltered.length}
-              numSelected={selected.length}
-              onSort={onSort}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                  checked,
-                  dataFiltered.map((row) => row.path)
-                )
-              }
+      <TableContainer sx={{ px: { md: 3 } }}>
+        <Table
+          size="medium"
+          sx={{ minWidth: 960, borderCollapse: 'separate', borderSpacing: '0 6px' }}
+        >
+          <TableHeadCustom
+            order={order}
+            orderBy={orderBy}
+            headLabel={TABLE_HEAD}
+            rowCount={dataFiltered.length}
+            numSelected={selected.length}
+            onSort={onSort}
+            onSelectAllRows={(checked) =>
+              onSelectAllRows(
+                checked,
+                dataFiltered.map((row) => row.path)
+              )
+            }
+            sx={{
+              [`& .${tableCellClasses.head}`]: {
+                '&:first-of-type': { borderTopLeftRadius: 12, borderBottomLeftRadius: 12 },
+                '&:last-of-type': { borderTopRightRadius: 12, borderBottomRightRadius: 12 },
+              },
+            }}
+          />
+
+          <TableBody>
+            {dataFiltered.map((row) => (
+              <MediaTableRow
+                key={row.id}
+                row={row}
+                selected={selected.includes(row.path)}
+                onSelectRow={() => onSelectRow(row.path)}
+                onDeleteRow={onDeleteRow}
+                deleteLoading={deleteLoading}
+              />
+            ))}
+            <TableNoData
+              notFound={notFound}
               sx={{
-                [`& .${tableCellClasses.head}`]: {
-                  '&:first-of-type': { borderTopLeftRadius: 12, borderBottomLeftRadius: 12 },
-                  '&:last-of-type': { borderTopRightRadius: 12, borderBottomRightRadius: 12 },
-                },
+                m: -2,
+                borderRadius: 1.5,
+                border: (theme) => `dashed 1px ${theme.vars.palette.divider}`,
               }}
             />
-
-            <TableBody>
-              {dataFiltered.map((row) => (
-                <MediaTableRow
-                  key={row.id}
-                  row={row}
-                  selected={selected.includes(row.path)}
-                  onSelectRow={() => onSelectRow(row.path)}
-                  onDeleteRow={onDeleteRow}
-                  deleteLoading={deleteLoading}
-                />
-              ))}
-              <TableNoData
-                notFound={notFound}
-                sx={{
-                  m: -2,
-                  borderRadius: 1.5,
-                  border: (theme) => `dashed 1px ${theme.vars.palette.divider}`,
-                }}
-              />
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-
-      <TablePaginationCustom
-        page={page}
-        dense={dense}
-        rowsPerPage={meta.limit}
-        count={meta.total}
-        onPageChange={onChangePage}
-        onChangeDense={onChangeDense}
-        onRowsPerPageChange={onChangeRowsPerPage}
-        sx={{ [`& .${tablePaginationClasses.toolbar}`]: { borderTopColor: 'transparent' } }}
-      />
-    </>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 }

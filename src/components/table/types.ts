@@ -1,5 +1,4 @@
 export type TableProps = {
-  dense: boolean;
   page: number;
   rowsPerPage: number;
   order: 'asc' | 'desc';
@@ -13,7 +12,6 @@ export type TableProps = {
   onSort: (id: string) => void;
   onChangePage: (event: unknown, newPage: number) => void;
   onChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onChangeDense: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onUpdatePageDeleteRow: (totalRowsInPage: number) => void;
   onUpdatePageDeleteRows: ({
     totalRowsInPage,
@@ -24,7 +22,6 @@ export type TableProps = {
   }) => void;
   //
   setPage: React.Dispatch<React.SetStateAction<number>>;
-  setDense: React.Dispatch<React.SetStateAction<boolean>>;
   setOrder: React.Dispatch<React.SetStateAction<'desc' | 'asc'>>;
   setOrderBy: React.Dispatch<React.SetStateAction<string>>;
   setSelected: React.Dispatch<React.SetStateAction<string[]>>;

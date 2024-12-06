@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { tablePaginationClasses } from '@mui/material/TablePagination';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
@@ -15,28 +16,40 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { useGetImagesQuery, useDeleteImagesMutation } from 'src/redux/features/image/imageApi';
 
 import { toast } from 'src/components/snackbar';
-import { useTable } from 'src/components/table';
 import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { LoadingScreen } from 'src/components/loading-screen';
+import { useTable, TablePaginationCustom } from 'src/components/table';
 
 import { FetchingError } from 'src/sections/error/fetching-error';
 
 import { MediaTable } from '../media-table';
 import { MediaFilters } from '../media-filters';
 import { MediaGridView } from '../media-grid-view';
+import { MediaUploadDialog } from '../media-upload-dialog';
 import { MediaFiltersResult } from '../media-filters-result';
 import { MEDIA_FILTER_OPTIONS } from '../media-filters-options';
-import { MediaNewFolderDialog } from '../media-new-folder-dialog';
 
 // ----------------------------------------------------------------------
 
 export function MediaView() {
   const table = useTable({ defaultRowsPerPage: 10, defaultOrder: 'desc' });
+  const {
+    page,
+    rowsPerPage,
+    orderBy,
+    order,
+    selected,
+    setSelected,
+    onResetPage,
+    onChangePage,
+    onChangeRowsPerPage,
+  } = table;
 
   const [searchText, setSearchText] = useState<string>('');
   const [types, setTypes] = useState<string[]>([]);
   const [queryParams, setQueryParams] = useState<TQueryParam[]>([]);
+  const [view, setView] = useState<'list' | null>('list');
 
   const searchTerm = useDebounce(searchText, 500);
 
@@ -48,15 +61,15 @@ export function MediaView() {
     error,
   } = useGetImagesQuery([
     ...queryParams,
-    { name: 'page', value: table.page + 1 },
-    { name: 'limit', value: table.rowsPerPage },
+    { name: 'page', value: page + 1 },
+    { name: 'limit', value: rowsPerPage },
     {
       name: 'sortBy',
-      value: table.orderBy,
+      value: orderBy,
     },
     {
       name: 'sortOrder',
-      value: table.order,
+      value: order,
     },
     { name: 'searchTerm', value: searchTerm },
     { name: 'type', value: types.join(',') },
@@ -64,14 +77,8 @@ export function MediaView() {
 
   const openFromDate = useBoolean();
   const openToDate = useBoolean();
-
   const confirm = useBoolean();
-
   const upload = useBoolean();
-
-  const [view, setView] = useState('list');
-
-  // const [tableData, setTableData] = useState<IFile[]>(_allFiles);
 
   const canReset =
     !!searchText ||
@@ -83,7 +90,7 @@ export function MediaView() {
 
   // Handler
   const handleChangeView = useCallback(
-    (event: React.MouseEvent<HTMLElement>, newView: string | null) => {
+    (event: React.MouseEvent<HTMLElement>, newView: 'list' | null) => {
       if (newView !== null) {
         setView(newView);
       }
@@ -110,18 +117,18 @@ export function MediaView() {
 
   const handleDeleteItems = useCallback(async () => {
     try {
-      const res = await deleteImages({ images_path: table.selected });
+      const res = await deleteImages({ images_path: selected });
       if (res?.error) {
         toast.error((res?.error as IErrorResponse)?.data?.message || 'Failed to delete!');
       } else {
         toast.success('Delete success!');
-        table.setSelected([]);
+        setSelected([]);
       }
       confirm.onFalse();
     } catch (err) {
       toast.error((typeof err === 'string' ? err : err.message) || 'Failed to delete!');
     }
-  }, [deleteImages, table, confirm]);
+  }, [deleteImages, selected, setSelected, confirm]);
 
   // JSX
   const renderFilters = (
@@ -137,7 +144,7 @@ export function MediaView() {
         setSearchText={setSearchText}
         queryParams={queryParams}
         setQueryparams={setQueryParams}
-        onResetPage={table.onResetPage}
+        onResetPage={onResetPage}
         openFromDate={openFromDate.value}
         onOpenFromDate={openFromDate.onTrue}
         onCloseFromDate={openFromDate.onFalse}
@@ -168,7 +175,7 @@ export function MediaView() {
       types={types}
       setTypes={setTypes}
       totalResults={images?.meta?.total || 0}
-      onResetPage={table.onResetPage}
+      onResetPage={onResetPage}
     />
   );
 
@@ -207,7 +214,6 @@ export function MediaView() {
 
         {view === 'list' ? (
           <MediaTable
-            meta={images.meta}
             table={table}
             dataFiltered={images.data}
             onDeleteRow={handleDeleteItem}
@@ -218,15 +224,24 @@ export function MediaView() {
         ) : (
           <MediaGridView
             table={table}
+            total={images.meta.total}
             dataFiltered={images.data}
             onDeleteItem={handleDeleteItem}
             onOpenConfirm={confirm.onTrue}
             deleteLoading={deleteLoading}
           />
         )}
+        <TablePaginationCustom
+          page={page}
+          rowsPerPage={images.meta.limit}
+          count={images.meta.total}
+          onPageChange={onChangePage}
+          onRowsPerPageChange={onChangeRowsPerPage}
+          sx={{ [`& .${tablePaginationClasses.toolbar}`]: { borderTopColor: 'transparent' } }}
+        />
       </DashboardContent>
 
-      <MediaNewFolderDialog open={upload.value} onClose={upload.onFalse} />
+      <MediaUploadDialog open={upload.value} onClose={upload.onFalse} />
 
       <ConfirmDialog
         open={confirm.value}
@@ -234,8 +249,8 @@ export function MediaView() {
         title="Delete"
         content={
           <>
-            Are you sure want to delete <strong> {table.selected.length} </strong>{' '}
-            {table.selected.length === 1 ? 'image' : 'images'} ?
+            Are you sure want to delete <strong> {selected.length} </strong>{' '}
+            {selected.length === 1 ? 'image' : 'images'} ?
           </>
         }
         action={

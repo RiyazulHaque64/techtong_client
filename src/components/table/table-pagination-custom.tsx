@@ -2,9 +2,7 @@ import type { Theme, SxProps } from '@mui/material/styles';
 import type { TablePaginationProps } from '@mui/material/TablePagination';
 
 import Box from '@mui/material/Box';
-import Switch from '@mui/material/Switch';
 import TablePagination from '@mui/material/TablePagination';
-import FormControlLabel from '@mui/material/FormControlLabel';
 
 // ----------------------------------------------------------------------
 
@@ -16,9 +14,7 @@ export type TablePaginationCustomProps = TablePaginationProps & {
 
 export function TablePaginationCustom({
   sx,
-  dense,
-  onChangeDense,
-  rowsPerPageOptions = [5, 10, 25],
+  rowsPerPageOptions = [5, 10, 15, 20, 25],
   ...other
 }: TablePaginationCustomProps) {
   return (
@@ -29,19 +25,6 @@ export function TablePaginationCustom({
         {...other}
         sx={{ borderTopColor: 'transparent' }}
       />
-
-      {onChangeDense && (
-        <FormControlLabel
-          label="Dense"
-          control={<Switch name="dense" checked={dense} onChange={onChangeDense} />}
-          sx={{
-            pl: 2,
-            py: 1.5,
-            top: 0,
-            position: { sm: 'absolute' },
-          }}
-        />
-      )}
     </Box>
   );
 }

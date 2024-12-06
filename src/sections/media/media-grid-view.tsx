@@ -13,25 +13,27 @@ import { Iconify } from 'src/components/iconify';
 
 import { MediaPanel } from './media-panel';
 import { MediaFileItem } from './media-file-item';
+import { MediaUploadDialog } from './media-upload-dialog';
 import { MediaActionSelected } from './media-action-selected';
-import { MediaNewFolderDialog } from './media-new-folder-dialog';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  table: TableProps;
+  total: number;
   dataFiltered: IImage[];
   onOpenConfirm: () => void;
   onDeleteItem: (path: string, close: () => void) => void;
   deleteLoading: boolean;
+  table: TableProps;
 };
 
 export function MediaGridView({
-  table,
   dataFiltered,
   onDeleteItem,
   onOpenConfirm,
   deleteLoading,
+  total,
+  table,
 }: Props) {
   const { selected, onSelectRow: onSelectItem, onSelectAllRows: onSelectAllItems } = table;
 
@@ -45,8 +47,8 @@ export function MediaGridView({
     <>
       <Box ref={containerRef}>
         <MediaPanel
-          title="Files"
-          subtitle={`${dataFiltered.filter((item) => item.type !== 'folder').length} files`}
+          title="Images"
+          subtitle={`${dataFiltered?.length} of ${total} images`}
           onOpen={upload.onTrue}
           collapse={files.value}
           onCollapse={files.onToggle}
@@ -62,19 +64,17 @@ export function MediaGridView({
             }}
             gap={3}
           >
-            {dataFiltered
-              .filter((i) => i.type !== 'folder')
-              .map((file) => (
-                <MediaFileItem
-                  key={file.id}
-                  file={file}
-                  selected={selected.includes(file.id)}
-                  onSelect={() => onSelectItem(file.id)}
-                  onDelete={onDeleteItem}
-                  sx={{ maxWidth: 'auto' }}
-                  deleteLoading={deleteLoading}
-                />
-              ))}
+            {dataFiltered.map((file) => (
+              <MediaFileItem
+                key={file.id}
+                file={file}
+                selected={selected.includes(file.path)}
+                onSelect={() => onSelectItem(file.path)}
+                onDelete={onDeleteItem}
+                sx={{ maxWidth: 'auto' }}
+                deleteLoading={deleteLoading}
+              />
+            ))}
           </Box>
         </Collapse>
         {!!selected?.length && (
@@ -85,7 +85,7 @@ export function MediaGridView({
             onSelectAllItems={(checked) =>
               onSelectAllItems(
                 checked,
-                dataFiltered.map((row) => row.id)
+                dataFiltered.map((row) => row.path)
               )
             }
             action={
@@ -103,7 +103,7 @@ export function MediaGridView({
           />
         )}
       </Box>
-      <MediaNewFolderDialog open={upload.value} onClose={upload.onFalse} />
+      <MediaUploadDialog open={upload.value} onClose={upload.onFalse} />
     </>
   );
 }
