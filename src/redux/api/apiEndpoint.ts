@@ -2,6 +2,7 @@ const features = {
   auth: '/auth',
   user: '/user',
   image: '/image',
+  brand: '/brand',
 };
 
 const api_endpoint = {
@@ -18,6 +19,12 @@ const api_endpoint = {
     get_images: `${features.image}`,
     update_image: `${features.image}/update`,
     delete_image: `${features.image}/delete-images`,
+  },
+  brand: {
+    add_brand: `${features.brand}/add-brand`,
+    get_brands: `${features.brand}`,
+    update_brand: `${features.brand}`,
+    delete_brand: `${features.brand}`,
   },
 };
 

@@ -1,4 +1,5 @@
 export type TableProps = {
+  dense: boolean;
   page: number;
   rowsPerPage: number;
   order: 'asc' | 'desc';
@@ -6,6 +7,7 @@ export type TableProps = {
   //
   selected: string[];
   onSelectRow: (id: string) => void;
+  onChangeDense: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectAllRows: (checked: boolean, newSelecteds: string[]) => void;
   //
   onResetPage: () => void;

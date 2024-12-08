@@ -18,6 +18,8 @@ export type UseTableProps = {
 export function useTable(props?: UseTableProps): UseTableReturn {
   const [page, setPage] = useState(props?.defaultCurrentPage || 0);
 
+  const [dense, setDense] = useState(!!props?.defaultDense);
+
   const [rowsPerPage, setRowsPerPage] = useState(props?.defaultRowsPerPage || 5);
 
   const [orderBy, setOrderBy] = useState(props?.defaultOrderBy || 'created_at');
@@ -51,6 +53,10 @@ export function useTable(props?: UseTableProps): UseTableReturn {
   const onChangeRowsPerPage = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setPage(0);
     setRowsPerPage(parseInt(event.target.value, 10));
+  }, []);
+
+  const onChangeDense = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setDense(event.target.checked);
   }, []);
 
   const onSelectAllRows = useCallback((checked: boolean, inputValue: string[]) => {
@@ -109,6 +115,7 @@ export function useTable(props?: UseTableProps): UseTableReturn {
   );
 
   return {
+    dense,
     order,
     page,
     orderBy,
@@ -120,6 +127,7 @@ export function useTable(props?: UseTableProps): UseTableReturn {
     //
     onSort,
     onChangePage,
+    onChangeDense,
     onResetPage,
     onChangeRowsPerPage,
     onUpdatePageDeleteRow,

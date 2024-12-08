@@ -38,6 +38,7 @@ const ICONS = {
   analytics: icon('ic-analytics'),
   dashboard: icon('ic-dashboard'),
   parameter: icon('ic-parameter'),
+  brand: icon('ic-brand'),
 };
 
 // ----------------------------------------------------------------------
@@ -51,7 +52,6 @@ export const navData = [
     items: [
       { title: 'One', path: paths.dashboard.root, icon: ICONS.dashboard },
       { title: 'Media', path: paths.dashboard.media, icon: ICONS.media },
-      { title: 'Three', path: paths.dashboard.three, icon: ICONS.analytics },
     ],
   },
   /**
@@ -69,6 +69,16 @@ export const navData = [
           { title: 'Five', path: paths.dashboard.group.five },
           { title: 'Six', path: paths.dashboard.group.six },
         ],
+      },
+    ],
+  },
+  {
+    subheader: 'Product Management',
+    items: [
+      {
+        title: 'Brand',
+        path: paths.dashboard.brand,
+        icon: ICONS.brand,
       },
     ],
   },
