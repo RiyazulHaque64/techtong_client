@@ -1,5 +1,5 @@
 import type { DialogProps } from '@mui/material/Dialog';
-import type { IErrorResponse } from 'src/redux/interfaces/common';
+import type { TQueryParam, IErrorResponse } from 'src/redux/interfaces/common';
 
 import { useState, useCallback } from 'react';
 
@@ -9,14 +9,20 @@ import { grey } from '@mui/material/colors';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import { Tab, Box, Tabs, Alert, Stack, IconButton } from '@mui/material';
+import { Tab, Box, Tabs, Grid, Alert, Stack, IconButton } from '@mui/material';
 
+import { useBoolean } from 'src/hooks/use-boolean';
+
+import { CONFIG } from 'src/config-global';
 import { varAlpha } from 'src/theme/styles';
-import { useUploadImagesMutation } from 'src/redux/features/image/imageApi';
+import { useGetImagesQuery, useUploadImagesMutation } from 'src/redux/features/image/imageApi';
 
 import { Iconify } from 'src/components/iconify';
 
+import { MEDIA_FILTER_OPTIONS } from 'src/sections/media/media-filters-options';
+
 import { Upload } from '../upload';
+import { ImageFiltersToolbar } from './components/image-filters-toolbar';
 import { MultiFilePreview } from '../upload/components/preview-multi-file';
 
 // ----------------------------------------------------------------------
@@ -28,11 +34,21 @@ type Props = DialogProps & {
 };
 
 export function ImageSelectModal({ open, onClose, title = 'Select Image', ...other }: Props) {
-  const [uploadImages, { isLoading }] = useUploadImagesMutation();
+  const [uploadImages, { isLoading: uploadImageLoading }] = useUploadImagesMutation();
+  const { data: images } = useGetImagesQuery([]);
+  console.log('images: ', images);
 
   const [selectedTab, setSelectedTab] = useState<string>('library');
   const [files, setFiles] = useState<(File | string)[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>('');
+  const [types, setTypes] = useState<string[]>([]);
+  const [queryParams, setQueryParams] = useState<TQueryParam[]>([]);
+  const [page, setPage] = useState<number>(0);
+  console.log(page);
+
+  const openFromDate = useBoolean();
+  const openToDate = useBoolean();
 
   const handleChangeTab = useCallback((event: React.SyntheticEvent, newValue: string) => {
     setSelectedTab(newValue);
@@ -69,18 +85,27 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
     }
   };
 
+  const onResetPage = useCallback(() => {
+    setPage(0);
+  }, []);
+
   return (
     <Dialog
       fullWidth
       open={open}
       onClose={onClose}
       {...other}
-      sx={{ '& .MuiDialog-paper': { minWidth: '94%', height: 'calc(100vh - 120px)' } }}
+      sx={{
+        '& .MuiDialog-paper': { minWidth: '92%', height: 'calc(100vh - 100px)' },
+      }}
     >
       <DialogTitle sx={{ p: (theme) => theme.spacing(3, 3, 2, 3) }}> {title}</DialogTitle>
       <IconButton
         aria-label="close"
-        onClick={onClose}
+        onClick={() => {
+          onClose();
+          setFiles([]);
+        }}
         sx={(theme) => ({
           position: 'absolute',
           right: 8,
@@ -91,33 +116,62 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
         <Iconify icon="line-md:close" sx={{ color: 'text.secondary' }} />
       </IconButton>
       <DialogContent dividers sx={{ pt: 1, pb: 0, border: 'none' }}>
-        <Tabs
-          value={selectedTab}
-          onChange={handleChangeTab}
-          sx={{
-            px: 2.5,
-            boxShadow: (theme) =>
-              `inset 0 -2px 0 0 ${varAlpha(theme.vars.palette.grey['500Channel'], 0.08)}`,
-          }}
-        >
-          <Tab
-            iconPosition="start"
-            value="library"
-            label="Library"
-            icon={<Iconify icon="ic:round-perm-media" />}
-          />
-          <Tab
-            iconPosition="start"
-            value="upload"
-            label="Upload"
-            icon={<Iconify icon="eva:cloud-upload-fill" />}
-          />
-        </Tabs>
+        <Stack direction={{ sm: 'column', md: 'row' }}>
+          <Tabs
+            value={selectedTab}
+            onChange={handleChangeTab}
+            sx={{
+              px: 2.5,
+              boxShadow: (theme) =>
+                `inset 0 -2px 0 0 ${varAlpha(theme.vars.palette.grey['500Channel'], 0.08)}`,
+              width: selectedTab === 'library' ? { sm: '100%', md: '30%' } : '100%',
+            }}
+          >
+            <Tab
+              iconPosition="start"
+              value="library"
+              label="Library"
+              icon={<Iconify icon="ic:round-perm-media" />}
+            />
+            <Tab
+              iconPosition="start"
+              value="upload"
+              label="Upload"
+              icon={<Iconify icon="eva:cloud-upload-fill" />}
+            />
+          </Tabs>
+          {selectedTab === 'library' && (
+            <Stack
+              sx={{
+                width: { sm: '100%', md: '70%' },
+                borderBottom: `2px solid ${grey[100]}`,
+                p: { xs: 2, md: 0 },
+              }}
+            >
+              <ImageFiltersToolbar
+                types={types}
+                setTypes={setTypes}
+                searchText={searchText}
+                setSearchText={setSearchText}
+                queryParams={queryParams}
+                setQueryparams={setQueryParams}
+                onResetPage={onResetPage}
+                openFromDate={openFromDate.value}
+                onOpenFromDate={openFromDate.onTrue}
+                onCloseFromDate={openFromDate.onFalse}
+                openToDate={openToDate.value}
+                onOpenToDate={openToDate.onTrue}
+                onCloseToDate={openToDate.onFalse}
+                options={{ types: MEDIA_FILTER_OPTIONS }}
+              />
+            </Stack>
+          )}
+        </Stack>
         <Box
           sx={{
-            maxHeight: 'calc(100vh - 380px)',
+            maxHeight: 'calc(100vh - 356px)',
             overflowY: 'auto',
-            my: 3,
+            mt: 4,
             '&::-webkit-scrollbar': {
               width: '6px',
             },
@@ -137,7 +191,7 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
           {selectedTab === 'upload' && (
             <>
               {!!errorMsg && (
-                <Alert severity="error" sx={{ width: { xs: '90%', sm: '95%', md: '97%' }, ml: 2 }}>
+                <Alert severity="error" sx={{ width: { xs: '80%', sm: '90%', md: '95%' }, ml: 4 }}>
                   {errorMsg}
                 </Alert>
               )}
@@ -161,6 +215,27 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
               </Stack>
             </>
           )}
+
+          {selectedTab === 'library' && (
+            <Grid container>
+              <Grid item>
+                <Box
+                  component="img"
+                  sx={{
+                    display: 'block',
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                    width: '100%',
+                    borderRadius: '8px 8px 0px 0px',
+                    height: '250px',
+                    objectFit: 'cover',
+                  }}
+                  src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${'example.jpg'}`}
+                  alt="File"
+                />
+              </Grid>
+            </Grid>
+          )}
         </Box>
       </DialogContent>
       <DialogActions>
@@ -169,9 +244,9 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
             variant="contained"
             startIcon={<Iconify icon="eva:cloud-upload-fill" />}
             onClick={handleUpload}
-            disabled={isLoading}
+            disabled={uploadImageLoading}
             sx={{
-              ...(isLoading && {
+              ...(uploadImageLoading && {
                 display: 'flex',
                 width: '134px',
                 justifyContent: 'flex-start',
@@ -191,7 +266,7 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
               }),
             }}
           >
-            {isLoading ? 'Uploading' : 'Upload'}
+            {uploadImageLoading ? 'Uploading' : 'Upload'}
           </Button>
         ) : (
           <Button variant="contained" startIcon={<Iconify icon="eva:cloud-upload-fill" />}>
