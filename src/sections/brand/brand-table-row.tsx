@@ -56,7 +56,7 @@ export function BrandTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
         </TableCell>
         <TableCell> {name} </TableCell>
         <TableCell> {description} </TableCell>
-        <TableCell align="center"> {_count.products} </TableCell>
+        <TableCell align="center"> {_count?.products} </TableCell>
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
           <IconButton onClick={details.onTrue}>
             <Iconify icon="solar:eye-bold" />
