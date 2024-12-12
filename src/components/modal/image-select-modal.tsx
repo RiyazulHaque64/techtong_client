@@ -1,3 +1,5 @@
+import type { IImage } from 'src/types/image';
+import type { Dispatch, SetStateAction } from 'react';
 import type { DialogProps } from '@mui/material/Dialog';
 import type { TQueryParam, IErrorResponse } from 'src/redux/interfaces/common';
 
@@ -9,19 +11,24 @@ import { grey } from '@mui/material/colors';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import { Tab, Box, Tabs, Grid, Alert, Stack, IconButton } from '@mui/material';
+import { Tab, Box, Tabs, Grid, Card, Alert, Stack, IconButton } from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
+import { useDebounce } from 'src/hooks/use-debounce';
 
-import { CONFIG } from 'src/config-global';
 import { varAlpha } from 'src/theme/styles';
 import { useGetImagesQuery, useUploadImagesMutation } from 'src/redux/features/image/imageApi';
 
 import { Iconify } from 'src/components/iconify';
 
+import { FetchingError } from 'src/sections/error/fetching-error';
 import { MEDIA_FILTER_OPTIONS } from 'src/sections/media/media-filters-options';
 
 import { Upload } from '../upload';
+import { EmptyContent } from '../empty-content';
+import { LoadingScreen } from '../loading-screen';
+import { ImageItem } from './components/image-item';
+import { ImageDetails } from './components/image-details';
 import { ImageFiltersToolbar } from './components/image-filters-toolbar';
 import { MultiFilePreview } from '../upload/components/preview-multi-file';
 
@@ -31,12 +38,21 @@ type Props = DialogProps & {
   open: boolean;
   onClose: () => void;
   title?: string;
+  selectedImages: string[];
+  setSelectedImages: Dispatch<SetStateAction<string[]>>;
+  multiple?: boolean;
 };
 
-export function ImageSelectModal({ open, onClose, title = 'Select Image', ...other }: Props) {
+export function ImageSelectModal({
+  open,
+  onClose,
+  title = 'Select Image',
+  selectedImages,
+  setSelectedImages,
+  multiple = true,
+  ...other
+}: Props) {
   const [uploadImages, { isLoading: uploadImageLoading }] = useUploadImagesMutation();
-  const { data: images } = useGetImagesQuery([]);
-  console.log('images: ', images);
 
   const [selectedTab, setSelectedTab] = useState<string>('library');
   const [files, setFiles] = useState<(File | string)[]>([]);
@@ -44,11 +60,40 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
   const [searchText, setSearchText] = useState<string>('');
   const [types, setTypes] = useState<string[]>([]);
   const [queryParams, setQueryParams] = useState<TQueryParam[]>([]);
-  const [page, setPage] = useState<number>(0);
-  console.log(page);
+  const [currentSelected, setCurrentSelected] = useState<IImage | null>(null);
+
+  const searchTerm = useDebounce(searchText, 500);
+
+  const {
+    data: images,
+    isLoading: getImagesLoading,
+    error: getImagesError,
+    isError: isGetImagesError,
+  } = useGetImagesQuery([
+    { name: 'limit', value: 50 },
+    { name: 'searchTerm', value: searchTerm },
+    { name: 'type', value: types.join(',') },
+    ...queryParams,
+  ]);
 
   const openFromDate = useBoolean();
   const openToDate = useBoolean();
+
+  const onSelectImage = useCallback(
+    (inputValue: IImage) => {
+      if (multiple) {
+        const newSelected = selectedImages.includes(inputValue.path)
+          ? selectedImages.filter((value) => value !== inputValue.path)
+          : [...selectedImages, inputValue.path];
+
+        setSelectedImages(newSelected);
+      } else {
+        const path = selectedImages.includes(inputValue.path) ? [] : [inputValue.path];
+        setSelectedImages(path);
+      }
+    },
+    [selectedImages, setSelectedImages, multiple]
+  );
 
   const handleChangeTab = useCallback((event: React.SyntheticEvent, newValue: string) => {
     setSelectedTab(newValue);
@@ -85,10 +130,6 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
     }
   };
 
-  const onResetPage = useCallback(() => {
-    setPage(0);
-  }, []);
-
   return (
     <Dialog
       fullWidth
@@ -105,6 +146,11 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
         onClick={() => {
           onClose();
           setFiles([]);
+          setCurrentSelected(null);
+          setSelectedImages([]);
+          setSearchText('');
+          setTypes([]);
+          setQueryParams([]);
         }}
         sx={(theme) => ({
           position: 'absolute',
@@ -155,7 +201,6 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
                 setSearchText={setSearchText}
                 queryParams={queryParams}
                 setQueryparams={setQueryParams}
-                onResetPage={onResetPage}
                 openFromDate={openFromDate.value}
                 onOpenFromDate={openFromDate.onTrue}
                 onCloseFromDate={openFromDate.onFalse}
@@ -167,76 +212,108 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
             </Stack>
           )}
         </Stack>
-        <Box
-          sx={{
-            maxHeight: 'calc(100vh - 356px)',
-            overflowY: 'auto',
-            mt: 4,
-            '&::-webkit-scrollbar': {
-              width: '6px',
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: '#ffffff',
-              borderRadius: '8px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: grey[400],
-              borderRadius: '8px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              backgroundColor: grey[500],
-            },
-          }}
-        >
-          {selectedTab === 'upload' && (
-            <>
-              {!!errorMsg && (
-                <Alert severity="error" sx={{ width: { xs: '80%', sm: '90%', md: '95%' }, ml: 4 }}>
-                  {errorMsg}
-                </Alert>
-              )}
-              <Stack direction={{ xs: 'column', md: 'row' }} gap={2} sx={{ p: 2 }}>
-                <Box sx={{ width: { xs: '100%', md: `${files.length > 0 ? '30%' : '100%'}` } }}>
-                  <Upload
-                    multiple
-                    accept={{ 'image/*': [] }}
-                    value={files}
-                    onDrop={handleDrop}
-                    onRemove={handleRemoveFile}
-                    previewMultiFile={false}
-                    showSubHeading={false}
-                  />
-                </Box>
-                {files.length > 0 && (
-                  <Box sx={{ width: { xs: '100%', md: '70%' } }}>
-                    <MultiFilePreview files={files} thumbnail={false} onRemove={handleRemoveFile} />
-                  </Box>
+        <Stack direction="row">
+          <Box
+            sx={{
+              width: selectedTab === 'library' && currentSelected ? '75%' : '100%',
+              maxHeight: 'calc(100vh - 356px)',
+              overflowY: 'auto',
+              mt: 4,
+              '&::-webkit-scrollbar': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-track': {
+                backgroundColor: '#ffffff',
+                borderRadius: '8px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: grey[400],
+                borderRadius: '8px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                backgroundColor: grey[500],
+              },
+            }}
+          >
+            {selectedTab === 'upload' && (
+              <>
+                {!!errorMsg && (
+                  <Alert
+                    severity="error"
+                    sx={{ width: { xs: '80%', sm: '90%', md: '95%' }, ml: 4 }}
+                  >
+                    {errorMsg}
+                  </Alert>
                 )}
-              </Stack>
-            </>
-          )}
+                <Stack direction={{ xs: 'column', md: 'row' }} gap={2} sx={{ p: 2 }}>
+                  <Box sx={{ width: { xs: '100%', md: `${files.length > 0 ? '30%' : '100%'}` } }}>
+                    <Upload
+                      multiple
+                      accept={{ 'image/*': [] }}
+                      value={files}
+                      onDrop={handleDrop}
+                      onRemove={handleRemoveFile}
+                      previewMultiFile={false}
+                      showSubHeading={false}
+                    />
+                  </Box>
+                  {files.length > 0 && (
+                    <Box sx={{ width: { xs: '100%', md: '70%' } }}>
+                      <MultiFilePreview
+                        files={files}
+                        thumbnail={false}
+                        onRemove={handleRemoveFile}
+                      />
+                    </Box>
+                  )}
+                </Stack>
+              </>
+            )}
 
-          {selectedTab === 'library' && (
-            <Grid container>
-              <Grid item>
-                <Box
-                  component="img"
-                  sx={{
-                    display: 'block',
-                    maxWidth: '100%',
-                    overflow: 'hidden',
-                    width: '100%',
-                    borderRadius: '8px 8px 0px 0px',
-                    height: '250px',
-                    objectFit: 'cover',
-                  }}
-                  src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${'example.jpg'}`}
-                  alt="File"
-                />
-              </Grid>
-            </Grid>
+            {selectedTab === 'library' && (
+              <>
+                {getImagesLoading && (
+                  <Stack sx={{ height: 'calc(100vh - 356px)' }}>
+                    <LoadingScreen />
+                  </Stack>
+                )}
+                {!getImagesLoading && isGetImagesError && (
+                  <FetchingError errorResponse={(getImagesError as IErrorResponse).data} inModal />
+                )}
+                {!getImagesLoading && images?.data?.length === 0 && (
+                  <Stack sx={{ height: 'calc(100vh - 356px)' }}>
+                    <EmptyContent title="No image found" />
+                  </Stack>
+                )}
+                <Grid container spacing={1}>
+                  {images?.data?.map((image) => (
+                    <ImageItem
+                      currentSelected={currentSelected}
+                      setCurrentSelected={setCurrentSelected}
+                      file={image}
+                      key={image.id}
+                      onSelect={() => onSelectImage(image)}
+                      selected={selectedImages.includes(image.path)}
+                    />
+                  ))}
+                </Grid>
+              </>
+            )}
+          </Box>
+          {selectedTab === 'library' && currentSelected && (
+            <Card
+              sx={{
+                width: '25%',
+                height: 'calc(100vh - 356px)',
+                p: 2,
+                mx: 1,
+                mt: 4,
+              }}
+            >
+              <ImageDetails currentSelected={currentSelected} />
+            </Card>
           )}
-        </Box>
+        </Stack>
       </DialogContent>
       <DialogActions>
         {selectedTab === 'upload' ? (
@@ -269,7 +346,17 @@ export function ImageSelectModal({ open, onClose, title = 'Select Image', ...oth
             {uploadImageLoading ? 'Uploading' : 'Upload'}
           </Button>
         ) : (
-          <Button variant="contained" startIcon={<Iconify icon="eva:cloud-upload-fill" />}>
+          <Button
+            variant="contained"
+            startIcon={<Iconify icon="eva:cloud-upload-fill" />}
+            onClick={() => {
+              onClose();
+              setCurrentSelected(null);
+              setSearchText('');
+              setTypes([]);
+              setQueryParams([]);
+            }}
+          >
             Select
           </Button>
         )}

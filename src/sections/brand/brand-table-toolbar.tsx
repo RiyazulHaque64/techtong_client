@@ -1,101 +1,61 @@
-import type { IBrandTableFilters } from 'src/types/brand';
-import type { UseSetStateReturn } from 'src/hooks/use-set-state';
+import type { Dispatch, SetStateAction } from 'react';
 
 import { useCallback } from 'react';
 
 import Stack from '@mui/material/Stack';
-import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { Iconify } from 'src/components/iconify';
-import { usePopover, CustomPopover } from 'src/components/custom-popover';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  dateError: boolean;
-  onResetPage: () => void;
-  filters: UseSetStateReturn<IBrandTableFilters>;
+  setSearchText: Dispatch<SetStateAction<string>>;
+  searchText: string;
 };
 
-export function BrandTableToolbar({ filters, onResetPage, dateError }: Props) {
-  const popover = usePopover();
-
-  const handleFilterName = useCallback(
+export function BrandTableToolbar({ setSearchText, searchText }: Props) {
+  const handleSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onResetPage();
-      filters.setState({ searchTerm: event.target.value });
+      setSearchText(event.target.value);
     },
-    [filters, onResetPage]
+    [setSearchText]
   );
 
   return (
-    <>
-      <Stack
-        spacing={2}
-        alignItems={{ xs: 'flex-end', md: 'center' }}
-        direction={{ xs: 'column', md: 'row' }}
-        sx={{ p: 2.5, pr: { xs: 2.5, md: 1 } }}
-      >
-        <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
-          <TextField
-            fullWidth
-            value={filters.state.searchTerm}
-            onChange={handleFilterName}
-            placeholder="Search customer or order number..."
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+    <Stack
+      spacing={2}
+      alignItems={{ xs: 'flex-end', md: 'center' }}
+      direction={{ xs: 'column', md: 'row' }}
+      sx={{ p: 2.5, pr: { xs: 2.5, md: 1 } }}
+    >
+      <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
+        <TextField
+          fullWidth
+          value={searchText}
+          onChange={handleSearch}
+          placeholder="Search brand..."
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+              </InputAdornment>
+            ),
+            ...(searchText && {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Iconify
+                    icon="line-md:close"
+                    sx={{ color: 'text.disabled', cursor: 'pointer' }}
+                    onClick={() => setSearchText('')}
+                  />
                 </InputAdornment>
               ),
-            }}
-          />
-
-          <IconButton onClick={popover.onOpen}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
-        </Stack>
+            }),
+          }}
+        />
       </Stack>
-
-      <CustomPopover
-        open={popover.open}
-        anchorEl={popover.anchorEl}
-        onClose={popover.onClose}
-        slotProps={{ arrow: { placement: 'right-top' } }}
-      >
-        <MenuList>
-          <MenuItem
-            onClick={() => {
-              popover.onClose();
-            }}
-          >
-            <Iconify icon="solar:printer-minimalistic-bold" />
-            Print
-          </MenuItem>
-
-          <MenuItem
-            onClick={() => {
-              popover.onClose();
-            }}
-          >
-            <Iconify icon="solar:import-bold" />
-            Import
-          </MenuItem>
-
-          <MenuItem
-            onClick={() => {
-              popover.onClose();
-            }}
-          >
-            <Iconify icon="solar:export-bold" />
-            Export
-          </MenuItem>
-        </MenuList>
-      </CustomPopover>
-    </>
+    </Stack>
   );
 }

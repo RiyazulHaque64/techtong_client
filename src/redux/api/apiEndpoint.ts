@@ -24,7 +24,7 @@ const api_endpoint = {
     add_brand: `${features.brand}/add-brand`,
     get_brands: `${features.brand}`,
     update_brand: `${features.brand}`,
-    delete_brand: `${features.brand}`,
+    delete_brand: `${features.brand}/delete-brand`,
   },
 };
 

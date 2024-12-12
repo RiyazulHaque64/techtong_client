@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 // ----------------------------------------------------------------------
 
 export type TableSelectedActionProps = StackProps & {
-  dense?: boolean;
   rowCount: number;
   numSelected: number;
   action?: React.ReactNode;
@@ -15,9 +14,9 @@ export type TableSelectedActionProps = StackProps & {
 };
 
 export function TableSelectedAction({
-  action,
   rowCount,
   numSelected,
+  action,
   onSelectAllRows,
   sx,
   ...other

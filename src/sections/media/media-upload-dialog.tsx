@@ -65,7 +65,6 @@ export function MediaUploadDialog({
       const formData = new FormData();
       files.forEach((file) => formData.append('images', file));
       const res = await uploadImages(formData);
-      console.log('response: ', res);
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
       } else {

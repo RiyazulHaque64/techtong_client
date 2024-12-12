@@ -1,4 +1,3 @@
-import type { IBrandTableFilters } from 'src/types/brand';
 import type { IErrorResponse } from 'src/redux/interfaces/common';
 
 import { useState, useCallback } from 'react';
@@ -13,14 +12,12 @@ import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 
 import { paths } from 'src/routes/paths';
-import { useRouter } from 'src/routes/hooks';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
-import { useSetState } from 'src/hooks/use-set-state';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { useGetBrandsQuery } from 'src/redux/features/brand/brandApi';
+import { useGetBrandsQuery, useDeleteBrandMutation } from 'src/redux/features/brand/brandApi';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -42,7 +39,8 @@ import {
 import { FetchingError } from 'src/sections/error/fetching-error';
 
 import { BrandTableRow } from '../brand-table-row';
-import { BrandTableFiltersResult } from '../brand-table-filter-result';
+import { BrandManageForm } from '../brand-manage-form';
+import { BrandTableToolbar } from '../brand-table-toolbar';
 
 // ----------------------------------------------------------------------
 
@@ -63,16 +61,16 @@ const TABLE_HEAD = [
 
 export function BrandView() {
   const table = useTable();
-  const { page, rowsPerPage, orderBy, order } = table;
+  const { page, rowsPerPage, orderBy, order, selected, setSelected } = table;
 
   const [searchText, setSearchText] = useState<string>('');
-
-  console.log(setSearchText);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const selectLogo = useBoolean();
 
   const searchTerm = useDebounce(searchText, 500);
 
+  const [deleteBrands, { isLoading: deleteLoading }] = useDeleteBrandMutation();
   const {
     data: brands,
     isLoading: getBrandsLoading,
@@ -92,37 +90,39 @@ export function BrandView() {
     { name: 'searchTerm', value: searchTerm },
   ]);
 
-  const router = useRouter();
-
   const confirm = useBoolean();
+  const manageForm = useBoolean();
 
-  const filters = useSetState<IBrandTableFilters>({
-    searchTerm: '',
-    startDate: null,
-    endDate: null,
-  });
-
-  const canReset =
-    !!filters.state.searchTerm || (!!filters.state.startDate && !!filters.state.endDate);
-
-  const notFound = (!brands?.data.length && canReset) || !brands?.data.length;
-
-  const handleDeleteRow = useCallback(async (id: string, close: () => void) => {
-    toast.success('Delete success!');
-    close();
-    console.log(id);
-  }, []);
-
-  const handleDeleteRows = useCallback(() => {
-    toast.success('Delete success!');
-  }, []);
-
-  const handleViewRow = useCallback(
-    (id: string) => {
-      router.push(paths.dashboard.root);
+  const handleDeleteRow = useCallback(
+    async (id: string, close: () => void) => {
+      try {
+        const res = await deleteBrands({ ids: [id] });
+        if (res?.error) {
+          toast.error((res?.error as IErrorResponse)?.data?.message || 'Delete failed!');
+        } else {
+          toast.success('Delete success!');
+          close();
+        }
+      } catch (err) {
+        toast.error('Delete failed!');
+      }
     },
-    [router]
+    [deleteBrands]
   );
+
+  const handleDeleteRows = useCallback(async () => {
+    try {
+      const res = await deleteBrands({ ids: selected });
+      if (res?.error) {
+        toast.error((res?.error as IErrorResponse)?.data?.message || 'Delete failed!');
+      } else {
+        toast.success('Delete success!');
+        setSelected([]);
+      }
+    } catch (err) {
+      toast.error('Delete failed!');
+    }
+  }, [selected, deleteBrands, setSelected]);
 
   if (getBrandsLoading) {
     return (
@@ -151,31 +151,17 @@ export function BrandView() {
           <Button
             variant="contained"
             startIcon={<Iconify icon="eva:cloud-upload-fill" />}
-            onClick={selectLogo.onTrue}
+            onClick={manageForm.onTrue}
           >
-            Select Logo
+            Add Brand
           </Button>
         </Stack>
 
         <Card>
-          {/* <BrandTableToolbar
-            filters={filters}
-            onResetPage={table.onResetPage}
-            dateError={dateError}
-          /> */}
-
-          {canReset && (
-            <BrandTableFiltersResult
-              filters={filters}
-              totalResults={brands?.meta.total}
-              onResetPage={table.onResetPage}
-              sx={{ p: 2.5, pt: 0 }}
-            />
-          )}
+          <BrandTableToolbar setSearchText={setSearchText} searchText={searchText} />
 
           <Box sx={{ position: 'relative' }}>
             <TableSelectedAction
-              dense={table.dense}
               numSelected={table.selected.length}
               rowCount={brands.meta.total}
               onSelectAllRows={(checked) =>
@@ -218,7 +204,7 @@ export function BrandView() {
                       selected={table.selected.includes(row.id)}
                       onSelectRow={() => table.onSelectRow(row.id)}
                       onDeleteRow={handleDeleteRow}
-                      onViewRow={() => handleViewRow(row.id)}
+                      deleteLoading={deleteLoading}
                     />
                   ))}
 
@@ -227,7 +213,7 @@ export function BrandView() {
                     emptyRows={emptyRows(table.page, table.rowsPerPage, brands.data.length)}
                   />
 
-                  <TableNoData notFound={notFound} />
+                  <TableNoData notFound={!!(brands.data.length === 0)} />
                 </TableBody>
               </Table>
             </Scrollbar>
@@ -235,17 +221,21 @@ export function BrandView() {
 
           <TablePaginationCustom
             page={table.page}
-            dense={table.dense}
             count={brands.meta.total}
             rowsPerPage={table.rowsPerPage}
             onPageChange={table.onChangePage}
-            onChangeDense={table.onChangeDense}
             onRowsPerPageChange={table.onChangeRowsPerPage}
           />
         </Card>
       </DashboardContent>
 
-      <ImageSelectModal open={selectLogo.value} onClose={selectLogo.onFalse} />
+      <ImageSelectModal
+        open={selectLogo.value}
+        onClose={selectLogo.onFalse}
+        selectedImages={selectedImages}
+        setSelectedImages={setSelectedImages}
+        multiple={false}
+      />
 
       <ConfirmDialog
         open={confirm.value}
@@ -269,6 +259,8 @@ export function BrandView() {
           </Button>
         }
       />
+
+      <BrandManageForm open={manageForm.value} onClose={manageForm.onFalse} />
     </>
   );
 }

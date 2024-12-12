@@ -22,12 +22,12 @@ import { BrandManageForm } from './brand-manage-form';
 type Props = {
   row: IBrand;
   selected: boolean;
-  onViewRow: () => void;
   onSelectRow: () => void;
   onDeleteRow: (id: string, close: () => void) => void;
+  deleteLoading: boolean;
 };
 
-export function BrandTableRow({ row, selected, onViewRow, onSelectRow, onDeleteRow }: Props) {
+export function BrandTableRow({ row, selected, onSelectRow, onDeleteRow, deleteLoading }: Props) {
   const { id, icon, name, description, _count } = row;
   const confirm = useBoolean();
 
@@ -48,9 +48,9 @@ export function BrandTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
         <TableCell align="center">
           <Stack direction="row" alignItems="center" spacing={2}>
             <img
-              src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${icon}}`}
+              src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${icon}`}
               alt={name}
-              style={{ borderRadius: '4px' }}
+              style={{ borderRadius: '4px', width: '40px', height: '40px', objectFit: 'cover' }}
             />
           </Stack>
         </TableCell>
@@ -78,13 +78,7 @@ export function BrandTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
         deleteLoading={false}
       />
 
-      <BrandManageForm
-        item={row}
-        open={manageForm.value}
-        onClose={manageForm.onFalse}
-        onDelete={onDeleteRow}
-        deleteLoading={false}
-      />
+      <BrandManageForm item={row} open={manageForm.value} onClose={manageForm.onFalse} />
 
       <ConfirmDialog
         open={confirm.value}
@@ -96,6 +90,7 @@ export function BrandTableRow({ row, selected, onViewRow, onSelectRow, onDeleteR
             variant="contained"
             color="error"
             onClick={() => onDeleteRow(id, confirm.onFalse)}
+            disabled={deleteLoading}
           >
             Delete
           </Button>

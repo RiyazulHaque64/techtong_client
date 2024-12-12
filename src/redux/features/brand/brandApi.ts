@@ -36,14 +36,15 @@ const authApi = baseApi.injectEndpoints({
       }),
     }),
     deleteBrand: builder.mutation({
-      query: (id: string) => ({
-        url: `${api_endpoint.brand.delete_brand}/${id}`,
+      query: (payload: { ids: string[] }) => ({
+        url: `${api_endpoint.brand.delete_brand}`,
         method: 'DELETE',
+        body: payload,
       }),
       invalidatesTags: [tags.brand],
     }),
     updateBrand: builder.mutation({
-      query: (paylaod: { data: Record<string, string>; id: string }) => ({
+      query: (paylaod: { id: string; data: Record<string, string> }) => ({
         url: `${api_endpoint.brand.update_brand}/${paylaod.id}`,
         method: 'PATCH',
         body: paylaod.data,

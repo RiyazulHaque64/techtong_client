@@ -64,7 +64,6 @@ export function ForgotPasswordView() {
   } = methods;
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
     try {
       setErrorMsg('');
       const res = await forgotPassword(data);

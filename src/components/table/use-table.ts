@@ -24,7 +24,7 @@ export function useTable(props?: UseTableProps): UseTableReturn {
 
   const [orderBy, setOrderBy] = useState(props?.defaultOrderBy || 'created_at');
 
-  const [order, setOrder] = useState<'asc' | 'desc'>(props?.defaultOrder || 'asc');
+  const [order, setOrder] = useState<'asc' | 'desc'>(props?.defaultOrder || 'desc');
 
   const [selected, setSelected] = useState<string[]>(props?.defaultSelected || []);
 

@@ -25,7 +25,6 @@ import { CustomDatePicker } from 'src/components/custom-date-picker/custom-date-
 // ----------------------------------------------------------------------
 
 type Props = {
-  onResetPage: () => void;
   openFromDate: boolean;
   onOpenFromDate: () => void;
   onCloseFromDate: () => void;
@@ -45,7 +44,6 @@ type Props = {
 
 export function ImageFiltersToolbar({
   options,
-  onResetPage,
   queryParams,
   setQueryparams,
   openFromDate,
@@ -70,10 +68,9 @@ export function ImageFiltersToolbar({
   // Handler
   const handleSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onResetPage();
       setSearchText(event.target.value);
     },
-    [setSearchText, onResetPage]
+    [setSearchText]
   );
 
   const handleFromDate = useCallback(
@@ -83,7 +80,6 @@ export function ImageFiltersToolbar({
       } else if (to_date && fIsAfter(newValue, to_date)) {
         setDateError('From date must be before than to date');
       } else {
-        onResetPage();
         const fromDate = fDateTime(newValue, 'YYYY-MM-DD') as string;
         setQueryparams((prev) => {
           const othersQueries = prev.filter((query) => query.name !== 'fromDate');
@@ -93,7 +89,7 @@ export function ImageFiltersToolbar({
         setDateError('');
       }
     },
-    [onResetPage, setQueryparams, onCloseFromDate, to_date]
+    [setQueryparams, onCloseFromDate, to_date]
   );
 
   const handleToDate = useCallback(
@@ -101,7 +97,6 @@ export function ImageFiltersToolbar({
       if (from_date && fIsAfter(from_date, newValue)) {
         setDateError('To date must be later than start date');
       } else {
-        onResetPage();
         const toDate = fDateTime(newValue, 'YYYY-MM-DD') as string;
         setQueryparams((prev) => {
           const othersQueries = prev.filter((query) => query.name !== 'toDate');
@@ -111,7 +106,7 @@ export function ImageFiltersToolbar({
         setDateError('');
       }
     },
-    [onResetPage, setQueryparams, onCloseToDate, from_date]
+    [setQueryparams, onCloseToDate, from_date]
   );
 
   const handleFilterType = useCallback(
