@@ -14,6 +14,7 @@ export const paths = {
     media: `/media`,
     brand: `/brand`,
     category: `/category`,
+    attribute: `/attribute`,
     three: `/three`,
     group: {
       root: `/group`,

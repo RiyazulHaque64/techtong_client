@@ -32,9 +32,9 @@ import { ImageSelectModal } from 'src/components/modal/image-select-modal';
 
 // ----------------------------------------------------------------------
 
-export type NewBrandSchemaType = zod.infer<typeof NewBrandSchema>;
+export type NewCategorySchemaType = zod.infer<typeof NewCategorySchema>;
 
-export const NewBrandSchema = zod.object({
+export const NewCategorySchema = zod.object({
   title: zod.string().min(1, { message: 'Title is required!' }),
   description: zod.string().optional(),
   icon: zod.string().optional(),
@@ -69,9 +69,9 @@ export function CategoryManageForm({ item, open, onClose, ...other }: Props) {
     [title, description, icon, parent_id]
   );
 
-  const methods = useForm<NewBrandSchemaType>({
+  const methods = useForm<NewCategorySchemaType>({
     mode: 'onSubmit',
-    resolver: zodResolver(NewBrandSchema),
+    resolver: zodResolver(NewCategorySchema),
     defaultValues,
   });
 

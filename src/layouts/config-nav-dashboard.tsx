@@ -40,6 +40,7 @@ const ICONS = {
   parameter: icon('ic-parameter'),
   brand: icon('ic-brand'),
   category: icon('ic-category'),
+  attribute: icon('ic-attribute'),
 };
 
 // ----------------------------------------------------------------------
@@ -55,24 +56,6 @@ export const navData = [
       { title: 'Media', path: paths.dashboard.media, icon: ICONS.media },
     ],
   },
-  /**
-   * Management
-   */
-  {
-    subheader: 'Management',
-    items: [
-      {
-        title: 'Group',
-        path: paths.dashboard.group.root,
-        icon: ICONS.user,
-        children: [
-          { title: 'Four', path: paths.dashboard.group.root },
-          { title: 'Five', path: paths.dashboard.group.five },
-          { title: 'Six', path: paths.dashboard.group.six },
-        ],
-      },
-    ],
-  },
   {
     subheader: 'Product Management',
     items: [
@@ -85,6 +68,11 @@ export const navData = [
         title: 'Category',
         path: paths.dashboard.category,
         icon: ICONS.category,
+      },
+      {
+        title: 'Attribute',
+        path: paths.dashboard.attribute,
+        icon: ICONS.attribute,
       },
     ],
   },
