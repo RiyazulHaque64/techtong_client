@@ -5,7 +5,7 @@ import { baseApi } from 'src/redux/api/baseApi';
 import api_endpoint from 'src/redux/api/apiEndpoint';
 import { tags } from 'src/redux/constants/tag-types';
 
-const authApi = baseApi.injectEndpoints({
+const imageApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     uploadImages: builder.mutation({
       query: (data: FormData) => ({
@@ -59,4 +59,4 @@ export const {
   useGetImagesQuery,
   useDeleteImagesMutation,
   useUpdateImageMutation,
-} = authApi;
+} = imageApi;

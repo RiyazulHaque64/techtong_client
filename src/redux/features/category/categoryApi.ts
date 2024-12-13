@@ -1,21 +1,21 @@
-import type { IBrand } from 'src/types/brand';
+import type { ICategory } from 'src/types/category';
 import type { TMeta, TQueryParam, TReduxResponse } from 'src/redux/interfaces/common';
 
 import { baseApi } from 'src/redux/api/baseApi';
 import api_endpoint from 'src/redux/api/apiEndpoint';
 import { tags } from 'src/redux/constants/tag-types';
 
-const brandApi = baseApi.injectEndpoints({
+const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    addBrand: builder.mutation({
+    addCategory: builder.mutation({
       query: (data) => ({
-        url: api_endpoint.brand.add_brand,
+        url: api_endpoint.category.add_category,
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: [tags.brand],
+      invalidatesTags: [tags.category],
     }),
-    getBrands: builder.query({
+    getCategories: builder.query({
       query: (args: TQueryParam[]) => {
         const params = new URLSearchParams();
         if (args.length) {
@@ -24,39 +24,39 @@ const brandApi = baseApi.injectEndpoints({
           });
         }
         return {
-          url: api_endpoint.brand.get_brands,
+          url: api_endpoint.category.get_categories,
           method: 'GET',
           params,
         };
       },
-      providesTags: [tags.brand],
-      transformResponse: (response: TReduxResponse<IBrand[]>) => ({
+      providesTags: [tags.category],
+      transformResponse: (response: TReduxResponse<ICategory[]>) => ({
         data: response.data,
         meta: response.meta as TMeta,
       }),
     }),
-    deleteBrand: builder.mutation({
+    deleteCategories: builder.mutation({
       query: (payload: { ids: string[] }) => ({
-        url: `${api_endpoint.brand.delete_brand}`,
+        url: `${api_endpoint.category.delete_category}`,
         method: 'DELETE',
         body: payload,
       }),
-      invalidatesTags: [tags.brand],
+      invalidatesTags: [tags.category],
     }),
-    updateBrand: builder.mutation({
+    updateCategory: builder.mutation({
       query: (paylaod: { id: string; data: Record<string, string> }) => ({
-        url: `${api_endpoint.brand.update_brand}/${paylaod.id}`,
+        url: `${api_endpoint.category.update_category}/${paylaod.id}`,
         method: 'PATCH',
         body: paylaod.data,
       }),
-      invalidatesTags: [tags.brand],
+      invalidatesTags: [tags.category],
     }),
   }),
 });
 
 export const {
-  useAddBrandMutation,
-  useGetBrandsQuery,
-  useUpdateBrandMutation,
-  useDeleteBrandMutation,
-} = brandApi;
+  useAddCategoryMutation,
+  useGetCategoriesQuery,
+  useDeleteCategoriesMutation,
+  useUpdateCategoryMutation,
+} = categoryApi;

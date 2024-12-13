@@ -1,5 +1,3 @@
-import type { IDatePickerControl } from './common';
-
 export interface IBrand {
   id: string;
   name: string;
@@ -15,6 +13,4 @@ export interface IBrand {
 
 export type IBrandTableFilters = {
   searchTerm: string;
-  startDate: IDatePickerControl;
-  endDate: IDatePickerControl;
 };

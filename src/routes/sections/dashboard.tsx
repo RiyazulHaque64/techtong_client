@@ -15,6 +15,7 @@ import { paths } from '../paths';
 const IndexPage = lazy(() => import('src/pages/dashboard/one'));
 const Media = lazy(() => import('src/pages/dashboard/media'));
 const Brand = lazy(() => import('src/pages/dashboard/brand'));
+const Category = lazy(() => import('src/pages/dashboard/category'));
 const ChangePassword = lazy(() => import('src/pages/account/change-password'));
 const UpdateProfile = lazy(() => import('src/pages/account/update-profile'));
 const PageFour = lazy(() => import('src/pages/dashboard/four'));
@@ -41,6 +42,7 @@ export const dashboardRoutes = [
       { path: paths.auth.update_profile, element: <UpdateProfile /> },
       { path: paths.dashboard.media, element: <Media /> },
       { path: paths.dashboard.brand, element: <Brand /> },
+      { path: paths.dashboard.category, element: <Category /> },
       {
         path: 'group',
         children: [

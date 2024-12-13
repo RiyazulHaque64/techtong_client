@@ -17,7 +17,10 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { useGetBrandsQuery, useDeleteBrandMutation } from 'src/redux/features/brand/brandApi';
+import {
+  useGetCategoriesQuery,
+  useDeleteCategoriesMutation,
+} from 'src/redux/features/category/categoryApi';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -38,16 +41,17 @@ import {
 
 import { FetchingError } from 'src/sections/error/fetching-error';
 
-import { BrandTableRow } from '../brand-table-row';
-import { BrandManageForm } from '../brand-manage-form';
-import { BrandTableToolbar } from '../brand-table-toolbar';
+import { CategoryTableRow } from '../category-table-row';
+import { CategoryManageForm } from '../category-manage-form';
+import { CategoryTableToolbar } from '../category-table-toolbar';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'icon', label: 'Icon', width: 120 },
-  { id: 'name', label: 'Name', width: 150 },
+  { id: 'title', label: 'Title', width: 150 },
   { id: 'description', label: 'Description' },
+  { id: 'parent', label: 'Parent Category', align: 'center' },
   {
     id: '_count.products',
     label: 'Products',
@@ -59,7 +63,7 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export function BrandView() {
+export function CategoryView() {
   const [searchText, setSearchText] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
@@ -72,13 +76,13 @@ export function BrandView() {
   const { page, rowsPerPage, orderBy, order, selected, setSelected } = table;
 
   // Fetcher
-  const [deleteBrands, { isLoading: deleteLoading }] = useDeleteBrandMutation();
+  const [deleteCategories, { isLoading: deleteLoading }] = useDeleteCategoriesMutation();
   const {
-    data: brands,
-    isLoading: getBrandsLoading,
+    data: categories,
+    isLoading: getCategoriesLoading,
     isError,
     error,
-  } = useGetBrandsQuery([
+  } = useGetCategoriesQuery([
     { name: 'page', value: page + 1 },
     { name: 'limit', value: rowsPerPage },
     {
@@ -96,7 +100,7 @@ export function BrandView() {
   const handleDeleteRow = useCallback(
     async (id: string, close: () => void) => {
       try {
-        const res = await deleteBrands({ ids: [id] });
+        const res = await deleteCategories({ ids: [id] });
         if (res?.error) {
           toast.error((res?.error as IErrorResponse)?.data?.message || 'Delete failed!');
         } else {
@@ -107,12 +111,12 @@ export function BrandView() {
         toast.error('Delete failed!');
       }
     },
-    [deleteBrands]
+    [deleteCategories]
   );
 
   const handleDeleteRows = useCallback(async () => {
     try {
-      const res = await deleteBrands({ ids: selected });
+      const res = await deleteCategories({ ids: selected });
       if (res?.error) {
         toast.error((res?.error as IErrorResponse)?.data?.message || 'Delete failed!');
       } else {
@@ -122,16 +126,16 @@ export function BrandView() {
     } catch (err) {
       toast.error('Delete failed!');
     }
-  }, [selected, deleteBrands, setSelected]);
+  }, [selected, deleteCategories, setSelected]);
 
   // JSX
-  if (getBrandsLoading) {
+  if (getCategoriesLoading) {
     return (
       <LoadingScreen sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
     );
   }
 
-  if (isError || !brands) {
+  if (isError || !categories) {
     return (
       <FetchingError
         errorResponse={(error as IErrorResponse).data}
@@ -145,8 +149,8 @@ export function BrandView() {
       <DashboardContent>
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
           <CustomBreadcrumbs
-            heading="Brand"
-            links={[{ name: 'Dashboard', href: paths.dashboard.root }, { name: 'Brand' }]}
+            heading="Category"
+            links={[{ name: 'Dashboard', href: paths.dashboard.root }, { name: 'Category' }]}
             sx={{ mb: { xs: 3, md: 5 } }}
           />
           <Button
@@ -154,21 +158,21 @@ export function BrandView() {
             startIcon={<Iconify icon="eva:cloud-upload-fill" />}
             onClick={manageForm.onTrue}
           >
-            Add Brand
+            Add Category
           </Button>
         </Stack>
 
         <Card>
-          <BrandTableToolbar setSearchText={setSearchText} searchText={searchText} />
+          <CategoryTableToolbar setSearchText={setSearchText} searchText={searchText} />
 
           <Box sx={{ position: 'relative' }}>
             <TableSelectedAction
               numSelected={table.selected.length}
-              rowCount={brands.meta.total}
+              rowCount={categories.meta.total}
               onSelectAllRows={(checked) =>
                 table.onSelectAllRows(
                   checked,
-                  brands.data.map((row) => row.id)
+                  categories.data.map((row) => row.id)
                 )
               }
               action={
@@ -186,20 +190,20 @@ export function BrandView() {
                   order={table.order}
                   orderBy={table.orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={brands.meta.total}
+                  rowCount={categories.meta.total}
                   numSelected={table.selected.length}
                   onSort={table.onSort}
                   onSelectAllRows={(checked) =>
                     table.onSelectAllRows(
                       checked,
-                      brands.data.map((row) => row.id)
+                      categories.data.map((row) => row.id)
                     )
                   }
                 />
 
                 <TableBody>
-                  {brands.data.map((row) => (
-                    <BrandTableRow
+                  {categories.data.map((row) => (
+                    <CategoryTableRow
                       key={row.id}
                       row={row}
                       selected={table.selected.includes(row.id)}
@@ -211,10 +215,13 @@ export function BrandView() {
 
                   <TableEmptyRows
                     height={table.dense ? 56 : 56 + 20}
-                    emptyRows={emptyRows(table.page, table.rowsPerPage, brands.data.length)}
+                    emptyRows={emptyRows(table.page, table.rowsPerPage, categories.data.length)}
                   />
 
-                  <TableNoData notFound={!!(brands.data.length === 0)} title="No brands found" />
+                  <TableNoData
+                    notFound={!!(categories.data.length === 0)}
+                    title="No categories found"
+                  />
                 </TableBody>
               </Table>
             </Scrollbar>
@@ -222,7 +229,7 @@ export function BrandView() {
 
           <TablePaginationCustom
             page={table.page}
-            count={brands.meta.total}
+            count={categories.meta.total}
             rowsPerPage={table.rowsPerPage}
             onPageChange={table.onChangePage}
             onRowsPerPageChange={table.onChangeRowsPerPage}
@@ -231,7 +238,7 @@ export function BrandView() {
       </DashboardContent>
 
       <ImageSelectModal
-        title="Select logo"
+        title="Select icon"
         open={selectLogo.value}
         onClose={selectLogo.onFalse}
         selectedImages={selectedImages}
@@ -262,7 +269,7 @@ export function BrandView() {
         }
       />
 
-      <BrandManageForm open={manageForm.value} onClose={manageForm.onFalse} />
+      <CategoryManageForm open={manageForm.value} onClose={manageForm.onFalse} />
     </>
   );
 }

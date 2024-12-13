@@ -3,6 +3,7 @@ const features = {
   user: '/user',
   image: '/image',
   brand: '/brand',
+  category: '/category',
 };
 
 const api_endpoint = {
@@ -25,6 +26,12 @@ const api_endpoint = {
     get_brands: `${features.brand}`,
     update_brand: `${features.brand}`,
     delete_brand: `${features.brand}/delete-brand`,
+  },
+  category: {
+    add_category: `${features.category}/add-category`,
+    get_categories: `${features.category}`,
+    update_category: `${features.category}`,
+    delete_category: `${features.category}/delete-category`,
   },
 };
 

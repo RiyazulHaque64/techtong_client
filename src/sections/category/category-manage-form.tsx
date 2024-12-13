@@ -1,4 +1,4 @@
-import type { IBrand } from 'src/types/brand';
+import type { ICategory } from 'src/types/category';
 import type { DrawerProps } from '@mui/material/Drawer';
 import type { IErrorResponse } from 'src/redux/interfaces/common';
 
@@ -18,7 +18,11 @@ import Typography from '@mui/material/Typography';
 import { useBoolean } from 'src/hooks/use-boolean';
 
 import { CONFIG } from 'src/config-global';
-import { useAddBrandMutation, useUpdateBrandMutation } from 'src/redux/features/brand/brandApi';
+import {
+  useGetCategoriesQuery,
+  useAddCategoryMutation,
+  useUpdateCategoryMutation,
+} from 'src/redux/features/category/categoryApi';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -31,22 +35,24 @@ import { ImageSelectModal } from 'src/components/modal/image-select-modal';
 export type NewBrandSchemaType = zod.infer<typeof NewBrandSchema>;
 
 export const NewBrandSchema = zod.object({
-  name: zod.string().min(1, { message: 'Name is required!' }),
+  title: zod.string().min(1, { message: 'Title is required!' }),
   description: zod.string().optional(),
   icon: zod.string().optional(),
+  parent_id: zod.string().optional(),
 });
 
 type Props = DrawerProps & {
-  item?: IBrand;
+  item?: ICategory;
   onClose: () => void;
-  currentBrand?: any;
+  currentCategory?: ICategory;
 };
 
-export function BrandManageForm({ item, open, onClose, ...other }: Props) {
-  const { id, name, icon, description } = item || {};
+export function CategoryManageForm({ item, open, onClose, ...other }: Props) {
+  const { id, title, icon, description, parent_id, parent } = item || {};
 
-  const [updateBrand, { isLoading: updateLoading }] = useUpdateBrandMutation();
-  const [addBrand, { isLoading: addLoading }] = useAddBrandMutation();
+  const { data: categories } = useGetCategoriesQuery([{ name: 'limit', value: 500 }]);
+  const [updateCategory, { isLoading: updateLoading }] = useUpdateCategoryMutation();
+  const [addCategory, { isLoading: addLoading }] = useAddCategoryMutation();
 
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>('');
@@ -55,11 +61,12 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
 
   const defaultValues = useMemo(
     () => ({
-      name: name || '',
+      title: title || '',
       description: description || '',
       icon: icon || '',
+      parent_id: parent_id || '',
     }),
-    [name, description, icon]
+    [title, description, icon, parent_id]
   );
 
   const methods = useForm<NewBrandSchemaType>({
@@ -76,14 +83,18 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
+      if (data.parent_id === '') {
+        delete data.parent_id;
+      }
+      console.log('new category data: ', data);
       if (selectedImages.length > 0) {
         data.icon = selectedImages[0];
       }
       let res;
       if (id) {
-        res = await updateBrand({ id, data });
+        res = await updateCategory({ id, data });
       } else {
-        res = await addBrand(data);
+        res = await addCategory(data);
       }
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
@@ -107,7 +118,7 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
         {...other}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 2.5 }}>
-          <Typography variant="h6"> {id ? 'Edit Brand' : 'Add Brand'} </Typography>
+          <Typography variant="h6"> {id ? 'Edit Category' : 'Add Category'} </Typography>
           <IconButton
             aria-label="edit_name"
             size="small"
@@ -163,11 +174,26 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
                     }}
                   />
                 ) : (
-                  <Typography variant="h6">Select Logo</Typography>
+                  <Typography variant="h6">Select Icon</Typography>
                 )}
               </Stack>
-              <Field.Text name="name" label="Name" />
+              <Field.Text name="title" label="Title" />
               <Field.Text name="description" label="Description" />
+              <Field.Select
+                native
+                name="parent_id"
+                label="Parent Category"
+                InputLabelProps={{ shrink: true }}
+              >
+                <option value={parent_id || ''}>
+                  {parent_id && parent ? parent.title : 'None'}
+                </option>
+                {categories?.data.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.title}
+                  </option>
+                ))}
+              </Field.Select>
             </Stack>
             <Box sx={{ p: 2.5 }}>
               <Button
@@ -188,7 +214,7 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
         </Form>
       </Drawer>
       <ImageSelectModal
-        title="Select logo"
+        title="Select icon"
         open={selectImageModal.value}
         onClose={selectImageModal.onFalse}
         selectedImages={selectedImages}
@@ -198,4 +224,3 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
     </>
   );
 }
-// calc(100vh - 170px)

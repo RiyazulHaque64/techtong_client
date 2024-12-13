@@ -13,6 +13,7 @@ export const paths = {
     root: '/',
     media: `/media`,
     brand: `/brand`,
+    category: `/category`,
     three: `/three`,
     group: {
       root: `/group`,

@@ -39,6 +39,7 @@ const ICONS = {
   dashboard: icon('ic-dashboard'),
   parameter: icon('ic-parameter'),
   brand: icon('ic-brand'),
+  category: icon('ic-category'),
 };
 
 // ----------------------------------------------------------------------
@@ -79,6 +80,11 @@ export const navData = [
         title: 'Brand',
         path: paths.dashboard.brand,
         icon: ICONS.brand,
+      },
+      {
+        title: 'Category',
+        path: paths.dashboard.category,
+        icon: ICONS.category,
       },
     ],
   },
