@@ -16,7 +16,10 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
 import { useGetCategoriesQuery } from 'src/redux/features/category/categoryApi';
-import { useAddBrandMutation, useUpdateBrandMutation } from 'src/redux/features/brand/brandApi';
+import {
+  useAddAttributeMutation,
+  useUpdateAttributeMutation,
+} from 'src/redux/features/attribute/attributeApi';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -24,34 +27,63 @@ import { Form, Field } from 'src/components/hook-form';
 
 // ----------------------------------------------------------------------
 
+export const _tags = [
+  `Technology`,
+  `Health and Wellness`,
+  `Travel`,
+  `Finance`,
+  `Education`,
+  `Food and Beverage`,
+  `Fashion`,
+  `Home and Garden`,
+  `Sports`,
+  `Entertainment`,
+  `Business`,
+  `Science`,
+  `Automotive`,
+  `Beauty`,
+  `Fitness`,
+  `Lifestyle`,
+  `Real Estate`,
+  `Parenting`,
+  `Pet Care`,
+  `Environmental`,
+  `DIY and Crafts`,
+  `Gaming`,
+  `Photography`,
+  `Music`,
+];
+
 export type NewAttributeSchemaType = zod.infer<typeof NewAttributeSchema>;
 
 export const NewAttributeSchema = zod.object({
   name: zod.string().min(1, { message: 'Name is required!' }),
-  description: zod.string().optional(),
-  icon: zod.string().optional(),
+  value: zod.array(zod.string()),
+  category_id: zod.string().optional(),
 });
 
 type Props = DrawerProps & {
   item?: IAttribute;
   onClose: () => void;
-  currentBrand?: any;
+  open: boolean;
 };
 
 export function AttributeManageForm({ item, open, onClose, ...other }: Props) {
-  const { id, name, category_id, category } = item || {};
+  const { id, name, value, category_id, category } = item || {};
 
   const { data: categories } = useGetCategoriesQuery([{ name: 'limit', value: 500 }]);
-  const [updateBrand, { isLoading: updateLoading }] = useUpdateBrandMutation();
-  const [addBrand, { isLoading: addLoading }] = useAddBrandMutation();
+  const [addAttribute, { isLoading: addLoading }] = useAddAttributeMutation();
+  const [updateAttribute, { isLoading: updateLoading }] = useUpdateAttributeMutation();
 
   const [errorMsg, setErrorMsg] = useState<string>('');
 
   const defaultValues = useMemo(
     () => ({
       name: name || '',
+      value: value || [],
+      category_id: category_id || '',
     }),
-    [name]
+    [name, category_id, value]
   );
 
   const methods = useForm<NewAttributeSchemaType>({
@@ -62,22 +94,24 @@ export function AttributeManageForm({ item, open, onClose, ...other }: Props) {
 
   const {
     handleSubmit,
+    watch,
     formState: { isSubmitting },
     reset,
   } = methods;
 
+  console.log('category_id: ', watch('category_id'));
   const onSubmit = handleSubmit(async (data) => {
     try {
       let res;
       if (id) {
-        res = await updateBrand({ id, data });
+        res = await updateAttribute({ id, data });
       } else {
-        res = await addBrand(data);
+        res = await addAttribute(data);
       }
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
       } else {
-        toast.success(id ? 'Update success!' : 'Create success!');
+        toast.success(id ? 'Update success!' : 'Add success!');
         onClose();
       }
     } catch (err) {
@@ -116,11 +150,15 @@ export function AttributeManageForm({ item, open, onClose, ...other }: Props) {
           )}
           <Stack direction="column" spacing={2.5} flexGrow={1} sx={{ p: 2.5 }}>
             <Field.Text name="name" label="Name" />
-            <Field.Text name="description" label="Description" />
+            <Field.ChipText
+              name="value"
+              placeholder="Value"
+              helperText="Separate values with comma(,) or press enter"
+            />
             <Field.Select
               native
-              name="parent_id"
-              label="Parent Category"
+              name="category_id"
+              label="Category"
               InputLabelProps={{ shrink: true }}
             >
               <option value={category_id || ''}>
@@ -145,7 +183,7 @@ export function AttributeManageForm({ item, open, onClose, ...other }: Props) {
               }
               disabled={isSubmitting || updateLoading || addLoading}
             >
-              {id ? 'Save Changes' : 'Add Brand'}
+              {id ? 'Save Changes' : 'Add Attribute'}
             </Button>
           </Box>
         </Stack>

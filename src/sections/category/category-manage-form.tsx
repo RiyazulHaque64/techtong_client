@@ -99,7 +99,7 @@ export function CategoryManageForm({ item, open, onClose, ...other }: Props) {
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
       } else {
-        toast.success(id ? 'Update success!' : 'Create success!');
+        toast.success(id ? 'Update success!' : 'Add success!');
         onClose();
       }
     } catch (err) {
@@ -207,7 +207,7 @@ export function CategoryManageForm({ item, open, onClose, ...other }: Props) {
                 }
                 disabled={isSubmitting || updateLoading || addLoading}
               >
-                {id ? 'Save Changes' : 'Add Brand'}
+                {id ? 'Save Changes' : 'Add Category'}
               </Button>
             </Box>
           </Stack>

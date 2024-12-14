@@ -44,7 +44,7 @@ const attributeApi = baseApi.injectEndpoints({
       invalidatesTags: [tags.attribute],
     }),
     updateAttribute: builder.mutation({
-      query: (paylaod: { id: string; data: Record<string, string> }) => ({
+      query: (paylaod: { id: string; data: Record<string, any> }) => ({
         url: `${api_endpoint.attribute.update_attribute}/${paylaod.id}`,
         method: 'PATCH',
         body: paylaod.data,
