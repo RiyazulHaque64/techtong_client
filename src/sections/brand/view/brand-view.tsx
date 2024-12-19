@@ -45,11 +45,11 @@ import { BrandTableToolbar } from '../brand-table-toolbar';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'icon', label: 'Icon', width: 120 },
+  { id: 'icon', label: 'Icon', width: 120, noSort: true },
   { id: 'name', label: 'Name', width: 150 },
   { id: 'description', label: 'Description' },
   {
-    id: '_count.products',
+    id: 'products',
     label: 'Products',
     width: 100,
     align: 'center',
@@ -89,7 +89,7 @@ export function BrandView() {
       name: 'sortOrder',
       value: order,
     },
-    { name: 'searchTerm', value: searchTerm },
+    ...(searchTerm.length > 0 ? [{ name: 'searchTerm', value: searchTerm }] : []),
   ]);
 
   // Handlers

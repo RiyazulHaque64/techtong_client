@@ -44,16 +44,17 @@ import { FetchingError } from 'src/sections/error/fetching-error';
 import { CategoryTableRow } from '../category-table-row';
 import { CategoryManageForm } from '../category-manage-form';
 import { CategoryTableToolbar } from '../category-table-toolbar';
+import { CategoryFiltersResult } from '../category-filters-result';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'icon', label: 'Icon', width: 120 },
+  { id: 'icon', label: 'Icon', width: 120, noSort: true },
   { id: 'title', label: 'Title', width: 150 },
   { id: 'description', label: 'Description' },
-  { id: 'parent', label: 'Parent Category', align: 'center' },
+  { id: 'parent', label: 'Parent Category', align: 'center', noSort: true },
   {
-    id: '_count.products',
+    id: 'products',
     label: 'Products',
     width: 100,
     align: 'center',
@@ -66,6 +67,7 @@ const TABLE_HEAD = [
 export function CategoryView() {
   const [searchText, setSearchText] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [parentCategory, setParentCategory] = useState<string>('');
 
   const selectLogo = useBoolean();
   const confirm = useBoolean();
@@ -73,7 +75,7 @@ export function CategoryView() {
   const searchTerm = useDebounce(searchText, 500);
   const table = useTable();
 
-  const { page, rowsPerPage, orderBy, order, selected, setSelected } = table;
+  const { page, rowsPerPage, orderBy, order, selected, setSelected, onResetPage } = table;
 
   // Fetcher
   const [deleteCategories, { isLoading: deleteLoading }] = useDeleteCategoriesMutation();
@@ -93,8 +95,13 @@ export function CategoryView() {
       name: 'sortOrder',
       value: order,
     },
-    { name: 'searchTerm', value: searchTerm },
+    ...(searchTerm.length > 0 ? [{ name: 'searchTerm', value: searchTerm }] : []),
+    ...(parentCategory.length > 0 && parentCategory !== 'ALL'
+      ? [{ name: 'parent', value: parentCategory }]
+      : []),
   ]);
+
+  const canReset = !!searchText || (parentCategory.length > 0 && parentCategory !== 'ALL');
 
   // Handlers
   const handleDeleteRow = useCallback(
@@ -163,7 +170,23 @@ export function CategoryView() {
         </Stack>
 
         <Card>
-          <CategoryTableToolbar setSearchText={setSearchText} searchText={searchText} />
+          <CategoryTableToolbar
+            setSearchText={setSearchText}
+            searchText={searchText}
+            parentCategory={parentCategory}
+            setParentCategory={setParentCategory}
+          />
+          {canReset && (
+            <CategoryFiltersResult
+              parentCategory={parentCategory}
+              setParentCategory={setParentCategory}
+              searchText={searchText}
+              setSearchText={setSearchText}
+              onResetPage={onResetPage}
+              totalResults={categories.meta.total}
+              sx={{ p: 2.5, pt: 0 }}
+            />
+          )}
 
           <Box sx={{ position: 'relative' }}>
             <TableSelectedAction

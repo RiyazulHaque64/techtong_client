@@ -86,15 +86,18 @@ export function CategoryManageForm({ item, open, onClose, ...other }: Props) {
       if (data.parent_id === '') {
         delete data.parent_id;
       }
-      console.log('new category data: ', data);
       if (selectedImages.length > 0) {
         data.icon = selectedImages[0];
       }
       let res;
       if (id) {
         res = await updateCategory({ id, data });
+        reset();
+        setSelectedImages([]);
       } else {
         res = await addCategory(data);
+        reset();
+        setSelectedImages([]);
       }
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);

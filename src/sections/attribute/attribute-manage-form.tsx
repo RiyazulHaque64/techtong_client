@@ -94,14 +94,13 @@ export function AttributeManageForm({ item, open, onClose, ...other }: Props) {
 
   const {
     handleSubmit,
-    watch,
     formState: { isSubmitting },
     reset,
   } = methods;
 
-  console.log('category_id: ', watch('category_id'));
   const onSubmit = handleSubmit(async (data) => {
     try {
+      if (data.category_id === '') delete data.category_id;
       let res;
       if (id) {
         res = await updateAttribute({ id, data });

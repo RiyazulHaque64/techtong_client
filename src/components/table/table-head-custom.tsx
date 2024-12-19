@@ -44,6 +44,8 @@ export function TableHeadCustom({
   numSelected = 0,
   onSelectAllRows,
 }: TableHeadCustomProps) {
+  console.log('order by', orderBy);
+  console.log('on sort', onSort);
   return (
     <TableHead sx={sx}>
       <TableRow>
@@ -70,7 +72,7 @@ export function TableHeadCustom({
             sortDirection={orderBy === headCell.id ? order : false}
             sx={{ width: headCell.width, minWidth: headCell.minWidth }}
           >
-            {onSort ? (
+            {onSort && !headCell.noSort ? (
               <TableSortLabel
                 hideSortIcon
                 active={orderBy === headCell.id}

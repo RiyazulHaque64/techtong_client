@@ -1,5 +1,8 @@
 import type { IAttribute } from 'src/types/attribute';
 
+import { startCase } from 'lodash';
+
+import { Chip } from '@mui/material';
 import Button from '@mui/material/Button';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
@@ -45,7 +48,13 @@ export function AttributeTableRow({
             inputProps={{ id: `row-checkbox-${id}`, 'aria-label': `Row checkbox` }}
           />
         </TableCell>
-        <TableCell> {name} </TableCell>
+        <TableCell> {startCase(name)} </TableCell>
+        <TableCell align="center">{row.category?.title}</TableCell>
+        <TableCell align="center">
+          {row.value.map((v) => (
+            <Chip key={v} variant="soft" color="info" label={startCase(v)} sx={{ m: 0.5 }} />
+          ))}
+        </TableCell>
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
           <IconButton onClick={manageForm.onTrue}>
             <Iconify icon="solar:pen-bold" />

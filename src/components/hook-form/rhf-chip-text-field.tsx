@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from 'react';
+import type { FocusEvent, KeyboardEvent } from 'react';
 import type { TextFieldProps } from '@mui/material/TextField';
 
 import { Controller, useFormContext } from 'react-hook-form';
@@ -36,8 +36,18 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
     }
   };
 
+  const handleBlur = (
+    e: FocusEvent<HTMLInputElement>,
+    new_value: string,
+    onChange: (value: string) => void
+  ) => {
+    if (new_value.trim().length > 0) {
+      setValue(name, [...values, new_value.trim()], { shouldValidate: true });
+      onChange('');
+    }
+  };
+
   const handleDeleteChip = (chipToDelete: string) => {
-    console.log('chip to delete: ', chipToDelete);
     const remainingChip = values.filter((value) => value !== chipToDelete);
     setValue(name, remainingChip);
   };
@@ -75,6 +85,9 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
               value={field.value || ''}
               onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
                 handleKeyDown(e, field.value, field.onChange)
+              }
+              onBlur={(e: FocusEvent<HTMLInputElement>) =>
+                handleBlur(e, field.value, field.onChange)
               }
               error={!!error}
               InputProps={{

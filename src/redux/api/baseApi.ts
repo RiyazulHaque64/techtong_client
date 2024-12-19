@@ -44,7 +44,7 @@ const baseQueryWithRefreshToken: BaseQueryFn<FetchArgs, BaseQueryApi, Definition
     const data = await res.json();
     if (data?.data) {
       const { user } = (api.getState() as RootState).auth;
-      api.dispatch(setUser({ user, token: data.data }));
+      api.dispatch(setUser({ user, token: data.data?.access_token }));
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logout());

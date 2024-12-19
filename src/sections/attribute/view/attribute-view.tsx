@@ -17,8 +17,11 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { useDeleteBrandMutation } from 'src/redux/features/brand/brandApi';
-import { useGetAttributesQuery } from 'src/redux/features/attribute/attributeApi';
+import { useGetCategoriesQuery } from 'src/redux/features/category/categoryApi';
+import {
+  useGetAttributesQuery,
+  useDeleteAttributeMutation,
+} from 'src/redux/features/attribute/attributeApi';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -26,7 +29,6 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { LoadingScreen } from 'src/components/loading-screen';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
-import { ImageSelectModal } from 'src/components/modal/image-select-modal';
 import {
   useTable,
   emptyRows,
@@ -42,11 +44,14 @@ import { FetchingError } from 'src/sections/error/fetching-error';
 import { AttributeTableRow } from '../attribute-table-row';
 import { AttributeManageForm } from '../attribute-manage-form';
 import { AttributeTableToolbar } from '../attribute-table-toolbar';
+import { AttributeFiltersResult } from '../attribute-filters-result';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', width: 150 },
+  { id: 'category', label: 'Category', width: 150, align: 'center' },
+  { id: 'value', label: 'Value', align: 'center', noSort: true },
   { id: '', width: 88 },
 ];
 
@@ -54,18 +59,18 @@ const TABLE_HEAD = [
 
 export function AttributeView() {
   const [searchText, setSearchText] = useState<string>('');
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  const selectLogo = useBoolean();
   const confirm = useBoolean();
   const manageForm = useBoolean();
   const searchTerm = useDebounce(searchText, 500);
   const table = useTable();
 
-  const { page, rowsPerPage, orderBy, order, selected, setSelected } = table;
+  const { page, rowsPerPage, orderBy, order, selected, setSelected, onResetPage } = table;
 
   // Fetcher
-  const [deleteBrands, { isLoading: deleteLoading }] = useDeleteBrandMutation();
+  const { data: categories } = useGetCategoriesQuery([{ name: 'limit', value: 500 }]);
+  const [deleteAttributes, { isLoading: deleteLoading }] = useDeleteAttributeMutation();
   const {
     data: brands,
     isLoading: getBrandsLoading,
@@ -82,14 +87,19 @@ export function AttributeView() {
       name: 'sortOrder',
       value: order,
     },
-    { name: 'searchTerm', value: searchTerm },
+    ...(searchTerm ? [{ name: 'searchTerm', value: searchTerm }] : []),
+    ...(selectedCategories.length > 0
+      ? [{ name: 'category', value: selectedCategories.join(',') }]
+      : []),
   ]);
+
+  const canReset = !!searchText || selectedCategories.length > 0;
 
   // Handlers
   const handleDeleteRow = useCallback(
     async (id: string, close: () => void) => {
       try {
-        const res = await deleteBrands({ ids: [id] });
+        const res = await deleteAttributes({ ids: [id] });
         if (res?.error) {
           toast.error((res?.error as IErrorResponse)?.data?.message || 'Delete failed!');
         } else {
@@ -100,12 +110,12 @@ export function AttributeView() {
         toast.error('Delete failed!');
       }
     },
-    [deleteBrands]
+    [deleteAttributes]
   );
 
   const handleDeleteRows = useCallback(async () => {
     try {
-      const res = await deleteBrands({ ids: selected });
+      const res = await deleteAttributes({ ids: selected });
       if (res?.error) {
         toast.error((res?.error as IErrorResponse)?.data?.message || 'Delete failed!');
       } else {
@@ -115,7 +125,7 @@ export function AttributeView() {
     } catch (err) {
       toast.error('Delete failed!');
     }
-  }, [selected, deleteBrands, setSelected]);
+  }, [selected, deleteAttributes, setSelected]);
 
   // JSX
   if (getBrandsLoading) {
@@ -152,7 +162,24 @@ export function AttributeView() {
         </Stack>
 
         <Card>
-          <AttributeTableToolbar setSearchText={setSearchText} searchText={searchText} />
+          <AttributeTableToolbar
+            setSearchText={setSearchText}
+            searchText={searchText}
+            selectedCategories={selectedCategories}
+            setSelectedCategories={setSelectedCategories}
+            categories={categories?.data || []}
+          />
+          {canReset && (
+            <AttributeFiltersResult
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
+              searchText={searchText}
+              setSearchText={setSearchText}
+              onResetPage={onResetPage}
+              totalResults={brands.meta.total}
+              sx={{ p: 2.5, pt: 0 }}
+            />
+          )}
 
           <Box sx={{ position: 'relative' }}>
             <TableSelectedAction
@@ -222,15 +249,6 @@ export function AttributeView() {
           />
         </Card>
       </DashboardContent>
-
-      <ImageSelectModal
-        title="Select logo"
-        open={selectLogo.value}
-        onClose={selectLogo.onFalse}
-        selectedImages={selectedImages}
-        setSelectedImages={setSelectedImages}
-        multiple={false}
-      />
 
       <ConfirmDialog
         open={confirm.value}
