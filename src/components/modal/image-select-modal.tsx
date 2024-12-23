@@ -147,10 +147,12 @@ export function ImageSelectModal({
           onClose();
           setFiles([]);
           setCurrentSelected(null);
-          setSelectedImages([]);
           setSearchText('');
           setTypes([]);
           setQueryParams([]);
+          if (!multiple) {
+            setSelectedImages([]);
+          }
         }}
         sx={(theme) => ({
           position: 'absolute',

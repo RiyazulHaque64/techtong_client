@@ -1,11 +1,10 @@
 import type { FocusEvent, KeyboardEvent } from 'react';
 import type { TextFieldProps } from '@mui/material/TextField';
 
-import { startCase } from 'lodash';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import TextField from '@mui/material/TextField';
-import { Chip, Stack, IconButton, InputAdornment } from '@mui/material';
+import { Box, Chip, InputAdornment } from '@mui/material';
 
 import { Iconify } from '../iconify';
 
@@ -27,18 +26,15 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
   ) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      if (new_value.trim() && !values.includes(new_value.toLowerCase())) {
-        setValue(name, [...values, new_value.trim().toLowerCase()], { shouldValidate: true });
+      if (new_value.trim() && !values.includes(new_value)) {
+        setValue(name, [...values, new_value.trim()], { shouldValidate: true });
       }
       onChange('');
+    } else if (e.key === 'Backspace' && new_value === '' && values.length > 0) {
+      const updatedValues = [...values];
+      updatedValues.pop();
+      setValue(name, updatedValues);
     }
-  };
-
-  const handleClick = (new_value: string, onChange: (value: string) => void) => {
-    if (new_value.trim() && !values.includes(new_value.toLowerCase())) {
-      setValue(name, [...values, new_value.trim().toLowerCase()], { shouldValidate: true });
-    }
-    onChange('');
   };
 
   const handleBlur = (
@@ -47,7 +43,7 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
     onChange: (value: string) => void
   ) => {
     if (new_value.trim().length > 0) {
-      setValue(name, [...values, new_value.trim().toLowerCase()], { shouldValidate: true });
+      setValue(name, [...values, new_value.trim()], { shouldValidate: true });
       onChange('');
     }
   };
@@ -62,43 +58,58 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
       name="chip_value"
       control={control}
       render={({ field, fieldState: { error } }) => (
-        <>
+        <Box>
           <TextField
             {...field}
             fullWidth
-            type="text"
-            value={field.value || ''}
+            type={type}
+            value={type === 'number' && field.value === 0 ? '' : field.value}
             onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
               handleKeyDown(e, field.value, field.onChange)
             }
             onBlur={(e: FocusEvent<HTMLInputElement>) => handleBlur(e, field.value, field.onChange)}
             error={!!error}
             helperText={error?.message ?? helperText}
-            InputProps={{
+            inputProps={{
+              autoComplete: 'off',
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => handleClick(field.value, field.onChange)} edge="end">
-                    <Iconify icon="ic:round-plus" width={24} />
-                  </IconButton>
+                  <Iconify icon="solar:user-rounded-bold" width={24} />
                 </InputAdornment>
               ),
             }}
             {...other}
           />
-          <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-            {values.map((chip, index) => (
-              <Chip
-                key={index}
-                label={startCase(chip)}
-                size="small"
-                variant="soft"
-                color="info"
-                onDelete={() => handleDeleteChip(chip)}
-              />
-            ))}
-          </Stack>
-        </>
+          {values.map((chip, index) => (
+            <Chip
+              key={index}
+              label={chip}
+              size="small"
+              variant="soft"
+              color="info"
+              onDelete={() => handleDeleteChip(chip)}
+            />
+          ))}
+        </Box>
       )}
     />
   );
 }
+
+// {/* <TextField
+//   {...field}
+//   fullWidth
+//   variant="outlined"
+//   value={field.value || ''}
+//   onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, field.value, field.onChange)}
+//   onBlur={(e: FocusEvent<HTMLInputElement>) => handleBlur(e, field.value, field.onChange)}
+//   error={!!error}
+//   InputProps={{
+//     disableUnderline: true,
+//     style: { margin: '0 4px', width: 'auto', flex: 1 },
+//   }}
+//   sx={{
+//     '& .MuiInputBase-root': { padding: 0 },
+//   }}
+//   {...other}
+// />; */}

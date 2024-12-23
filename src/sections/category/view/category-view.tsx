@@ -158,7 +158,7 @@ export function CategoryView() {
           <CustomBreadcrumbs
             heading="Category"
             links={[{ name: 'Dashboard', href: paths.dashboard.root }, { name: 'Category' }]}
-            sx={{ mb: { xs: 3, md: 5 } }}
+            sx={{ mb: 3 }}
           />
           <Button
             variant="contained"

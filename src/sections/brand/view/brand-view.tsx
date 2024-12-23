@@ -147,7 +147,7 @@ export function BrandView() {
           <CustomBreadcrumbs
             heading="Brand"
             links={[{ name: 'Dashboard', href: paths.dashboard.root }, { name: 'Brand' }]}
-            sx={{ mb: { xs: 3, md: 5 } }}
+            sx={{ mb: 3 }}
           />
           <Button
             variant="contained"

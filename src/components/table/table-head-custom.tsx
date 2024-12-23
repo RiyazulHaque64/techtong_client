@@ -44,8 +44,6 @@ export function TableHeadCustom({
   numSelected = 0,
   onSelectAllRows,
 }: TableHeadCustomProps) {
-  console.log('order by', orderBy);
-  console.log('on sort', onSort);
   return (
     <TableHead sx={sx}>
       <TableRow>

@@ -14,6 +14,8 @@ export const paths = {
     media: `/media`,
     brand: `/brand`,
     category: `/category`,
+    product: `/product`,
+    add_product: `/product/add`,
     attribute: `/attribute`,
     three: `/three`,
     group: {

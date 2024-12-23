@@ -60,6 +60,15 @@ export const navData = [
     subheader: 'Product Management',
     items: [
       {
+        title: 'Product',
+        path: paths.dashboard.product,
+        icon: ICONS.product,
+        children: [
+          { title: 'All Products', path: paths.dashboard.product },
+          { title: 'Add Product', path: paths.dashboard.add_product },
+        ],
+      },
+      {
         title: 'Brand',
         path: paths.dashboard.brand,
         icon: ICONS.brand,

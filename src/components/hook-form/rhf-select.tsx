@@ -161,7 +161,7 @@ export function RHFMultiSelect({
                   <Checkbox
                     size="small"
                     disableRipple
-                    checked={field.value.includes(option.value)}
+                    checked={field.value?.includes(option.value)}
                     {...slotProps?.checkbox}
                   />
                 )}

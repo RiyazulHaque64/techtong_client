@@ -54,15 +54,13 @@ export function AttributeTableToolbar({
     >
       <Stack direction="row" alignItems="center" spacing={2} flexGrow={1} sx={{ width: 1 }}>
         <FormControl sx={{ flexShrink: 0, width: { xs: 1, md: 190 } }}>
-          <InputLabel htmlFor="invoice-filter-service-select-label" sx={{ ml: '-4px' }}>
-            Category
-          </InputLabel>
+          <InputLabel htmlFor="invoice-filter-service-select-label">Category</InputLabel>
 
           <Select
             multiple
             value={selectedCategories}
             onChange={handleFilterService}
-            input={<OutlinedInput label="Service" />}
+            input={<OutlinedInput label="Category" />}
             renderValue={(selected) => selected.map((value: string) => value).join(', ')}
             inputProps={{ id: 'invoice-filter-service-select-label' }}
             sx={{ textTransform: 'capitalize' }}

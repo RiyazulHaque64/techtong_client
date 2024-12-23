@@ -1,6 +1,8 @@
-import { RHFSelect } from './rhf-select';
 import { RHFUploadAvatar } from './rhf-upload';
 import { RHFTextField } from './rhf-text-field';
+import { RHFImageSelect } from './rhf-image-select';
+import { RHFAutoComplete } from './rhf-auto-complete';
+import { RHFSelect, RHFMultiSelect } from './rhf-select';
 import { RHFChipTextField } from './rhf-chip-text-field';
 
 // ----------------------------------------------------------------------
@@ -10,4 +12,7 @@ export const Field = {
   UploadAvatar: RHFUploadAvatar,
   Select: RHFSelect,
   ChipText: RHFChipTextField,
+  MultiSelect: RHFMultiSelect,
+  AutoComplete: RHFAutoComplete,
+  ImageSelect: RHFImageSelect,
 };

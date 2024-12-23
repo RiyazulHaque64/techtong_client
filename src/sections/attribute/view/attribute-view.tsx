@@ -150,7 +150,7 @@ export function AttributeView() {
           <CustomBreadcrumbs
             heading="Attribute"
             links={[{ name: 'Dashboard', href: paths.dashboard.root }, { name: 'Attribute' }]}
-            sx={{ mb: { xs: 3, md: 5 } }}
+            sx={{ mb: 3 }}
           />
           <Button
             variant="contained"
