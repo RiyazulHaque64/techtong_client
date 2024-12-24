@@ -46,6 +46,8 @@ export const ProductValidationSchema = zod.object({
   ]),
   thumbnail: zod.array(zod.string()).min(1, { message: 'Thumbnail is required!' }),
   images: zod.array(zod.string()),
+  tags: zod.array(zod.string()),
+  key_features: zod.array(zod.string()),
 });
 
 export type ProductValidationSchemaType = zod.infer<typeof ProductValidationSchema>;
@@ -91,6 +93,8 @@ export function ManageProductForm() {
       video_url: '',
       thumbnail: [],
       images: [],
+      tags: [],
+      key_features: [],
     }),
     []
   );
@@ -269,6 +273,27 @@ export function ManageProductForm() {
               ) : (
                 <Typography>No attributes found</Typography>
               )}
+            </Card>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <Typography sx={{ fontWeight: 'bold' }}>Additional information</Typography>
+            <Typography variant="body2" color={theme.palette.text.secondary}>
+              Details information of the product
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <Card sx={{ padding: 4, width: '100%', boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.1)' }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Field.ChipText name="tags" label="Tags" />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field.ListText name="key_features" label="Key features" />
+                </Grid>
+              </Grid>
             </Card>
           </Grid>
         </Grid>

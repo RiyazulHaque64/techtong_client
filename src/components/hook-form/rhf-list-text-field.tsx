@@ -1,11 +1,10 @@
 import type { FocusEvent, KeyboardEvent } from 'react';
 import type { TextFieldProps } from '@mui/material/TextField';
 
-import { startCase } from 'lodash';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import TextField from '@mui/material/TextField';
-import { Box, Chip, Stack, IconButton, InputAdornment } from '@mui/material';
+import { Box, Stack, IconButton, Typography, InputAdornment } from '@mui/material';
 
 import { Iconify } from '../iconify';
 
@@ -15,7 +14,7 @@ type Props = TextFieldProps & {
   name: string;
 };
 
-export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
+export function RHFListTextField({ name, helperText, type, ...other }: Props) {
   const { control, watch, setValue } = useFormContext();
 
   const values: string[] = watch(name);
@@ -52,14 +51,14 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
     }
   };
 
-  const handleDeleteChip = (chipToDelete: string) => {
-    const remainingChip = values.filter((value) => value !== chipToDelete);
-    setValue(name, remainingChip);
+  const handleDeleteItem = (itemToDelete: string) => {
+    const remainingItem = values.filter((value) => value !== itemToDelete);
+    setValue(name, remainingItem);
   };
 
   return (
     <Controller
-      name="chip_value"
+      name="item_value"
       control={control}
       render={({ field, fieldState: { error } }) => (
         <Box>
@@ -85,16 +84,23 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
             }}
             {...other}
           />
-          <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', mt: 1 }}>
-            {values.map((chip, index) => (
-              <Chip
+          <Stack direction="column" spacing={1} sx={{ flexWrap: 'wrap', mt: 2, ml: 1 }}>
+            {values.map((item, index) => (
+              <Stack
+                direction="row"
+                alignItems="center"
+                gap={1}
                 key={index}
-                label={startCase(chip)}
-                size="small"
-                variant="soft"
-                color="info"
-                onDelete={() => handleDeleteChip(chip)}
-              />
+                sx={{ color: 'text.secondary' }}
+              >
+                <Iconify icon="bi:x-diamond" />
+                <Typography>{item}</Typography>
+                <Iconify
+                  icon="eva:close-fill"
+                  onClick={() => handleDeleteItem(item)}
+                  sx={{ cursor: 'pointer' }}
+                />
+              </Stack>
             ))}
           </Stack>
         </Box>

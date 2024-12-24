@@ -13,6 +13,8 @@ export type TProductInfo = {
   video_url?: string;
   thumbnail?: string;
   images?: string[];
+  tags?: string[];
+  key_features?: string[];
 };
 
 export const attributesFormatter = (attributes: Record<string, any> | undefined) => {
@@ -46,6 +48,8 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
     video_url,
     thumbnail,
     images,
+    tags,
+    key_features,
   } = productData;
   const productInfo: TProductInfo = {
     name,
@@ -63,6 +67,8 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
   if (video_url.length) productInfo.video_url = video_url;
   if (thumbnail.length) productInfo.thumbnail = thumbnail[0];
   if (images.length) productInfo.images = images;
+  if (tags.length) productInfo.tags = tags;
+  if (key_features.length) productInfo.key_features = key_features;
 
   return productInfo;
 };
