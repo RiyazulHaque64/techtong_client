@@ -1,3 +1,4 @@
+import { RHFEditor } from './rhf-editor';
 import { RHFUploadAvatar } from './rhf-upload';
 import { RHFTextField } from './rhf-text-field';
 import { RHFImageSelect } from './rhf-image-select';
@@ -17,4 +18,5 @@ export const Field = {
   AutoComplete: RHFAutoComplete,
   ImageSelect: RHFImageSelect,
   ListText: RHFListTextField,
+  Editor: RHFEditor,
 };

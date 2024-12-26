@@ -3,6 +3,7 @@ import type { ProductValidationSchemaType } from './manage-product-form';
 export type TProductInfo = {
   name: string;
   model: string;
+  code?: string;
   price: number;
   discount_price?: number;
   retailer_price?: number;
@@ -15,6 +16,9 @@ export type TProductInfo = {
   images?: string[];
   tags?: string[];
   key_features?: string[];
+  additional_information?: string;
+  description?: string;
+  specification?: { heading: string; fields: { title: string; value: string }[] }[];
 };
 
 export const attributesFormatter = (attributes: Record<string, any> | undefined) => {
@@ -38,6 +42,7 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
   const {
     name,
     model,
+    code,
     price,
     discount_price,
     retailer_price,
@@ -50,6 +55,9 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
     images,
     tags,
     key_features,
+    description,
+    additional_information,
+    specification,
   } = productData;
   const productInfo: TProductInfo = {
     name,
@@ -57,6 +65,7 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
     price,
   };
 
+  if (code) productInfo.code = code;
   if (discount_price > 0) productInfo.discount_price = discount_price;
   if (retailer_price > 0) productInfo.retailer_price = retailer_price;
   if (stock > 0) productInfo.stock = stock;
@@ -69,6 +78,9 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
   if (images.length) productInfo.images = images;
   if (tags.length) productInfo.tags = tags;
   if (key_features.length) productInfo.key_features = key_features;
+  if (additional_information) productInfo.additional_information = additional_information;
+  if (description) productInfo.description = description;
+  if (specification) productInfo.specification = specification;
 
   return productInfo;
 };
