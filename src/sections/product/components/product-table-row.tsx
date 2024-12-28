@@ -1,13 +1,17 @@
 import type { GridCellParams } from '@mui/x-data-grid';
+import type { TShortCategory } from 'src/types/category';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
+import { Typography } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import LinearProgress from '@mui/material/LinearProgress';
 
 import { fTime, fDate } from 'src/utils/format-time';
+
+import { CONFIG } from 'src/config-global';
 
 import { Label } from 'src/components/label';
 
@@ -64,11 +68,12 @@ export function RenderCellProduct({
 }: ParamsProps & {
   onViewRow: () => void;
 }) {
+  console.log('params render cell product: ', params.row.categories);
   return (
     <Stack direction="row" alignItems="center" sx={{ py: 2, width: 1 }}>
       <Avatar
+        src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${params.row?.thumbnail}`}
         alt={params.row.name}
-        src={params.row.coverUrl}
         variant="rounded"
         sx={{ width: 64, height: 64, mr: 2 }}
       />
@@ -88,7 +93,11 @@ export function RenderCellProduct({
         }
         secondary={
           <Box component="div" sx={{ typography: 'body2', color: 'text.disabled' }}>
-            {params.row.category}
+            {params.row.categories?.map((cat: TShortCategory) => (
+              <Typography component="span" key={cat.id}>
+                {cat.title}
+              </Typography>
+            ))}
           </Box>
         }
         sx={{ display: 'flex', flexDirection: 'column' }}

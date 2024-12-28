@@ -1,5 +1,5 @@
 import type { UseSetStateReturn } from 'src/hooks/use-set-state';
-import type { IProductItem, IProductTableFilters } from 'src/types/product';
+import type { IProduct, IProductTableFilters } from 'src/types/product';
 import type {
   GridSlots,
   GridColDef,
@@ -31,8 +31,8 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { useSetState } from 'src/hooks/use-set-state';
 
 import { PRODUCT_STOCK_OPTIONS } from 'src/_mock';
-import { useGetProducts } from 'src/actions/product';
 import { DashboardContent } from 'src/layouts/dashboard';
+import { useGetProductsQuery } from 'src/redux/features/product/product-api';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -64,15 +64,14 @@ const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 // ----------------------------------------------------------------------
 
 export function AllProductView() {
+  const { data: products, isLoading: getProductsLoading } = useGetProductsQuery([]);
   const confirmRows = useBoolean();
 
   const router = useRouter();
 
-  const { products, productsLoading } = useGetProducts();
-
   const filters = useSetState<IProductTableFilters>({ publish: [], stock: [] });
 
-  const [tableData, setTableData] = useState<IProductItem[]>([]);
+  const [tableData, setTableData] = useState<IProduct[]>([]);
 
   const [selectedRowIds, setSelectedRowIds] = useState<GridRowSelectionModel>([]);
 
@@ -82,14 +81,12 @@ export function AllProductView() {
     useState<GridColumnVisibilityModel>(HIDE_COLUMNS);
 
   useEffect(() => {
-    if (products.length) {
-      setTableData(products);
+    if (products && products.data?.length) {
+      setTableData(products.data);
     }
   }, [products]);
 
   const canReset = filters.state.publish.length > 0 || filters.state.stock.length > 0;
-
-  const dataFiltered = applyFilter({ inputData: tableData, filters: filters.state });
 
   const handleDeleteRow = useCallback(
     (id: string) => {
@@ -131,7 +128,7 @@ export function AllProductView() {
         canReset={canReset}
         selectedRowIds={selectedRowIds}
         setFilterButtonEl={setFilterButtonEl}
-        filteredResults={dataFiltered.length}
+        filteredResults={products?.meta?.total || 0}
         onOpenConfirmDeleteRows={confirmRows.onTrue}
       />
     ),
@@ -252,9 +249,9 @@ export function AllProductView() {
           <DataGrid
             checkboxSelection
             disableRowSelectionOnClick
-            rows={dataFiltered}
+            rows={products?.data}
             columns={columns}
-            loading={productsLoading}
+            loading={getProductsLoading}
             getRowHeight={() => 'auto'}
             pageSizeOptions={[5, 10, 25]}
             initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
@@ -264,7 +261,7 @@ export function AllProductView() {
             slots={{
               toolbar: CustomToolbarCallback as GridSlots['toolbar'],
               noRowsOverlay: () => <EmptyContent />,
-              noResultsOverlay: () => <EmptyContent title="No results found" />,
+              noResultsOverlay: () => <EmptyContent title="No product found" />,
             }}
             slotProps={{
               panel: { anchorEl: filterButtonEl },
@@ -364,25 +361,4 @@ function CustomToolbar({
       )}
     </>
   );
-}
-
-// ----------------------------------------------------------------------
-
-type ApplyFilterProps = {
-  inputData: IProductItem[];
-  filters: IProductTableFilters;
-};
-
-function applyFilter({ inputData, filters }: ApplyFilterProps) {
-  const { stock, publish } = filters;
-
-  if (stock.length) {
-    inputData = inputData.filter((product) => stock.includes(product.inventoryType));
-  }
-
-  if (publish.length) {
-    inputData = inputData.filter((product) => publish.includes(product.publish));
-  }
-
-  return inputData;
 }

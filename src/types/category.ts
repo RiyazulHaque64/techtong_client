@@ -18,3 +18,10 @@ export interface ICategory {
     products: number;
   };
 }
+
+export type TShortCategory = {
+  icon: string;
+  id: string;
+  slug: string;
+  title: string;
+};
