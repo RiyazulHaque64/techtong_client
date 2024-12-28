@@ -1,24 +1,17 @@
+import type { IAttribute } from 'src/types/attribute';
+
 import { startCase } from 'lodash';
 
 import { Grid, Stack, Typography } from '@mui/material';
 
-import { useGetAttributesQuery } from 'src/redux/features/attribute/attributeApi';
-
 import { Field } from 'src/components/hook-form';
 
-export function AttributesForm({ categoryValue }: { categoryValue: string }) {
-  const { data: attributes } = useGetAttributesQuery([
-    { name: 'limit', value: 500 },
-    { name: 'sortBy', value: 'name' },
-    { name: 'sortOrder', value: 'asc' },
-    { name: 'category', value: categoryValue },
-  ]);
-
+export function AttributesForm({ attributes }: { attributes: IAttribute[] | undefined }) {
   return (
     <>
-      {attributes?.data ? (
+      {attributes ? (
         <Grid container spacing={4}>
-          {attributes?.data.map((attribute) => {
+          {attributes.map((attribute) => {
             const options = attribute.value.map((v) => ({ label: startCase(v), value: v }));
             return (
               <Grid item xs={12} md={6} key={attribute.id}>
@@ -31,6 +24,7 @@ export function AttributesForm({ categoryValue }: { categoryValue: string }) {
                     options={options}
                     size="small"
                     placeholder="Select value"
+                    multiple
                   />
                 </Stack>
               </Grid>

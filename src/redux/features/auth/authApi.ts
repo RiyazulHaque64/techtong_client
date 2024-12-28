@@ -1,6 +1,6 @@
 import { CONFIG } from 'src/config-global';
-import { baseApi } from 'src/redux/api/baseApi';
-import api_endpoint from 'src/redux/api/apiEndpoint';
+import { baseApi } from 'src/redux/api/base-api';
+import api_endpoint from 'src/redux/api/api-endpoints';
 
 import { setUser } from './authSlice';
 

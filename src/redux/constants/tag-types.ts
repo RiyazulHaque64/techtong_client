@@ -3,6 +3,7 @@ export const tags = {
   brand: 'brand',
   category: 'category',
   attribute: 'attribute',
+  product: 'product',
 };
 
 export const tagTypes: string[] = Object.values(tags);

@@ -1,21 +1,21 @@
-import type { IBrand } from 'src/types/brand';
+import type { IProduct } from 'src/types/product';
 import type { TMeta, TQueryParam, TReduxResponse } from 'src/redux/interfaces/common';
 
 import { baseApi } from 'src/redux/api/base-api';
 import { tags } from 'src/redux/constants/tag-types';
 import api_endpoint from 'src/redux/api/api-endpoints';
 
-const brandApi = baseApi.injectEndpoints({
+const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    addBrand: builder.mutation({
+    addProduct: builder.mutation({
       query: (data) => ({
-        url: api_endpoint.brand.add_brand,
+        url: api_endpoint.product.add_product,
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: [tags.brand],
+      invalidatesTags: [tags.product],
     }),
-    getBrands: builder.query({
+    getProducts: builder.query({
       query: (args: TQueryParam[]) => {
         const params = new URLSearchParams();
         if (args.length) {
@@ -24,39 +24,39 @@ const brandApi = baseApi.injectEndpoints({
           });
         }
         return {
-          url: api_endpoint.brand.get_brands,
+          url: api_endpoint.product.get_products,
           method: 'GET',
           params,
         };
       },
-      providesTags: [tags.brand],
-      transformResponse: (response: TReduxResponse<IBrand[]>) => ({
+      providesTags: [tags.product],
+      transformResponse: (response: TReduxResponse<IProduct[]>) => ({
         data: response.data,
         meta: response.meta as TMeta,
       }),
     }),
-    deleteBrand: builder.mutation({
+    deleteProducts: builder.mutation({
       query: (payload: { ids: string[] }) => ({
-        url: `${api_endpoint.brand.delete_brand}`,
+        url: `${api_endpoint.product.delete_products}`,
         method: 'DELETE',
         body: payload,
       }),
-      invalidatesTags: [tags.brand],
+      invalidatesTags: [tags.product],
     }),
-    updateBrand: builder.mutation({
+    updateProduct: builder.mutation({
       query: (paylaod: { id: string; data: Record<string, any> }) => ({
-        url: `${api_endpoint.brand.update_brand}/${paylaod.id}`,
+        url: `${api_endpoint.product.update_product}/${paylaod.id}`,
         method: 'PATCH',
         body: paylaod.data,
       }),
-      invalidatesTags: [tags.brand],
+      invalidatesTags: [tags.product],
     }),
   }),
 });
 
 export const {
-  useAddBrandMutation,
-  useGetBrandsQuery,
-  useUpdateBrandMutation,
-  useDeleteBrandMutation,
-} = brandApi;
+  useAddProductMutation,
+  useGetProductsQuery,
+  useDeleteProductsMutation,
+  useUpdateProductMutation,
+} = productApi;

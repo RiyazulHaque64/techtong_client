@@ -1,9 +1,9 @@
 import type { ICategory } from 'src/types/category';
 import type { TMeta, TQueryParam, TReduxResponse } from 'src/redux/interfaces/common';
 
-import { baseApi } from 'src/redux/api/baseApi';
-import api_endpoint from 'src/redux/api/apiEndpoint';
+import { baseApi } from 'src/redux/api/base-api';
 import { tags } from 'src/redux/constants/tag-types';
+import api_endpoint from 'src/redux/api/api-endpoints';
 
 const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

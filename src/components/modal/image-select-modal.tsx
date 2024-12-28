@@ -11,7 +11,7 @@ import { grey } from '@mui/material/colors';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import { Tab, Box, Tabs, Grid, Card, Alert, Stack, IconButton } from '@mui/material';
+import { Tab, Box, Tabs, Card, Grid, Alert, Stack, IconButton } from '@mui/material';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
@@ -218,6 +218,7 @@ export function ImageSelectModal({
           <Box
             sx={{
               width: selectedTab === 'library' && currentSelected ? '75%' : '100%',
+              p: 1,
               maxHeight: 'calc(100vh - 356px)',
               overflowY: 'auto',
               mt: 4,
@@ -287,7 +288,7 @@ export function ImageSelectModal({
                     <EmptyContent title="No image found" />
                   </Stack>
                 )}
-                <Grid container spacing={1}>
+                <Grid container spacing={2}>
                   {images?.data?.map((image) => (
                     <ImageItem
                       currentSelected={currentSelected}

@@ -38,7 +38,7 @@ export function RHFAutoComplete({
           options={options}
           getOptionLabel={(option) => option.label || ''}
           isOptionEqualToValue={(option, value) => option.label === value.label}
-          value={field.value || null}
+          value={multiple ? field.value || [] : field.value || null}
           onChange={(_, value) => field.onChange(value)}
           renderInput={(params) => (
             <TextField {...params} label={label} placeholder={placeholder} />

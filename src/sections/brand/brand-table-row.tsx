@@ -50,7 +50,7 @@ export function BrandTableRow({ row, selected, onSelectRow, onDeleteRow, deleteL
             <img
               src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${icon}`}
               alt={name}
-              style={{ borderRadius: '4px', width: '40px', height: '40px', objectFit: 'cover' }}
+              style={{ borderRadius: '4px', objectFit: 'cover' }}
             />
           </Stack>
         </TableCell>

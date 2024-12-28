@@ -74,6 +74,8 @@ export function RHFImageSelect({
                             borderRadius: 1,
                             objectFit: 'cover',
                             border: `2px dashed ${grey[400]}`,
+                            bgcolor: (theme) =>
+                              varAlpha(theme.vars.palette.grey['500Channel'], 0.08),
                           }}
                         />
                         <IconButton

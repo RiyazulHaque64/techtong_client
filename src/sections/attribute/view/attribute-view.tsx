@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import { Stack } from '@mui/material';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
@@ -146,20 +145,20 @@ export function AttributeView() {
   return (
     <>
       <DashboardContent>
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-          <CustomBreadcrumbs
-            heading="Attribute"
-            links={[{ name: 'Dashboard', href: paths.dashboard.root }, { name: 'Attribute' }]}
-            sx={{ mb: 3 }}
-          />
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="eva:cloud-upload-fill" />}
-            onClick={manageForm.onTrue}
-          >
-            Add Attribute
-          </Button>
-        </Stack>
+        <CustomBreadcrumbs
+          heading="Attribute"
+          links={[{ name: 'Dashboard', href: paths.dashboard.root }, { name: 'Attribute' }]}
+          action={
+            <Button
+              onClick={manageForm.onTrue}
+              variant="contained"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+            >
+              Add Attribute
+            </Button>
+          }
+          sx={{ mb: 3 }}
+        />
 
         <Card>
           <AttributeTableToolbar

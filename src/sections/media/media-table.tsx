@@ -133,6 +133,7 @@ export function MediaTable({
             ))}
             <TableNoData
               notFound={notFound}
+              title="No media found"
               sx={{
                 m: -2,
                 borderRadius: 1.5,

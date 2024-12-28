@@ -1,3 +1,4 @@
+import type { IErrorResponse } from 'src/redux/interfaces/common';
 import type { TOptionItem } from 'src/components/hook-form/rhf-auto-complete';
 
 import { z as zod } from 'zod';
@@ -6,10 +7,14 @@ import { useMemo, useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { LoadingButton } from '@mui/lab';
-import { Stack, Button } from '@mui/material';
+import { Stack, Alert, Button } from '@mui/material';
 
 import { useDebounce } from 'src/hooks/use-debounce';
 
+import { useAddProductMutation } from 'src/redux/features/product/product-api';
+import { useGetAttributesQuery } from 'src/redux/features/attribute/attributeApi';
+
+import { toast } from 'src/components/snackbar';
 import { Form } from 'src/components/hook-form';
 
 import { productInfoFormatter } from './utils';
@@ -63,7 +68,18 @@ export type ProductValidationSchemaType = zod.infer<typeof ProductValidationSche
 
 export function ManageProductForm() {
   const [selectedCategories, setSelectedCategories] = useState<string>('uncategorized');
+  const [errorMsg, setErrorMsg] = useState<string>('');
+
+  const [addProduct, { isLoading }] = useAddProductMutation();
+
   const categoryValue = useDebounce(selectedCategories, 5000);
+
+  const { data: attributes } = useGetAttributesQuery([
+    { name: 'limit', value: 500 },
+    { name: 'sortBy', value: 'name' },
+    { name: 'sortOrder', value: 'asc' },
+    { name: 'category', value: categoryValue },
+  ]);
 
   const defaultValues = useMemo(
     () => ({
@@ -83,6 +99,9 @@ export function ManageProductForm() {
       key_features: [],
       description: '',
       additional_information: '',
+      attributes: {
+        Availability: [],
+      },
       specification: [
         {
           heading: '',
@@ -104,9 +123,24 @@ export function ManageProductForm() {
   const watchCategory = watch('category');
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log('submitted data: ', data);
-    const productInfo = productInfoFormatter(data);
-    console.log(productInfo);
+    console.log('data: ', data);
+    try {
+      setErrorMsg('');
+      const formattedData = productInfoFormatter(data);
+      console.log(formattedData);
+      const res = await addProduct(formattedData);
+      if (res?.error) {
+        toast.error('Add failed!');
+        setErrorMsg((res?.error as IErrorResponse)?.data?.message);
+      } else {
+        console.log('product data after add: ', res.data);
+        toast.success('Add success!');
+        reset();
+      }
+    } catch (error) {
+      toast.error('Add failed!');
+      setErrorMsg(typeof error === 'string' ? error : error.message);
+    }
   });
 
   useEffect(() => {
@@ -137,7 +171,7 @@ export function ManageProductForm() {
     {
       title: 'Associated information',
       description: 'Assign attributes related to the product',
-      content: <AttributesForm categoryValue={categoryValue} />,
+      content: <AttributesForm attributes={attributes?.data} />,
     },
     {
       title: 'Additional information',
@@ -153,15 +187,18 @@ export function ManageProductForm() {
 
   return (
     <Form methods={methods} onSubmit={onSubmit}>
+      <Alert variant="outlined" severity={errorMsg ? 'error' : 'info'} sx={{ mb: 3 }}>
+        {errorMsg || 'Product name, model and price is required to add a product.'}
+      </Alert>
       <Stack spacing={3}>
         {formSections.map((section) => (
           <ProductFormSection key={section.title} sectionInfo={section} />
         ))}
         <Stack direction="row" justifyContent="flex-end" gap={1} width="100%" sx={{ mt: 4 }}>
-          <Button variant="outlined" onClick={() => reset()}>
+          <Button variant="outlined" disabled={isLoading} onClick={() => reset()}>
             Reset
           </Button>
-          <LoadingButton type="submit" variant="contained" loading={false}>
+          <LoadingButton type="submit" variant="contained" disabled={isLoading} loading={isLoading}>
             Add Product
           </LoadingButton>
         </Stack>

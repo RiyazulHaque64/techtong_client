@@ -1,4 +1,4 @@
-import { Alert, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 
@@ -22,9 +22,6 @@ export function ManageProductView() {
           sx={{ mb: 3 }}
         />
       </Stack>
-      <Alert variant="outlined" severity="info" sx={{ mb: 3 }}>
-        Product name, model and price is required to add a product
-      </Alert>
       <ManageProductForm />
     </DashboardContent>
   );

@@ -4,10 +4,11 @@ import { useState, useCallback } from 'react';
 
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { tablePaginationClasses } from '@mui/material/TablePagination';
+
+import { paths } from 'src/routes/paths';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
@@ -19,6 +20,7 @@ import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { LoadingScreen } from 'src/components/loading-screen';
+import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { useTable, TablePaginationCustom } from 'src/components/table';
 
 import { FetchingError } from 'src/sections/error/fetching-error';
@@ -196,18 +198,22 @@ export function MediaView() {
   return (
     <>
       <DashboardContent>
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="h4">Media</Typography>
-          <Button
-            variant="contained"
-            startIcon={<Iconify icon="eva:cloud-upload-fill" />}
-            onClick={upload.onTrue}
-          >
-            Upload
-          </Button>
-        </Stack>
+        <CustomBreadcrumbs
+          heading="Media"
+          links={[{ name: 'Dashboard', href: paths.dashboard.root }, { name: 'Media' }]}
+          action={
+            <Button
+              onClick={upload.onTrue}
+              variant="contained"
+              startIcon={<Iconify icon="eva:cloud-upload-fill" />}
+            >
+              Upload
+            </Button>
+          }
+          sx={{ mb: 3 }}
+        />
 
-        <Stack spacing={2.5} sx={{ my: { xs: 3, md: 5 } }}>
+        <Stack spacing={2.5} sx={{ mb: { xs: 3, md: 5 } }}>
           {renderFilters}
           {canReset && renderResults}
         </Stack>

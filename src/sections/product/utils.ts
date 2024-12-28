@@ -10,7 +10,7 @@ export type TProductInfo = {
   stock?: number;
   attributes?: { slug: string; value: string }[];
   brand_id?: string;
-  categories?: string[];
+  categories?: { id: string }[];
   video_url?: string;
   thumbnail?: string;
   images?: string[];
@@ -22,19 +22,19 @@ export type TProductInfo = {
 };
 
 export const attributesFormatter = (attributes: Record<string, any> | undefined) => {
+  console.log('attributes from formatter: ', attributes);
   if (!attributes) return [];
-  const attributesArr = Object.keys(attributes).filter(
-    (item) => attributes[item]?.value !== undefined
-  );
+  const attributesArr = Object.keys(attributes).filter((item) => attributes[item].length !== 0);
+  console.log('attributesArr: ', attributesArr);
   const formattedAttributes = attributesArr.map((item) => ({
     slug: item,
-    value: attributes[item]?.value,
+    value: attributes[item],
   }));
   return formattedAttributes;
 };
 
 export const catgoriesFormatter = (categories: { label: string; value: string }[]) => {
-  const formattedCategories = categories.map((item) => item.value);
+  const formattedCategories = categories.map((item) => ({ id: item.value }));
   return formattedCategories;
 };
 
@@ -80,7 +80,7 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
   if (key_features.length) productInfo.key_features = key_features;
   if (additional_information) productInfo.additional_information = additional_information;
   if (description) productInfo.description = description;
-  if (specification) productInfo.specification = specification;
+  if (specification[0].heading) productInfo.specification = specification;
 
   return productInfo;
 };

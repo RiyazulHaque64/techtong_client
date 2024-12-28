@@ -112,6 +112,7 @@ export function AttributeManageForm({ item, open, onClose, ...other }: Props) {
       } else {
         toast.success(id ? 'Update success!' : 'Add success!');
         onClose();
+        reset();
       }
     } catch (err) {
       setErrorMsg(typeof err === 'string' ? err : err.message);

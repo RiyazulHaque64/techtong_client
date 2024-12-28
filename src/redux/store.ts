@@ -11,7 +11,7 @@ import {
   persistReducer,
 } from 'redux-persist';
 
-import { baseApi } from './api/baseApi';
+import { baseApi } from './api/base-api';
 import authReducer from './features/auth/authSlice';
 
 const persistConfig = {

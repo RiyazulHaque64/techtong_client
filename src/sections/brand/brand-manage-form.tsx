@@ -15,16 +15,11 @@ import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
-import { useBoolean } from 'src/hooks/use-boolean';
-
-import { CONFIG } from 'src/config-global';
 import { useAddBrandMutation, useUpdateBrandMutation } from 'src/redux/features/brand/brandApi';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
-import { FileThumbnail } from 'src/components/file-thumbnail';
-import { ImageSelectModal } from 'src/components/modal/image-select-modal';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +28,7 @@ export type NewBrandSchemaType = zod.infer<typeof NewBrandSchema>;
 export const NewBrandSchema = zod.object({
   name: zod.string().min(1, { message: 'Name is required!' }),
   description: zod.string().optional(),
-  icon: zod.string().optional(),
+  icon: zod.array(zod.string()).optional(),
 });
 
 type Props = DrawerProps & {
@@ -48,16 +43,13 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
   const [updateBrand, { isLoading: updateLoading }] = useUpdateBrandMutation();
   const [addBrand, { isLoading: addLoading }] = useAddBrandMutation();
 
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>('');
-
-  const selectImageModal = useBoolean();
 
   const defaultValues = useMemo(
     () => ({
       name: name || '',
       description: description || '',
-      icon: icon || '',
+      icon: icon ? [icon] : [],
     }),
     [name, description, icon]
   );
@@ -70,20 +62,24 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
 
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
     reset,
   } = methods;
 
+  console.log(errors);
+
   const onSubmit = handleSubmit(async (data) => {
     try {
-      if (selectedImages.length > 0) {
-        data.icon = selectedImages[0];
-      }
+      const brandInfo: { name: string; description?: string; icon?: string } = {
+        name: data.name,
+      };
+      if (data.description) brandInfo.description = data.description;
+      if (data.icon) brandInfo.icon = data.icon[0];
       let res;
       if (id) {
-        res = await updateBrand({ id, data });
+        res = await updateBrand({ id, data: brandInfo });
       } else {
-        res = await addBrand(data);
+        res = await addBrand(brandInfo);
       }
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
@@ -97,104 +93,99 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
   });
 
   return (
-    <>
-      <Drawer
-        open={open}
-        onClose={onClose}
-        anchor="right"
-        slotProps={{ backdrop: { invisible: true } }}
-        PaperProps={{ sx: { width: 320 } }}
-        {...other}
-      >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 2.5 }}>
-          <Typography variant="h6"> {id ? 'Edit Brand' : 'Add Brand'} </Typography>
-          <IconButton
-            aria-label="edit_name"
-            size="small"
-            onClick={() => {
-              onClose();
-              reset();
-              setSelectedImages([]);
-            }}
-          >
-            <Iconify icon="akar-icons:cross" sx={{ width: '14px', height: '14px' }} />
-          </IconButton>
-        </Stack>
-        <Form methods={methods} onSubmit={onSubmit}>
-          <Stack sx={{ height: 'calc(100vh - 68px)' }}>
-            {!!errorMsg && (
-              <Alert severity="error" sx={{ mx: 2.5, mb: 1 }}>
-                {errorMsg}
-              </Alert>
-            )}
-            <Stack direction="column" spacing={2.5} flexGrow={1} sx={{ p: 2.5 }}>
-              <Stack
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  borderStyle: 'dashed',
-                  borderWidth: 2,
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  height: '180px',
-                  mb: 2,
-                  cursor: 'pointer',
-                }}
-                onClick={selectImageModal.onTrue}
-              >
-                {icon || selectedImages.length > 0 ? (
-                  <FileThumbnail
-                    imageView
-                    file={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${selectedImages.length > 0 ? selectedImages[0] : icon}`}
-                    sx={{
-                      width: '100%',
-                      height: 'auto',
-                      alignSelf: 'flex-start',
-                    }}
-                    slotProps={{
-                      img: {
-                        width: 320,
-                        height: 'auto',
-                        aspectRatio: '4/3',
-                        objectFit: 'cover',
-                      },
-                      icon: { width: 64, height: 64 },
-                    }}
-                  />
-                ) : (
-                  <Typography variant="h6">Select Logo</Typography>
-                )}
-              </Stack>
-              <Field.Text name="name" label="Name" />
-              <Field.Text name="description" label="Description" />
-            </Stack>
-            <Box sx={{ p: 2.5 }}>
-              <Button
-                type="submit"
-                fullWidth
-                variant="soft"
-                color="primary"
-                size="large"
-                startIcon={
-                  <Iconify icon={id ? 'material-symbols:save-rounded' : 'f7:plus-app-fill'} />
-                }
-                disabled={isSubmitting || updateLoading || addLoading}
-              >
-                {id ? 'Save Changes' : 'Add Brand'}
-              </Button>
-            </Box>
+    <Drawer
+      open={open}
+      onClose={onClose}
+      anchor="right"
+      slotProps={{ backdrop: { invisible: true } }}
+      PaperProps={{ sx: { width: 320 } }}
+      {...other}
+    >
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ p: 2.5 }}>
+        <Typography variant="h6"> {id ? 'Edit Brand' : 'Add Brand'} </Typography>
+        <IconButton
+          aria-label="edit_name"
+          size="small"
+          onClick={() => {
+            onClose();
+            reset();
+          }}
+        >
+          <Iconify icon="akar-icons:cross" sx={{ width: '14px', height: '14px' }} />
+        </IconButton>
+      </Stack>
+      <Form methods={methods} onSubmit={onSubmit}>
+        <Stack sx={{ height: 'calc(100vh - 68px)' }}>
+          {!!errorMsg && (
+            <Alert severity="error" sx={{ mx: 2.5, mb: 1 }}>
+              {errorMsg}
+            </Alert>
+          )}
+          <Stack direction="column" spacing={2.5} flexGrow={1} sx={{ p: 2.5 }}>
+            <Field.ImageSelect
+              name="icon"
+              modalTitle="Select Icon"
+              placeholderHeading="Select or upload icon"
+            />
+            <Field.Text name="name" label="Name" />
+            <Field.Text name="description" label="Description" />
           </Stack>
-        </Form>
-      </Drawer>
-      <ImageSelectModal
-        title="Select logo"
-        open={selectImageModal.value}
-        onClose={selectImageModal.onFalse}
-        selectedImages={selectedImages}
-        setSelectedImages={setSelectedImages}
-        multiple={false}
-      />
-    </>
+          <Box sx={{ p: 2.5 }}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="soft"
+              color="primary"
+              size="large"
+              startIcon={
+                <Iconify icon={id ? 'material-symbols:save-rounded' : 'f7:plus-app-fill'} />
+              }
+              disabled={isSubmitting || updateLoading || addLoading}
+            >
+              {id ? 'Save Changes' : 'Add Brand'}
+            </Button>
+          </Box>
+        </Stack>
+      </Form>
+    </Drawer>
   );
 }
+
+// {/* <Stack
+//   direction="column"
+//   alignItems="center"
+//   justifyContent="center"
+//   sx={{
+//     borderStyle: 'dashed',
+//     borderWidth: 2,
+//     borderColor: 'divider',
+//     borderRadius: 1,
+//     height: '180px',
+//     mb: 2,
+//     cursor: 'pointer',
+//   }}
+//   onClick={selectImageModal.onTrue}
+// >
+//   {icon || selectedImages.length > 0 ? (
+//     <FileThumbnail
+//       imageView
+//       file={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${selectedImages.length > 0 ? selectedImages[0] : icon}`}
+//       sx={{
+//         width: '100%',
+//         height: 'auto',
+//         alignSelf: 'flex-start',
+//       }}
+//       slotProps={{
+//         img: {
+//           width: 320,
+//           height: 'auto',
+//           aspectRatio: '4/3',
+//           objectFit: 'cover',
+//         },
+//         icon: { width: 64, height: 64 },
+//       }}
+//     />
+//   ) : (
+//     <Typography variant="h6">Select Logo</Typography>
+//   )}
+// </Stack>; */}

@@ -16,6 +16,8 @@ export const paths = {
     category: `/category`,
     product: `/product`,
     add_product: `/product/add`,
+    edit_product: (id: string) => `/product/${id}/edit`,
+    details_product: (id: string) => `/product/${id}`,
     attribute: `/attribute`,
     three: `/three`,
     group: {
