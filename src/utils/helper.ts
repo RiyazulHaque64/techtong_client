@@ -174,3 +174,13 @@ export function getErrorName(statusCode: number) {
 
   return statusCodeMap[statusCode] || 'Unknown Error';
 }
+
+export const stockStatus = (stock: number) => {
+  if (stock === 0) {
+    return 'Out of stock';
+  }
+  if (stock < 5) {
+    return 'Low stock';
+  }
+  return 'In stock';
+};

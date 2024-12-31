@@ -47,7 +47,8 @@ import {
   RenderCellPrice,
   RenderCellPublish,
   RenderCellProduct,
-  RenderCellCreatedAt,
+  RenderCellFeatured,
+  RenderCellUpdatedAt,
 } from '../components/product-table-row';
 
 // ----------------------------------------------------------------------
@@ -137,7 +138,6 @@ export function AllProductView() {
   );
 
   const columns: GridColDef[] = [
-    { field: 'category', headerName: 'Category', filterable: false },
     {
       field: 'name',
       headerName: 'Product',
@@ -149,34 +149,35 @@ export function AllProductView() {
       ),
     },
     {
-      field: 'createdAt',
-      headerName: 'Create at',
-      width: 160,
-      renderCell: (params) => <RenderCellCreatedAt params={params} />,
+      field: 'updated_at',
+      headerName: 'Updated at',
+      width: 140,
+      renderCell: (params) => <RenderCellUpdatedAt params={params} />,
     },
     {
-      field: 'inventoryType',
+      field: 'stock',
       headerName: 'Stock',
-      width: 160,
+      width: 120,
       type: 'singleSelect',
-      valueOptions: PRODUCT_STOCK_OPTIONS,
       renderCell: (params) => <RenderCellStock params={params} />,
     },
     {
       field: 'price',
       headerName: 'Price',
-      width: 140,
-      editable: true,
+      width: 130,
       renderCell: (params) => <RenderCellPrice params={params} />,
     },
     {
-      field: 'publish',
+      field: 'published',
       headerName: 'Publish',
-      width: 110,
-      type: 'singleSelect',
-      editable: true,
-      valueOptions: PUBLISH_OPTIONS,
+      width: 100,
       renderCell: (params) => <RenderCellPublish params={params} />,
+    },
+    {
+      field: 'featured',
+      headerName: 'Featured',
+      width: 100,
+      renderCell: (params) => <RenderCellFeatured params={params} />,
     },
     {
       type: 'actions',
