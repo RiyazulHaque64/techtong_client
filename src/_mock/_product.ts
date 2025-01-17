@@ -50,11 +50,6 @@ export const PRODUCT_STOCK_OPTIONS = [
   { value: 'out of stock', label: 'Out of stock' },
 ];
 
-export const PRODUCT_PUBLISH_OPTIONS = [
-  { value: 'published', label: 'Published' },
-  { value: 'draft', label: 'Draft' },
-];
-
 export const PRODUCT_SORT_OPTIONS = [
   { value: 'featured', label: 'Featured' },
   { value: 'newest', label: 'Newest' },

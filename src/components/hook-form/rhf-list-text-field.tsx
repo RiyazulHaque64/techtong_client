@@ -93,7 +93,7 @@ export function RHFListTextField({ name, helperText, type, ...other }: Props) {
                 key={index}
                 sx={{ color: 'text.secondary' }}
               >
-                <Iconify icon="bi:x-diamond" />
+                <Iconify icon="eva:checkmark-circle-2-outline" />
                 <Typography>{item}</Typography>
                 <Iconify
                   icon="eva:close-fill"

@@ -1,25 +1,33 @@
+import type { IProduct } from 'src/types/product';
 import type { IErrorResponse } from 'src/redux/interfaces/common';
 import type { TOptionItem } from 'src/components/hook-form/rhf-auto-complete';
 
 import { z as zod } from 'zod';
 import { useForm } from 'react-hook-form';
-import { useMemo, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 
 import { LoadingButton } from '@mui/lab';
 import { Stack, Alert, Button } from '@mui/material';
 
+import { paths } from 'src/routes/paths';
+
 import { useDebounce } from 'src/hooks/use-debounce';
 
-import { useAddProductMutation } from 'src/redux/features/product/product-api';
 import { useGetAttributesQuery } from 'src/redux/features/attribute/attributeApi';
+import {
+  useAddProductMutation,
+  useUpdateProductMutation,
+} from 'src/redux/features/product/product-api';
 
 import { toast } from 'src/components/snackbar';
 import { Form } from 'src/components/hook-form';
+import { Iconify } from 'src/components/iconify';
 
-import { productInfoFormatter } from './utils';
 import { AttributesForm } from './components/attributes-form';
 import SpecificationForm from './components/specification-form';
+import { resetProductForm, productInfoFormatter } from './utils';
 import ProductFormSection from './components/product-form-section';
 import MediaInformationForm from './components/media-information-form';
 import { PriceInformationForm } from './components/price-information-form';
@@ -66,11 +74,19 @@ export const ProductValidationSchema = zod.object({
 
 export type ProductValidationSchemaType = zod.infer<typeof ProductValidationSchema>;
 
-export function ManageProductForm() {
+type Props = {
+  product?: IProduct;
+};
+
+export function ManageProductForm({ product }: Props) {
+  const navigate = useNavigate();
+
   const [selectedCategories, setSelectedCategories] = useState<string>('uncategorized');
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [statusCode, setStatusCode] = useState<number | null>(null);
 
-  const [addProduct, { isLoading }] = useAddProductMutation();
+  const [addProduct, { isLoading: addProductLoading }] = useAddProductMutation();
+  const [updateProduct, { isLoading: updateProductLoading }] = useUpdateProductMutation();
 
   const categoryValue = useDebounce(selectedCategories, 5000);
 
@@ -100,7 +116,7 @@ export function ManageProductForm() {
       description: '',
       additional_information: '',
       attributes: {
-        Availability: [],
+        Availability: [{ label: 'In Stock', value: 'in stock' }],
       },
       specification: [
         {
@@ -118,7 +134,7 @@ export function ManageProductForm() {
     resolver: zodResolver(ProductValidationSchema),
   });
 
-  const { handleSubmit, watch, reset, control } = methods;
+  const { handleSubmit, watch, reset, control, setValue } = methods;
 
   const watchCategory = watch('category');
 
@@ -127,20 +143,30 @@ export function ManageProductForm() {
     try {
       setErrorMsg('');
       const formattedData = productInfoFormatter(data);
-      console.log(formattedData);
-      const res = await addProduct(formattedData);
+
+      let res;
+      if (!product) {
+        res = await addProduct(formattedData);
+      } else {
+        res = await updateProduct({ id: product.id, data: formattedData });
+      }
       if (res?.error) {
-        toast.error('Add failed!');
+        toast.error(product ? 'Update failed!' : 'Add failed!');
+        setStatusCode((res?.error as IErrorResponse)?.status);
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
       } else {
-        console.log('product data after add: ', res.data);
-        toast.success('Add success!');
-        reset();
+        toast.success(product ? 'Update success!' : 'Add success!');
+        if (!product) {
+          reset();
+        } else {
+          navigate(paths.dashboard.product);
+        }
       }
     } catch (error) {
       toast.error('Add failed!');
       setErrorMsg(typeof error === 'string' ? error : error.message);
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   useEffect(() => {
@@ -151,6 +177,16 @@ export function ManageProductForm() {
       setSelectedCategories('uncategorized');
     }
   }, [watchCategory]);
+
+  const resetValue = useCallback(() => {
+    if (product) {
+      resetProductForm(product, setValue);
+    }
+  }, [product, setValue]);
+
+  useEffect(() => {
+    resetValue();
+  }, [resetValue]);
 
   const formSections = [
     {
@@ -187,7 +223,24 @@ export function ManageProductForm() {
 
   return (
     <Form methods={methods} onSubmit={onSubmit}>
-      <Alert variant="outlined" severity={errorMsg ? 'error' : 'info'} sx={{ mb: 3 }}>
+      <Alert
+        variant="outlined"
+        severity={errorMsg ? 'error' : 'info'}
+        sx={{ mb: 3 }}
+        action={
+          errorMsg &&
+          statusCode === 409 && (
+            <Button
+              color="error"
+              size="small"
+              variant="soft"
+              startIcon={<Iconify icon="eva:trash-2-fill" />}
+            >
+              Trash
+            </Button>
+          )
+        }
+      >
         {errorMsg || 'Product name, model and price is required to add a product.'}
       </Alert>
       <Stack spacing={3}>
@@ -195,11 +248,18 @@ export function ManageProductForm() {
           <ProductFormSection key={section.title} sectionInfo={section} />
         ))}
         <Stack direction="row" justifyContent="flex-end" gap={1} width="100%" sx={{ mt: 4 }}>
-          <Button variant="outlined" disabled={isLoading} onClick={() => reset()}>
-            Reset
-          </Button>
-          <LoadingButton type="submit" variant="contained" disabled={isLoading} loading={isLoading}>
-            Add Product
+          {!product && (
+            <Button variant="outlined" disabled={addProductLoading} onClick={() => reset()}>
+              Reset
+            </Button>
+          )}
+          <LoadingButton
+            type="submit"
+            variant="contained"
+            disabled={addProductLoading || updateProductLoading}
+            loading={addProductLoading || updateProductLoading}
+          >
+            {product ? 'Save changes' : 'Add product'}
           </LoadingButton>
         </Stack>
       </Stack>

@@ -1,3 +1,8 @@
+import type { IProduct } from 'src/types/product';
+import type { UseFormSetValue } from 'react-hook-form';
+
+import { startCase } from 'lodash';
+
 import type { ProductValidationSchemaType } from './manage-product-form';
 
 export type TProductInfo = {
@@ -22,15 +27,29 @@ export type TProductInfo = {
 };
 
 export const attributesFormatter = (attributes: Record<string, any> | undefined) => {
-  console.log('attributes from formatter: ', attributes);
   if (!attributes) return [];
   const attributesArr = Object.keys(attributes).filter((item) => attributes[item].length !== 0);
-  console.log('attributesArr: ', attributesArr);
+
   const formattedAttributes = attributesArr.map((item) => ({
     slug: item,
-    value: attributes[item],
+    value: attributes[item].map((i: { label: string; value: string }) => i.value),
   }));
   return formattedAttributes;
+};
+
+export const attributesParser = (
+  formattedAttributes: { slug: string; value: string[] }[]
+): Record<string, { label: string; value: string }[]> => {
+  const attributes: Record<string, { label: string; value: string }[]> = {};
+
+  formattedAttributes.forEach(({ slug, value }) => {
+    attributes[slug] = value.map((item) => ({
+      label: startCase(item),
+      value: item,
+    }));
+  });
+
+  return attributes;
 };
 
 export const catgoriesFormatter = (categories: { label: string; value: string }[]) => {
@@ -70,6 +89,7 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
   if (retailer_price > 0) productInfo.retailer_price = retailer_price;
   if (stock > 0) productInfo.stock = stock;
   const formattedAttributes = attributesFormatter(attributes);
+  console.log('formatted attributes: ', formattedAttributes);
   if (formattedAttributes.length) productInfo.attributes = formattedAttributes;
   if (brand) productInfo.brand_id = brand.value;
   if (category.length) productInfo.categories = catgoriesFormatter(category);
@@ -83,4 +103,42 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
   if (specification[0].heading) productInfo.specification = specification;
 
   return productInfo;
+};
+
+export const resetProductForm = (
+  product: IProduct,
+  setValue: UseFormSetValue<ProductValidationSchemaType>
+) => {
+  setValue('name', product.name);
+  setValue('model', product.model);
+  setValue('code', product.code);
+  setValue('price', product.price);
+  setValue('discount_price', product?.discount_price || 0);
+  setValue('retailer_price', product?.retailer_price || 0);
+  setValue('stock', product.stock);
+  setValue('video_url', product?.video_url || '');
+  setValue('brand', product?.brand ? { label: product.brand.name, value: product.brand.id } : null);
+  setValue(
+    'category',
+    product?.categories
+      ? product.categories?.map((item) => ({ label: item.title, value: item.id }))
+      : []
+  );
+  setValue('tags', product?.tags || []);
+  setValue('key_features', product?.key_features || []);
+  setValue('description', product?.description || '');
+  setValue('additional_information', product?.additional_information || '');
+  setValue('thumbnail', product?.thumbnail ? [product.thumbnail] : []);
+  setValue('images', product?.images || []);
+  setValue(
+    'attributes',
+    product.attributes
+      ? attributesParser(product.attributes)
+      : {
+          Availability: [],
+        }
+  );
+  if (product?.specification) {
+    setValue('specification', product.specification);
+  }
 };

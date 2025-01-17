@@ -44,8 +44,9 @@ const api_endpoint = {
   product: {
     add_product: `${features.product}/add-product`,
     get_products: `${features.product}`,
+    get_single_product: `${features.product}`,
     update_product: `${features.product}/update-product`,
-    delete_products: `${features.product}`,
+    delete_products: `${features.product}/delete-products`,
   },
 };
 

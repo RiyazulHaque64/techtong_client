@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { grey } from '@mui/material/colors';
@@ -10,7 +9,7 @@ import { CONFIG } from 'src/config-global';
 import { varAlpha } from 'src/theme/styles';
 
 import { Iconify } from '../iconify';
-import { ImageSelectModal } from '../modal/image-select-modal';
+import { ImageSelectModalByRHF } from '../modal/image-select-modal';
 import { ImageSelectPlaceholder } from '../upload/components/placeholder';
 
 // ----------------------------------------------------------------------
@@ -33,23 +32,10 @@ export function RHFImageSelect({
   placeholderSubHeading,
   multipleImageHeader = 'Selected images',
 }: Props) {
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const { control, setValue, watch } = useFormContext();
   const images = watch(name);
 
   const openImageModal = useBoolean();
-
-  useEffect(() => {
-    if (selectedImages.length) {
-      setValue(name, selectedImages);
-    }
-  }, [selectedImages, setValue, name]);
-
-  useEffect(() => {
-    if (!images.length) {
-      setSelectedImages([]);
-    }
-  }, [images]);
 
   return (
     <>
@@ -58,7 +44,7 @@ export function RHFImageSelect({
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
-            {selectedImages.length >= 1 && multiple ? (
+            {field.value?.length && multiple ? (
               <>
                 <Typography>{multipleImageHeader}:</Typography>
                 <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -93,7 +79,10 @@ export function RHFImageSelect({
                             },
                           }}
                           onClick={() =>
-                            setSelectedImages((prev) => prev.filter((item) => item !== image))
+                            setValue(
+                              name,
+                              field.value.filter((item: string) => item !== image)
+                            )
                           }
                         >
                           <Iconify icon="eva:close-fill" sx={{ color: 'white' }} />
@@ -162,12 +151,13 @@ export function RHFImageSelect({
           </>
         )}
       />
-      <ImageSelectModal
+      <ImageSelectModalByRHF
         title={modalTitle}
         open={openImageModal.value}
         onClose={openImageModal.onFalse}
-        selectedImages={selectedImages}
-        setSelectedImages={setSelectedImages}
+        name={name}
+        selectedImages={images}
+        setSelectedImages={setValue}
         multiple={multiple}
       />
     </>

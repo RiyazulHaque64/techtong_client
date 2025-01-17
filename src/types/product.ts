@@ -1,32 +1,54 @@
 import type { IDateValue } from './common';
 
-export interface IProduct {
+export type TProductBrand = {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string;
+};
+
+export type TProductCategory = {
+  id: string;
+  title: string;
+  slug: string;
+  icon?: string;
+};
+
+export type TProductSpecificationItem = {
+  heading: string;
+  fields: { title: string; value: string }[];
+};
+
+export type TProductAttributeItem = { slug: string; value: string[] };
+
+export type IProduct = {
   id: string;
   name: string;
   slug: string;
   model: string;
-  brand_id?: string;
-  tags?: string[];
   code?: string;
-  stock: number;
   price: number;
   discount_price?: number;
   retailer_price?: number;
+  stock: number;
+  brand_id?: string;
+  brand: TProductBrand;
+  categories?: TProductCategory[];
   thumbnail?: string;
-  images?: string[];
+  images: string[];
+  video_url?: string;
+  tags: string[];
+  description?: string;
+  specification?: TProductSpecificationItem[];
+  additional_information?: string;
+  key_features: string[];
+  attributes: TProductAttributeItem[];
   published: boolean;
   featured: boolean;
-  description?: string;
-  specification?: { heading: string; fields: { title: string; value: string }[] }[];
-  additional_information?: string;
-  key_features?: string[];
-  video_url?: string;
-  attributes?: { slug: string; value: string }[];
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
-  categories?: string[];
-}
+};
 
 // ----------------------------------------------------------------------
 
@@ -60,45 +82,4 @@ export type IProductReview = {
   postedAt: IDateValue;
   isPurchased: boolean;
   attachments?: string[];
-};
-
-export type IProductItem = {
-  id: string;
-  sku: string;
-  name: string;
-  code: string;
-  price: number;
-  taxes: number;
-  tags: string[];
-  sizes: string[];
-  publish: string;
-  gender: string[];
-  coverUrl: string;
-  images: string[];
-  colors: string[];
-  quantity: number;
-  category: string;
-  available: number;
-  totalSold: number;
-  description: string;
-  totalRatings: number;
-  totalReviews: number;
-  createdAt: IDateValue;
-  inventoryType: string;
-  subDescription: string;
-  priceSale: number | null;
-  reviews: IProductReview[];
-  ratings: {
-    name: string;
-    starCount: number;
-    reviewCount: number;
-  }[];
-  saleLabel: {
-    enabled: boolean;
-    content: string;
-  };
-  newLabel: {
-    enabled: boolean;
-    content: string;
-  };
 };

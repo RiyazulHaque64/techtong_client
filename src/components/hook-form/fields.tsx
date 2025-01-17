@@ -1,4 +1,5 @@
 import { RHFEditor } from './rhf-editor';
+import { RHFRating } from './rhf-rating';
 import { RHFUploadAvatar } from './rhf-upload';
 import { RHFTextField } from './rhf-text-field';
 import { RHFImageSelect } from './rhf-image-select';
@@ -19,4 +20,5 @@ export const Field = {
   ImageSelect: RHFImageSelect,
   ListText: RHFListTextField,
   Editor: RHFEditor,
+  Rating: RHFRating,
 };

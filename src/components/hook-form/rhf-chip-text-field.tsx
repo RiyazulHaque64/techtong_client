@@ -27,7 +27,7 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
   ) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      if (new_value.trim() && !values.includes(new_value.toLowerCase())) {
+      if (new_value?.length && new_value.trim() && !values.includes(new_value.toLowerCase())) {
         setValue(name, [...values, new_value.trim().toLowerCase()], { shouldValidate: true });
       }
       onChange('');
@@ -35,7 +35,7 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
   };
 
   const handleClick = (new_value: string, onChange: (value: string) => void) => {
-    if (new_value.trim() && !values.includes(new_value.toLowerCase())) {
+    if (new_value?.length && new_value.trim() && !values.includes(new_value.toLowerCase())) {
       setValue(name, [...values, new_value.trim().toLowerCase()], { shouldValidate: true });
     }
     onChange('');
@@ -46,7 +46,7 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
     new_value: string,
     onChange: (value: string) => void
   ) => {
-    if (new_value.trim().length > 0) {
+    if (new_value?.length && new_value.trim().length > 0) {
       setValue(name, [...values, new_value.trim().toLowerCase()], { shouldValidate: true });
       onChange('');
     }

@@ -8,7 +8,7 @@ import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 import { ManageProductForm } from '../manage-product-form';
 
-export function ManageProductView() {
+export function AddProductView() {
   return (
     <DashboardContent>
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">

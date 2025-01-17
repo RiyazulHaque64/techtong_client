@@ -17,8 +17,10 @@ const Media = lazy(() => import('src/pages/dashboard/media'));
 const Brand = lazy(() => import('src/pages/dashboard/brand'));
 const Category = lazy(() => import('src/pages/dashboard/category'));
 const Attribute = lazy(() => import('src/pages/dashboard/attribute'));
-const ManageProduct = lazy(() => import('src/pages/dashboard/product/add-product'));
+const AddProduct = lazy(() => import('src/pages/dashboard/product/add-product'));
+const EditProduct = lazy(() => import('src/pages/dashboard/product/edit-product'));
 const AllProducts = lazy(() => import('src/pages/dashboard/product/all-product'));
+const DetailsProduct = lazy(() => import('src/pages/dashboard/product/details-product'));
 const ChangePassword = lazy(() => import('src/pages/account/change-password'));
 const UpdateProfile = lazy(() => import('src/pages/account/update-profile'));
 const PageFour = lazy(() => import('src/pages/dashboard/four'));
@@ -47,8 +49,10 @@ export const dashboardRoutes = [
       { path: paths.dashboard.brand, element: <Brand /> },
       { path: paths.dashboard.category, element: <Category /> },
       { path: paths.dashboard.attribute, element: <Attribute /> },
-      { path: paths.dashboard.add_product, element: <ManageProduct /> },
+      { path: paths.dashboard.add_product, element: <AddProduct /> },
       { path: paths.dashboard.product, element: <AllProducts /> },
+      { path: `${paths.dashboard.product}/edit/:slug`, element: <EditProduct /> },
+      { path: `${paths.dashboard.product}/:slug`, element: <DetailsProduct /> },
       {
         path: 'group',
         children: [

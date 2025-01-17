@@ -1,5 +1,5 @@
+import type { IProductTableFilters } from 'src/types/product';
 import type { UseSetStateReturn } from 'src/hooks/use-set-state';
-import type { IProduct, IProductTableFilters } from 'src/types/product';
 import type {
   GridSlots,
   GridColDef,
@@ -7,10 +7,11 @@ import type {
   GridColumnVisibilityModel,
 } from '@mui/x-data-grid';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
+import { LoadingButton } from '@mui/lab';
 import Button from '@mui/material/Button';
 import {
   DataGrid,
@@ -32,7 +33,10 @@ import { useSetState } from 'src/hooks/use-set-state';
 
 import { PRODUCT_STOCK_OPTIONS } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { useGetProductsQuery } from 'src/redux/features/product/product-api';
+import {
+  useGetProductsQuery,
+  useDeleteProductsMutation,
+} from 'src/redux/features/product/product-api';
 
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
@@ -66,58 +70,62 @@ const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 
 export function AllProductView() {
   const { data: products, isLoading: getProductsLoading } = useGetProductsQuery([]);
+  const [deleteProducts, { isLoading: deleteProductsLoading }] = useDeleteProductsMutation();
+
   const confirmRows = useBoolean();
+  const confirmRow = useBoolean();
 
   const router = useRouter();
 
   const filters = useSetState<IProductTableFilters>({ publish: [], stock: [] });
 
-  const [tableData, setTableData] = useState<IProduct[]>([]);
-
-  const [selectedRowIds, setSelectedRowIds] = useState<GridRowSelectionModel>([]);
-
+  const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterButtonEl, setFilterButtonEl] = useState<HTMLButtonElement | null>(null);
-
   const [columnVisibilityModel, setColumnVisibilityModel] =
     useState<GridColumnVisibilityModel>(HIDE_COLUMNS);
 
-  useEffect(() => {
-    if (products && products.data?.length) {
-      setTableData(products.data);
-    }
-  }, [products]);
-
   const canReset = filters.state.publish.length > 0 || filters.state.stock.length > 0;
 
-  const handleDeleteRow = useCallback(
-    (id: string) => {
-      const deleteRow = tableData.filter((row) => row.id !== id);
+  const handleDeleteRow = useCallback(async () => {
+    if (!selectedId) return;
+    try {
+      const res = await deleteProducts({ ids: [selectedId] });
+      if (res?.error) {
+        toast.error('Delete failed!');
+      } else {
+        toast.success('Delete success!');
+        confirmRow.onFalse();
+      }
+    } catch (error) {
+      toast.error('Delete failed!');
+    }
+  }, [selectedId, confirmRow, deleteProducts]);
 
-      toast.success('Delete success!');
-
-      setTableData(deleteRow);
-    },
-    [tableData]
-  );
-
-  const handleDeleteRows = useCallback(() => {
-    const deleteRows = tableData.filter((row) => !selectedRowIds.includes(row.id));
-
-    toast.success('Delete success!');
-
-    setTableData(deleteRows);
-  }, [selectedRowIds, tableData]);
+  const handleDeleteRows = useCallback(async () => {
+    try {
+      const res = await deleteProducts({ ids: [...selectedRowIds] });
+      if (res?.error) {
+        toast.error('Delete failed!');
+      } else {
+        toast.success('Delete success!');
+        confirmRows.onFalse();
+      }
+    } catch (error) {
+      toast.error('Delete failed!');
+    }
+  }, [selectedRowIds, deleteProducts, confirmRows]);
 
   const handleEditRow = useCallback(
-    (id: string) => {
-      router.push(paths.dashboard.edit_product(id));
+    (slug: string) => {
+      router.push(paths.dashboard.edit_product(slug));
     },
     [router]
   );
 
   const handleViewRow = useCallback(
-    (id: string) => {
-      router.push(paths.dashboard.details_product(id));
+    (slug: string) => {
+      router.push(paths.dashboard.details_product(slug));
     },
     [router]
   );
@@ -194,20 +202,21 @@ export function AllProductView() {
           showInMenu
           icon={<Iconify icon="solar:eye-bold" />}
           label="View"
-          onClick={() => handleViewRow(params.row.id)}
+          onClick={() => handleViewRow(params.row.slug)}
         />,
         <GridActionsCellItem
           showInMenu
           icon={<Iconify icon="solar:pen-bold" />}
           label="Edit"
-          onClick={() => handleEditRow(params.row.id)}
+          onClick={() => handleEditRow(params.row.slug)}
         />,
         <GridActionsCellItem
           showInMenu
           icon={<Iconify icon="solar:trash-bin-trash-bold" />}
           label="Delete"
           onClick={() => {
-            handleDeleteRow(params.row.id);
+            setSelectedId(params.row.id);
+            confirmRow.onTrue();
           }}
           sx={{ color: 'error.main' }}
         />,
@@ -256,7 +265,9 @@ export function AllProductView() {
             getRowHeight={() => 'auto'}
             pageSizeOptions={[5, 10, 25]}
             initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-            onRowSelectionModelChange={(newSelectionModel) => setSelectedRowIds(newSelectionModel)}
+            onRowSelectionModelChange={(newSelectionModel) =>
+              setSelectedRowIds(newSelectionModel as string[])
+            }
             columnVisibilityModel={columnVisibilityModel}
             onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
             slots={{
@@ -274,6 +285,7 @@ export function AllProductView() {
         </Card>
       </DashboardContent>
 
+      {/* Multiple delete confirmation */}
       <ConfirmDialog
         open={confirmRows.value}
         onClose={confirmRows.onFalse}
@@ -294,6 +306,28 @@ export function AllProductView() {
           >
             Delete
           </Button>
+        }
+      />
+
+      {/* Single delete confirmation */}
+      <ConfirmDialog
+        open={confirmRow.value}
+        onClose={confirmRow.onFalse}
+        title="Delete"
+        content={<>Are you sure want to delete?</>}
+        action={
+          <LoadingButton
+            variant="contained"
+            color="error"
+            onClick={() => {
+              handleDeleteRow();
+              confirmRow.onFalse();
+            }}
+            loading={deleteProductsLoading}
+            disabled={deleteProductsLoading}
+          >
+            Delete
+          </LoadingButton>
         }
       />
     </>

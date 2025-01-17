@@ -26,7 +26,7 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
   ) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      if (new_value.trim() && !values.includes(new_value)) {
+      if (new_value.length && new_value.trim() && !values.includes(new_value)) {
         setValue(name, [...values, new_value.trim()], { shouldValidate: true });
       }
       onChange('');
