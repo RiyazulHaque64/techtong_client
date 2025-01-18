@@ -5,7 +5,8 @@ import Box from '@mui/material/Box';
 import { CONFIG } from 'src/config-global';
 
 import { Image } from 'src/components/image';
-import { Lightbox, useLightBox } from 'src/components/lightbox';
+import LightBox from 'src/components/lightbox/lightbox';
+import { useLightBox } from 'src/components/lightbox/use-lightbox';
 import {
   Carousel,
   useCarousel,
@@ -83,12 +84,11 @@ export function ProductDetailsCarousel({ images }: Props) {
           ))}
         </CarouselThumbs>
       </Box>
-
-      <Lightbox
+      <LightBox
         index={lightbox.selected}
-        slides={slides}
         open={lightbox.open}
         close={lightbox.onClose}
+        slides={slides}
         onGetCurrentIndex={(index) => lightbox.setSelected(index)}
       />
     </>

@@ -53,6 +53,7 @@ import {
   RenderCellProduct,
   RenderCellFeatured,
   RenderCellUpdatedAt,
+  RenderCellQuickUpdate,
 } from '../components/product-table-row';
 
 // ----------------------------------------------------------------------
@@ -150,7 +151,7 @@ export function AllProductView() {
       field: 'name',
       headerName: 'Product',
       flex: 1,
-      minWidth: 360,
+      minWidth: 350,
       hideable: false,
       renderCell: (params) => (
         <RenderCellProduct params={params} onViewRow={() => handleViewRow(params.row.id)} />
@@ -166,26 +167,42 @@ export function AllProductView() {
       field: 'stock',
       headerName: 'Stock',
       width: 120,
+      headerAlign: 'center',
+      align: 'center',
       type: 'singleSelect',
       renderCell: (params) => <RenderCellStock params={params} />,
     },
     {
       field: 'price',
       headerName: 'Price',
+      headerAlign: 'center',
+      align: 'center',
       width: 130,
       renderCell: (params) => <RenderCellPrice params={params} />,
     },
     {
       field: 'published',
       headerName: 'Publish',
-      width: 100,
+      headerAlign: 'center',
+      align: 'center',
+      width: 90,
       renderCell: (params) => <RenderCellPublish params={params} />,
     },
     {
       field: 'featured',
       headerName: 'Featured',
-      width: 100,
+      headerAlign: 'center',
+      align: 'center',
+      width: 90,
       renderCell: (params) => <RenderCellFeatured params={params} />,
+    },
+    {
+      field: 'quick_update',
+      headerName: 'Quick',
+      headerAlign: 'center',
+      align: 'center',
+      width: 60,
+      renderCell: (params) => <RenderCellQuickUpdate params={params} />,
     },
     {
       type: 'actions',
@@ -193,7 +210,7 @@ export function AllProductView() {
       headerName: ' ',
       align: 'right',
       headerAlign: 'right',
-      width: 80,
+      width: 50,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,

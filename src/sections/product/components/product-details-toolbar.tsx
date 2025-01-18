@@ -24,6 +24,7 @@ type Props = StackProps & {
   editLink: string;
   liveLink: string;
   product: IProduct;
+  updateLoading?: boolean;
   onChangePublish: (newValue: boolean) => void;
 };
 
@@ -32,6 +33,7 @@ export function ProductDetailsToolbar({
   editLink,
   liveLink,
   product,
+  updateLoading = false,
   onChangePublish,
   sx,
   ...other
@@ -82,8 +84,7 @@ export function ProductDetailsToolbar({
         <LoadingButton
           color="inherit"
           variant="contained"
-          loading={!product.published}
-          loadingIndicator="Loading…"
+          loading={updateLoading}
           endIcon={<Iconify icon="eva:arrow-ios-downward-fill" />}
           onClick={popover.onOpen}
           sx={{ textTransform: 'capitalize' }}

@@ -1,16 +1,17 @@
-import type { IProductReview } from 'src/types/product';
+import type { TProductReview } from 'src/types/product';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Rating from '@mui/material/Rating';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import { LinearProgress } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import LinearProgress from '@mui/material/LinearProgress';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
-import { sumBy } from 'src/utils/helper';
+import { useAppSelector } from 'src/redux/hooks';
+import { selectCurrentUser } from 'src/redux/features/auth/authSlice';
 
 import { Iconify } from 'src/components/iconify';
 
@@ -19,36 +20,62 @@ import { ProductReviewNewForm } from './product-review-new-form';
 
 // ----------------------------------------------------------------------
 
+const ratings = [
+  {
+    title: '5 Star',
+    value: '5',
+  },
+  {
+    title: '4 Star',
+    value: '4',
+  },
+  {
+    title: '3 Star',
+    value: '3',
+  },
+  {
+    title: '2 Star',
+    value: '2',
+  },
+  {
+    title: '1 Star',
+    value: '1',
+  },
+];
+
 type Props = {
-  totalRatings?: number;
-  totalReviews?: number;
-  reviews?: IProductReview[];
-  ratings?: { name: string; starCount: number; reviewCount: number }[];
+  avg_rating?: number;
+  reviews?: TProductReview[];
 };
 
-export function ProductDetailsReview({
-  totalRatings,
-  totalReviews,
-  ratings = [],
-  reviews = [],
-}: Props) {
+export function ProductDetailsReview({ avg_rating, reviews = [] }: Props) {
+  const currentUser = useAppSelector(selectCurrentUser);
   const review = useBoolean();
 
-  const total = sumBy(ratings, (star) => star.starCount);
+  const groupByRating: Record<string, TProductReview[]> = reviews.reduce<
+    Record<number, TProductReview[]>
+  >((group, item) => {
+    const rating = Math.round(item.rating);
+    if (!group[rating]) group[rating] = [];
+    group[rating].push(item);
+    return group;
+  }, {});
+
+  console.log('group by rating: ', groupByRating);
 
   const renderSummary = (
     <Stack spacing={1} alignItems="center" justifyContent="center">
       <Typography variant="subtitle2">Average rating</Typography>
 
       <Typography variant="h2">
-        {totalRatings}
+        {avg_rating}
         /5
       </Typography>
 
-      <Rating readOnly value={totalRatings} precision={0.1} />
+      <Rating readOnly value={avg_rating} precision={0.1} />
 
       <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-        5 reviews
+        {reviews.length} reviews
       </Typography>
     </Stack>
   );
@@ -63,31 +90,32 @@ export function ProductDetailsReview({
         borderRight: (theme) => ({ md: `dashed 1px ${theme.vars.palette.divider}` }),
       }}
     >
-      {ratings
-        .slice(0)
-        .reverse()
-        .map((rating) => (
-          <Stack key={rating.name} direction="row" alignItems="center">
-            <Typography variant="subtitle2" component="span" sx={{ width: 42 }}>
-              {rating.name}
-            </Typography>
+      {ratings.map((item) => (
+        <Stack key={item.value} direction="row" alignItems="center">
+          <Typography variant="subtitle2" component="span" sx={{ width: 42 }}>
+            {item.title}
+          </Typography>
 
-            <LinearProgress
-              color="inherit"
-              variant="determinate"
-              value={(rating.starCount / total) * 100}
-              sx={{ mx: 2, flexGrow: 1 }}
-            />
+          <LinearProgress
+            color="inherit"
+            variant="determinate"
+            value={
+              groupByRating[item.value]?.length
+                ? (groupByRating['5'].length / reviews.length) * 100
+                : 0
+            }
+            sx={{ mx: 2, flexGrow: 1 }}
+          />
 
-            <Typography
-              variant="body2"
-              component="span"
-              sx={{ minWidth: 48, color: 'text.secondary' }}
-            >
-              5
-            </Typography>
-          </Stack>
-        ))}
+          <Typography
+            variant="body2"
+            component="span"
+            sx={{ minWidth: 48, color: 'text.secondary' }}
+          >
+            {groupByRating[item.value]?.length || 0}
+          </Typography>
+        </Stack>
+      ))}
     </Stack>
   );
 
@@ -99,6 +127,7 @@ export function ProductDetailsReview({
         color="inherit"
         onClick={review.onTrue}
         startIcon={<Iconify icon="solar:pen-bold" />}
+        disabled={currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN'}
       >
         Write your review
       </Button>

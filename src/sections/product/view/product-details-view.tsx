@@ -10,10 +10,14 @@ import { useTabs } from 'src/hooks/use-tabs';
 
 import { varAlpha } from 'src/theme/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
+import { useUpdateProductMutation } from 'src/redux/features/product/product-api';
+
+import { toast } from 'src/components/snackbar';
 
 import ProductVideo from '../components/product-video';
 import ProductAttributes from '../components/product-attributes';
 import ProductSpecification from '../components/product-specification';
+import { ProductDetailsReview } from '../components/product-details-review';
 import { ProductDetailsToolbar } from '../components/product-details-toolbar';
 import { ProductDetailsSummary } from '../components/product-details-summery';
 import { ProductDetailsCarousel } from '../components/product-details-carousel';
@@ -27,13 +31,37 @@ type Props = {
 };
 
 export function ProductDetailsView({ product }: Props) {
-  const { slug, thumbnail, images } = product;
-  console.log('product: ', product);
+  const {
+    slug,
+    thumbnail,
+    images,
+    description,
+    specification,
+    additional_information,
+    video_url,
+    attributes,
+    reviews,
+  } = product;
+
+  const [updateProduct, { isLoading: updateLoading }] = useUpdateProductMutation();
+
   const tabs = useTabs('specification');
 
-  const handleChangePublish = useCallback((newValue: boolean) => {
-    console.log(newValue);
-  }, []);
+  const handleChangePublish = useCallback(
+    async (newValue: boolean) => {
+      try {
+        const res = await updateProduct({ id: product.id, data: { published: newValue } });
+        if (res?.error) {
+          toast.error('Failed to update!');
+        } else {
+          toast.success('Update success!');
+        }
+      } catch (err) {
+        toast.error('Failed to update!');
+      }
+    },
+    [product.id, updateProduct]
+  );
 
   return (
     <DashboardContent>
@@ -42,6 +70,7 @@ export function ProductDetailsView({ product }: Props) {
         editLink={paths.dashboard.edit_product(`${slug}`)}
         liveLink={paths.dashboard.details_product(`${slug}`)}
         onChangePublish={handleChangePublish}
+        updateLoading={updateLoading}
       />
       <Stack direction={{ xs: 'column', md: 'row' }} gap={6}>
         <Box width={{ xs: '100%', md: '40%' }}>
@@ -68,39 +97,31 @@ export function ProductDetailsView({ product }: Props) {
             { value: 'additional_information', label: 'Additional Information' },
             { value: 'video', label: 'Video' },
             { value: 'attributes', label: 'Attributes' },
+            { value: 'reviews', label: `Reviews (${product?.reviews.length})` },
           ].map((tab) => (
             <Tab key={tab.value} value={tab.value} label={tab.label} />
           ))}
         </Tabs>
 
         {tabs.value === 'description' && (
-          <ProductDetailsDescription description={product?.description ?? ''} />
+          <ProductDetailsDescription description={description ?? ''} />
         )}
 
         {tabs.value === 'specification' && (
-          <ProductSpecification specifications={product?.specification ?? []} />
+          <ProductSpecification specifications={specification ?? []} />
         )}
 
         {tabs.value === 'additional_information' && (
-          <ProductAdditionalInformation
-            additional_information={product?.additional_information ?? ''}
-          />
+          <ProductAdditionalInformation additional_information={additional_information ?? ''} />
         )}
 
-        {tabs.value === 'video' && <ProductVideo video_url={product?.video_url} />}
+        {tabs.value === 'video' && <ProductVideo video_url={video_url} />}
 
-        {tabs.value === 'attributes' && <ProductAttributes attributes={product?.attributes} />}
-        {/* {tabs.value === 'reviews' && (
-          <ProductDetailsReview
-            ratings={product?.ratings ?? []}
-            reviews={product?.reviews ?? []}
-            totalRatings={product?.totalRatings ?? 0}
-            totalReviews={product?.totalReviews ?? 0}
-          />
-        )} */}
+        {tabs.value === 'attributes' && <ProductAttributes attributes={attributes} />}
+        {tabs.value === 'reviews' && (
+          <ProductDetailsReview avg_rating={product?.avg_rating} reviews={reviews ?? []} />
+        )}
       </Card>
     </DashboardContent>
   );
 }
-
-// { value: 'reviews', label: `Reviews (${product?.reviews.length})` }

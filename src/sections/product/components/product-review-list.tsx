@@ -1,4 +1,4 @@
-import type { IProductReview } from 'src/types/product';
+import type { TProductReview } from 'src/types/product';
 
 import Pagination, { paginationClasses } from '@mui/material/Pagination';
 
@@ -7,7 +7,7 @@ import { ProductReviewItem } from './product-review-item';
 // ----------------------------------------------------------------------
 
 type Props = {
-  reviews: IProductReview[];
+  reviews: TProductReview[];
 };
 
 export function ProductReviewList({ reviews }: Props) {

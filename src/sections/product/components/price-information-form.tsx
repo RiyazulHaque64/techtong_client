@@ -1,10 +1,12 @@
+import type { SxProps } from '@mui/material';
+
 import { Box, Grid, InputAdornment } from '@mui/material';
 
 import { Field } from 'src/components/hook-form';
 
-export function PriceInformationForm() {
+export function PriceInformationForm({ sx }: { sx?: SxProps }) {
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{ ...sx }}>
       <Grid item xs={12}>
         <Field.Text
           name="price"

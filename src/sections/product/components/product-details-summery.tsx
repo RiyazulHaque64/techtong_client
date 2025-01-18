@@ -45,6 +45,8 @@ export function ProductDetailsSummary({
     model,
     categories,
     brand,
+    avg_rating,
+    reviews,
   } = product;
 
   const renderLabel = (
@@ -71,25 +73,33 @@ export function ProductDetailsSummary({
 
   const renderPrice = (
     <Stack direction="row" alignItems="center" spacing={1}>
-      <Label variant="outlined">
-        Regular Price: {price}
-        <Iconify icon="tabler:currency-taka" sx={{ width: 18, height: 18, ml: -0.5 }} />
-      </Label>
-      <Label variant="outlined">
-        Discount Price: {discount_price}
-        <Iconify icon="tabler:currency-taka" sx={{ width: 18, height: 18, ml: -0.5 }} />
-      </Label>
-      <Label variant="outlined">
-        Retailer Price: {retailer_price}
-        <Iconify icon="tabler:currency-taka" sx={{ width: 18, height: 18, ml: -0.5 }} />
-      </Label>
+      <Stack direction="row" alignItems="center">
+        <Typography variant="caption" sx={{ fontWeight: 'medium', fontSize: '0.9rem' }}>
+          Discount Price: {discount_price}
+        </Typography>
+        <Iconify icon="tabler:currency-taka" sx={{ width: 16, height: 16, ml: -0.4 }} />
+      </Stack>
+      <Stack direction="row" alignItems="center">
+        <Typography variant="caption" sx={{ fontWeight: 'medium', fontSize: '0.9rem' }}>
+          Retailer Price: {retailer_price}
+        </Typography>
+        <Iconify icon="tabler:currency-taka" sx={{ width: 16, height: 16, ml: -0.4 }} />
+      </Stack>
+      <Stack direction="row" alignItems="center">
+        <Typography variant="caption" sx={{ fontWeight: 'medium', fontSize: '0.9rem' }}>
+          Regular Price: {price}
+        </Typography>
+        <Iconify icon="tabler:currency-taka" sx={{ width: 16, height: 16, ml: -0.4 }} />
+      </Stack>
     </Stack>
   );
 
   const renderTagAndFeatures = (
     <Stack direction="column" gap={2}>
       <Box>
-        <Typography variant="h6">Key Features</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
+          Key Features
+        </Typography>
         {key_features.map((feature) => (
           <Typography key={feature} variant="body2" sx={{ color: 'text.secondary' }}>
             {feature}
@@ -142,9 +152,9 @@ export function ProductDetailsSummary({
           Available: {stock}
         </Typography>
         <Stack direction="row" alignItems="center">
-          <Rating size="small" value={5} precision={0.1} readOnly sx={{ mr: 1 }} />
+          <Rating size="small" value={avg_rating} precision={0.1} readOnly sx={{ mr: 1 }} />
           <Typography variant="caption" sx={{ fontSize: '0.9rem' }}>
-            5 reviews
+            {reviews.length} reviews
           </Typography>
         </Stack>
       </Stack>

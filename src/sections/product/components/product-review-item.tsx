@@ -1,21 +1,19 @@
-import type { IProductReview } from 'src/types/product';
+import type { TProductReview } from 'src/types/product';
 
-import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Rating from '@mui/material/Rating';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
-import ButtonBase from '@mui/material/ButtonBase';
 import ListItemText from '@mui/material/ListItemText';
 
 import { fDate } from 'src/utils/format-time';
 
-import { Iconify } from 'src/components/iconify';
+import { CONFIG } from 'src/config-global';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-  review: IProductReview;
+  review: TProductReview;
 };
 
 export function ProductReviewItem({ review }: Props) {
@@ -27,13 +25,13 @@ export function ProductReviewItem({ review }: Props) {
       sx={{ width: { md: 240 }, textAlign: { md: 'center' } }}
     >
       <Avatar
-        src={review.avatarUrl}
+        src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${review?.user?.profile_pic}`}
         sx={{ width: { xs: 48, md: 64 }, height: { xs: 48, md: 64 } }}
       />
 
       <ListItemText
-        primary={review.name}
-        secondary={fDate(review.postedAt)}
+        primary={review.user.name}
+        secondary={fDate(review.created_at)}
         primaryTypographyProps={{ noWrap: true, typography: 'subtitle2', mb: 0.5 }}
         secondaryTypographyProps={{ noWrap: true, typography: 'caption', component: 'span' }}
       />
@@ -44,44 +42,7 @@ export function ProductReviewItem({ review }: Props) {
     <Stack spacing={1} flexGrow={1}>
       <Rating size="small" value={review.rating} precision={0.1} readOnly />
 
-      {review.isPurchased && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          sx={{ color: 'success.main', typography: 'caption' }}
-        >
-          <Iconify icon="ic:round-verified" width={16} sx={{ mr: 0.5 }} />
-          Verified purchase
-        </Stack>
-      )}
-
-      <Typography variant="body2">{review.comment}</Typography>
-
-      {!!review.attachments?.length && (
-        <Stack direction="row" flexWrap="wrap" spacing={1} sx={{ pt: 1 }}>
-          {review.attachments.map((attachment) => (
-            <Box
-              key={attachment}
-              component="img"
-              alt={attachment}
-              src={attachment}
-              sx={{ width: 64, height: 64, borderRadius: 1.5 }}
-            />
-          ))}
-        </Stack>
-      )}
-
-      <Stack direction="row" spacing={2} sx={{ pt: 1.5 }}>
-        <ButtonBase disableRipple sx={{ gap: 0.5, typography: 'caption' }}>
-          <Iconify icon="solar:like-outline" width={16} />
-          123
-        </ButtonBase>
-
-        <ButtonBase disableRipple sx={{ gap: 0.5, typography: 'caption' }}>
-          <Iconify icon="solar:dislike-outline" width={16} />
-          34
-        </ButtonBase>
-      </Stack>
+      <Typography variant="body2">{review?.comment}</Typography>
     </Stack>
   );
 

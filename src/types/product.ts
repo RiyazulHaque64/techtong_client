@@ -1,5 +1,3 @@
-import type { IDateValue } from './common';
-
 export type TProductBrand = {
   id: string;
   name: string;
@@ -20,6 +18,19 @@ export type TProductSpecificationItem = {
 };
 
 export type TProductAttributeItem = { slug: string; value: string[] };
+
+export type TProductReview = {
+  id: string;
+  rating: number;
+  comment?: string;
+  created_at: string;
+  updated_at: string;
+  user: {
+    name: string;
+    email?: string;
+    profile_pic?: string;
+  };
+};
 
 export type IProduct = {
   id: string;
@@ -48,38 +59,13 @@ export type IProduct = {
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
+  avg_rating: number;
+  reviews: TProductReview[];
 };
 
 // ----------------------------------------------------------------------
 
-export type IProductFilters = {
-  rating: string;
-  gender: string[];
-  category: string;
-  colors: string[];
-  priceRange: number[];
-};
-
 export type IProductTableFilters = {
   stock: string[];
   publish: string[];
-};
-
-export type IProductReviewNewForm = {
-  rating: number | null;
-  review: string;
-  name: string;
-  email: string;
-};
-
-export type IProductReview = {
-  id: string;
-  name: string;
-  rating: number;
-  comment: string;
-  helpful: number;
-  avatarUrl: string;
-  postedAt: IDateValue;
-  isPurchased: boolean;
-  attachments?: string[];
 };

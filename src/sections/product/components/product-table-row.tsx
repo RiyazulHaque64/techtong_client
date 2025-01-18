@@ -10,7 +10,9 @@ import { LoadingButton } from '@mui/lab';
 import Avatar from '@mui/material/Avatar';
 import ListItemText from '@mui/material/ListItemText';
 import LinearProgress from '@mui/material/LinearProgress';
-import { Switch, Button, Divider, Typography } from '@mui/material';
+import { Switch, Button, Divider, Typography, IconButton } from '@mui/material';
+
+import { useBoolean } from 'src/hooks/use-boolean';
 
 import { stockStatus } from 'src/utils/helper';
 import { fTime, fDate } from 'src/utils/format-time';
@@ -21,6 +23,8 @@ import { useUpdateProductMutation } from 'src/redux/features/product/product-api
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { usePopover, CustomPopover } from 'src/components/custom-popover';
+
+import { QuickUpdateForm } from './quick-update-form';
 
 // ----------------------------------------------------------------------
 
@@ -169,6 +173,18 @@ export function RenderCellFeatured({ params }: ParamsProps) {
   );
 }
 
+export function RenderCellQuickUpdate({ params }: ParamsProps) {
+  const quickEdit = useBoolean();
+  return (
+    <>
+      <IconButton onClick={quickEdit.onTrue}>
+        <Iconify icon="lucide:edit" />
+      </IconButton>
+      <QuickUpdateForm open={quickEdit.value} onClose={quickEdit.onFalse} product={params.row} />
+    </>
+  );
+}
+
 export function RenderCellUpdatedAt({ params }: ParamsProps) {
   return (
     <Stack spacing={0.5}>
@@ -203,7 +219,12 @@ export function RenderCellProduct({
   onViewRow: () => void;
 }) {
   return (
-    <Stack direction="row" alignItems="center" sx={{ py: 2, width: 1 }}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      sx={{ py: 2, width: 1, cursor: 'pointer' }}
+      onClick={onViewRow}
+    >
       <Avatar
         src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${params.row?.thumbnail}`}
         alt={params.row.name}
