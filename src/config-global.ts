@@ -28,6 +28,7 @@ export type ConfigValue = {
   auth0: { clientId: string; domain: string; callbackUrl: string };
   supabase: { url: string; key: string };
   bucket: { url: string; name: string };
+  search_query: { limit: number };
 };
 
 // ----------------------------------------------------------------------
@@ -89,4 +90,5 @@ export const CONFIG: ConfigValue = {
     url: import.meta.env.VITE_BUCKET_URL,
     name: import.meta.env.VITE_BUCKET_NAME,
   },
+  search_query: { limit: 500 },
 };

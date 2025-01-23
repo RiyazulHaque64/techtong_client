@@ -17,13 +17,15 @@ export function ProductReviewList({ reviews }: Props) {
         <ProductReviewItem key={review.id} review={review} />
       ))}
 
-      <Pagination
-        count={10}
-        sx={{
-          mx: 'auto',
-          [`& .${paginationClasses.ul}`]: { my: 5, mx: 'auto', justifyContent: 'center' },
-        }}
-      />
+      {reviews.length !== 0 && (
+        <Pagination
+          count={10}
+          sx={{
+            mx: 'auto',
+            [`& .${paginationClasses.ul}`]: { my: 5, mx: 'auto', justifyContent: 'center' },
+          }}
+        />
+      )}
     </>
   );
 }

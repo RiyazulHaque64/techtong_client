@@ -142,3 +142,43 @@ export const resetProductForm = (
     setValue('specification', product.specification);
   }
 };
+
+export const PRODUCT_TAB_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'published', label: 'Published' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'featured', label: 'Featured' },
+];
+
+export const PRODUCT_DETAILS_TABS = [
+  { value: 'specification', label: 'Specification' },
+  { value: 'description', label: 'Description' },
+  { value: 'additional_information', label: 'Additional Information' },
+  { value: 'video', label: 'Video' },
+  { value: 'attributes', label: 'Attributes' },
+];
+
+export const RATINGS = [
+  {
+    title: '5 Star',
+    value: '5',
+  },
+  {
+    title: '4 Star',
+    value: '4',
+  },
+  {
+    title: '3 Star',
+    value: '3',
+  },
+  {
+    title: '2 Star',
+    value: '2',
+  },
+  {
+    title: '1 Star',
+    value: '1',
+  },
+];
+
+export type TFilterOption = { value: string; label: string };

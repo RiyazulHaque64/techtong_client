@@ -13,6 +13,7 @@ import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import { LoadingButton } from '@mui/lab';
 import Button from '@mui/material/Button';
+import { Tab, Tabs } from '@mui/material';
 import {
   DataGrid,
   gridClasses,
@@ -20,7 +21,6 @@ import {
   GridActionsCellItem,
   GridToolbarContainer,
   GridToolbarQuickFilter,
-  GridToolbarFilterButton,
   GridToolbarColumnsButton,
 } from '@mui/x-data-grid';
 
@@ -31,6 +31,7 @@ import { RouterLink } from 'src/routes/components';
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useSetState } from 'src/hooks/use-set-state';
 
+import { varAlpha } from 'src/theme/styles';
 import { PRODUCT_STOCK_OPTIONS } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 import {
@@ -38,12 +39,14 @@ import {
   useDeleteProductsMutation,
 } from 'src/redux/features/product/product-api';
 
+import { Label } from 'src/components/label';
 import { toast } from 'src/components/snackbar';
 import { Iconify } from 'src/components/iconify';
 import { EmptyContent } from 'src/components/empty-content';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
+import { PRODUCT_TAB_OPTIONS } from '../utils';
 import { ProductTableToolbar } from '../components/product-table-toolbar';
 import { ProductTableFiltersResult } from '../components/product-table-filters-result';
 import {
@@ -70,21 +73,20 @@ const HIDE_COLUMNS_TOGGLABLE = ['category', 'actions'];
 // ----------------------------------------------------------------------
 
 export function AllProductView() {
-  const { data: products, isLoading: getProductsLoading } = useGetProductsQuery([]);
-  const [deleteProducts, { isLoading: deleteProductsLoading }] = useDeleteProductsMutation();
-
-  const confirmRows = useBoolean();
-  const confirmRow = useBoolean();
-
-  const router = useRouter();
-
-  const filters = useSetState<IProductTableFilters>({ publish: [], stock: [] });
-
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterButtonEl, setFilterButtonEl] = useState<HTMLButtonElement | null>(null);
   const [columnVisibilityModel, setColumnVisibilityModel] =
     useState<GridColumnVisibilityModel>(HIDE_COLUMNS);
+  const [selectedTab, setSelectedTab] = useState('all');
+
+  const { data: products, isLoading: getProductsLoading } = useGetProductsQuery([]);
+  const [deleteProducts, { isLoading: deleteProductsLoading }] = useDeleteProductsMutation();
+
+  const confirmRows = useBoolean();
+  const confirmRow = useBoolean();
+  const router = useRouter();
+  const filters = useSetState<IProductTableFilters>({ publish: [], stock: [] });
 
   const canReset = filters.state.publish.length > 0 || filters.state.stock.length > 0;
 
@@ -265,14 +267,37 @@ export function AllProductView() {
           sx={{ mb: 3 }}
         />
 
-        <Card
-          sx={{
-            flexGrow: { md: 1 },
-            display: { md: 'flex' },
-            height: { xs: 800, md: 2 },
-            flexDirection: { md: 'column' },
-          }}
-        >
+        <Card>
+          <Tabs
+            value={selectedTab}
+            onChange={(event, newValue) => setSelectedTab(newValue)}
+            sx={{
+              px: 2.5,
+              boxShadow: (theme) =>
+                `inset 0 -2px 0 0 ${varAlpha(theme.vars.palette.grey['500Channel'], 0.08)}`,
+            }}
+          >
+            {PRODUCT_TAB_OPTIONS.map((t) => (
+              <Tab
+                key={t.value}
+                iconPosition="end"
+                value={t.value}
+                label={t.label}
+                icon={
+                  <Label
+                    variant={((t.value === 'all' || t.value === selectedTab) && 'filled') || 'soft'}
+                    color={
+                      (t.value === 'published' && 'success') ||
+                      (t.value === 'draft' && 'warning') ||
+                      'default'
+                    }
+                  >
+                    {['published', 'draft'].includes(t.value) ? 5 : 2}
+                  </Label>
+                }
+              />
+            ))}
+          </Tabs>
           <DataGrid
             checkboxSelection
             disableRowSelectionOnClick
@@ -289,7 +314,9 @@ export function AllProductView() {
             onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
             slots={{
               toolbar: CustomToolbarCallback as GridSlots['toolbar'],
-              noRowsOverlay: () => <EmptyContent />,
+              noRowsOverlay: () => (
+                <EmptyContent title="No product found" sx={{ height: '280px' }} />
+              ),
               noResultsOverlay: () => <EmptyContent title="No product found" />,
             }}
             slotProps={{
@@ -297,7 +324,10 @@ export function AllProductView() {
               toolbar: { setFilterButtonEl },
               columnsManagement: { getTogglableColumns },
             }}
-            sx={{ [`& .${gridClasses.cell}`]: { alignItems: 'center', display: 'inline-flex' } }}
+            sx={{
+              [`& .${gridClasses.cell}`]: { alignItems: 'center', display: 'inline-flex' },
+              height: '490px',
+            }}
           />
         </Card>
       </DashboardContent>
@@ -399,7 +429,6 @@ function CustomToolbar({
           )}
 
           <GridToolbarColumnsButton />
-          <GridToolbarFilterButton ref={setFilterButtonEl} />
           <GridToolbarExport />
         </Stack>
       </GridToolbarContainer>
@@ -414,3 +443,10 @@ function CustomToolbar({
     </>
   );
 }
+
+// sx={{
+//             flexGrow: { md: 1 },
+//             display: { md: 'flex' },
+//             height: { xs: 800, md: 2 },
+//             flexDirection: { md: 'column' },
+//           }}

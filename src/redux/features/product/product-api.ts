@@ -32,7 +32,14 @@ const productApi = baseApi.injectEndpoints({
       providesTags: [tags.product],
       transformResponse: (response: TReduxResponse<IProduct[]>) => ({
         data: response.data,
-        meta: response.meta as TMeta,
+        meta: response.meta as TMeta & {
+          all: number;
+          published: number;
+          draft: number;
+          featured: number;
+          low_stock: number;
+          in_stock: number;
+        },
       }),
     }),
     getSingleProduct: builder.query({

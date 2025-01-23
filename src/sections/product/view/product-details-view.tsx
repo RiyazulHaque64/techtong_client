@@ -14,6 +14,7 @@ import { useUpdateProductMutation } from 'src/redux/features/product/product-api
 
 import { toast } from 'src/components/snackbar';
 
+import { PRODUCT_DETAILS_TABS } from '../utils';
 import ProductVideo from '../components/product-video';
 import ProductAttributes from '../components/product-attributes';
 import ProductSpecification from '../components/product-specification';
@@ -92,11 +93,7 @@ export function ProductDetailsView({ product }: Props) {
           }}
         >
           {[
-            { value: 'specification', label: 'Specification' },
-            { value: 'description', label: 'Description' },
-            { value: 'additional_information', label: 'Additional Information' },
-            { value: 'video', label: 'Video' },
-            { value: 'attributes', label: 'Attributes' },
+            ...PRODUCT_DETAILS_TABS,
             { value: 'reviews', label: `Reviews (${product?.reviews.length})` },
           ].map((tab) => (
             <Tab key={tab.value} value={tab.value} label={tab.label} />

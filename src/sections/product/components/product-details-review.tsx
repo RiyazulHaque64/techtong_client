@@ -15,33 +15,11 @@ import { selectCurrentUser } from 'src/redux/features/auth/authSlice';
 
 import { Iconify } from 'src/components/iconify';
 
+import { RATINGS } from '../utils';
 import { ProductReviewList } from './product-review-list';
 import { ProductReviewNewForm } from './product-review-new-form';
 
 // ----------------------------------------------------------------------
-
-const ratings = [
-  {
-    title: '5 Star',
-    value: '5',
-  },
-  {
-    title: '4 Star',
-    value: '4',
-  },
-  {
-    title: '3 Star',
-    value: '3',
-  },
-  {
-    title: '2 Star',
-    value: '2',
-  },
-  {
-    title: '1 Star',
-    value: '1',
-  },
-];
 
 type Props = {
   avg_rating?: number;
@@ -68,7 +46,7 @@ export function ProductDetailsReview({ avg_rating, reviews = [] }: Props) {
       <Typography variant="subtitle2">Average rating</Typography>
 
       <Typography variant="h2">
-        {avg_rating}
+        {avg_rating || 0}
         /5
       </Typography>
 
@@ -90,7 +68,7 @@ export function ProductDetailsReview({ avg_rating, reviews = [] }: Props) {
         borderRight: (theme) => ({ md: `dashed 1px ${theme.vars.palette.divider}` }),
       }}
     >
-      {ratings.map((item) => (
+      {RATINGS.map((item) => (
         <Stack key={item.value} direction="row" alignItems="center">
           <Typography variant="subtitle2" component="span" sx={{ width: 42 }}>
             {item.title}

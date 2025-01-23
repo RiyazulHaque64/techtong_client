@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { AllProductView } from 'src/sections/product/view/all-product-view';
+import { ProductListView } from 'src/sections/product/view/product-list-view';
 
 // ----------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ export default function Page() {
         <title> {metadata.title}</title>
       </Helmet>
 
-      <AllProductView />
+      <ProductListView />
     </>
   );
 }

@@ -83,6 +83,8 @@ export function SignInView() {
       const res = await login(data);
       if (res?.error) {
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
+      } else if (res.data?.data?.role === 'USER') {
+        setErrorMsg('You are not authorized to access dashboard');
       }
     } catch (err) {
       setErrorMsg(typeof err === 'string' ? err : err.message);

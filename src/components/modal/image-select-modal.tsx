@@ -62,6 +62,7 @@ export function ImageSelectModal({
   const [types, setTypes] = useState<string[]>([]);
   const [queryParams, setQueryParams] = useState<TQueryParam[]>([]);
   const [currentSelected, setCurrentSelected] = useState<IImage | null>(null);
+  const [limit, setLimit] = useState<number>(4);
 
   const searchTerm = useDebounce(searchText, 500);
 
@@ -71,7 +72,7 @@ export function ImageSelectModal({
     error: getImagesError,
     isError: isGetImagesError,
   } = useGetImagesQuery([
-    { name: 'limit', value: 50 },
+    { name: 'limit', value: limit },
     { name: 'searchTerm', value: searchTerm },
     { name: 'type', value: types.join(',') },
     ...queryParams,
@@ -301,6 +302,13 @@ export function ImageSelectModal({
                     />
                   ))}
                 </Grid>
+                {images?.meta?.total && images?.meta?.total > limit && (
+                  <Stack direction="row" justifyContent="center" sx={{ mt: 4 }}>
+                    <Button variant="outlined" onClick={() => setLimit((prev) => prev + 50)}>
+                      Show more
+                    </Button>
+                  </Stack>
+                )}
               </>
             )}
           </Box>
@@ -369,6 +377,8 @@ export function ImageSelectModal({
   );
 }
 
+// ------------------------ Image Select Modal By RHF ------------------------
+
 type RHFProps = DialogProps & {
   open: boolean;
   onClose: () => void;
@@ -398,6 +408,7 @@ export function ImageSelectModalByRHF({
   const [types, setTypes] = useState<string[]>([]);
   const [queryParams, setQueryParams] = useState<TQueryParam[]>([]);
   const [currentSelected, setCurrentSelected] = useState<IImage | null>(null);
+  const [limit, setLimit] = useState<number>(50);
 
   const searchTerm = useDebounce(searchText, 500);
 
@@ -407,7 +418,7 @@ export function ImageSelectModalByRHF({
     error: getImagesError,
     isError: isGetImagesError,
   } = useGetImagesQuery([
-    { name: 'limit', value: 50 },
+    { name: 'limit', value: limit },
     { name: 'searchTerm', value: searchTerm },
     { name: 'type', value: types.join(',') },
     ...queryParams,
@@ -637,6 +648,13 @@ export function ImageSelectModalByRHF({
                     />
                   ))}
                 </Grid>
+                {images?.meta?.total && images?.meta?.total > limit && (
+                  <Stack direction="row" justifyContent="center" sx={{ mt: 4 }}>
+                    <Button variant="outlined" onClick={() => setLimit((prev) => prev + 50)}>
+                      Show more
+                    </Button>
+                  </Stack>
+                )}
               </>
             )}
           </Box>
