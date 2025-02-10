@@ -53,7 +53,7 @@ export function RHFImageSelect({
                       <Box sx={{ position: 'relative' }}>
                         <Box
                           component="img"
-                          src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${image}`}
+                          src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${image}`}
                           sx={{
                             width: 1,
                             height: 1,
@@ -132,7 +132,7 @@ export function RHFImageSelect({
                 {field.value.length && !multiple ? (
                   <Box
                     component="img"
-                    src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${field.value[0]}`}
+                    src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${field.value[0]}`}
                     sx={{ width: 1, height: 1, borderRadius: 1, objectFit: 'cover' }}
                   />
                 ) : (

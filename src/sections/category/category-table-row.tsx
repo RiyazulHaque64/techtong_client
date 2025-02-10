@@ -54,7 +54,7 @@ export function CategoryTableRow({
         <TableCell align="center">
           <Stack direction="row" alignItems="center" spacing={2}>
             <img
-              src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${icon}`}
+              src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${icon}`}
               alt={title}
               style={{ borderRadius: '4px', width: '40px', height: '40px', objectFit: 'cover' }}
             />

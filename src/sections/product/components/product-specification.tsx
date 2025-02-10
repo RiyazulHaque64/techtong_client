@@ -43,7 +43,8 @@ const ProductSpecification = ({ specifications }: Props) => {
                         backgroundColor: (theme) => theme.palette.grey[100],
                         color: 'text.primary',
                         fontWeight: 'bold',
-                        padding: 1.2,
+                        px: 2,
+                        py: 1,
                       }}
                     >
                       {field.title}

@@ -43,44 +43,57 @@ import {
 
 import { FetchingError } from 'src/sections/error/fetching-error';
 
-import { PRODUCT_TAB_OPTIONS } from '../utils';
 import { ProductTableRow } from '../components/product-list/product-table-row';
 import { ProductFiltersState } from '../components/product-list/product-filters-state';
 import { ProductTableToolbar } from '../components/product-list/product-table-toolbar';
+import {
+  PRODUCT_TAB_OPTIONS,
+  BRAND_FILTER_DEFAULT_OPTION,
+  STOCK_STATUS_DEFAULT_OPTION,
+  CATEGORY_FILTER_DEFAULT_OPTION,
+} from '../utils';
+
+import type { TFilterOption } from '../utils';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Product', width: 120 },
-  { id: 'stock', label: 'Stock', width: 150 },
-  { id: 'price', label: 'Price' },
-  { id: 'updated_at', label: 'Updated at', align: 'center' },
+  { id: 'name', label: 'Product', width: 180 },
+  { id: 'stock', label: 'Stock', width: 120 },
+  { id: 'price', label: 'Price', width: 90 },
+  { id: 'updated_at', label: 'Updated at', align: 'center', width: 90 },
   {
     id: 'published',
     label: 'Published',
-    width: 100,
+    width: 80,
     align: 'center',
     noSort: true,
   },
-  { id: '', width: 88 },
+  {
+    id: 'featured',
+    label: 'Featured',
+    width: 80,
+    align: 'center',
+    noSort: true,
+  },
+  { id: '', label: 'Actions', align: 'center', width: 80 },
 ];
 
 // ----------------------------------------------------------------------
 
+export type TProductFilter = {
+  stock_status: TFilterOption;
+  brand: TFilterOption;
+  category: TFilterOption;
+};
+
 export function ProductListView() {
   const [searchText, setSearchText] = useState<string>('');
   const [selectedTab, setSelectedTab] = useState('all');
-  const [stockStatus, setStockStatus] = useState<{ value: string; label: string }>({
-    value: '',
-    label: 'Stock status',
-  });
-  const [selectedBrand, setSelectedBrand] = useState<{ value: string; label: string }>({
-    value: '',
-    label: 'Select brand',
-  });
-  const [selectedCategory, setSelectedCategory] = useState<{ value: string; label: string }>({
-    value: '',
-    label: 'Select category',
+  const [filter, setFilter] = useState<TProductFilter>({
+    stock_status: STOCK_STATUS_DEFAULT_OPTION,
+    brand: BRAND_FILTER_DEFAULT_OPTION,
+    category: CATEGORY_FILTER_DEFAULT_OPTION,
   });
 
   const confirm = useBoolean();
@@ -108,9 +121,15 @@ export function ProductListView() {
       value: order,
     },
     ...(searchTerm.length > 0 ? [{ name: 'searchTerm', value: searchTerm }] : []),
+    ...(filter.brand.value.length > 0 ? [{ name: 'brand', value: filter.brand.value }] : []),
+    ...(filter.category.value.length > 0 ? [{ name: 'brand', value: filter.category.value }] : []),
+    ...(filter.stock_status.value.length > 0
+      ? [{ name: 'stock_status', value: filter.stock_status.value }]
+      : []),
   ]);
 
-  const canReset = !!searchText;
+  const canReset =
+    !!searchText || !!filter.stock_status.value || !!filter.brand.value || !!filter.category.value;
 
   // Handlers
   const handleDeleteRow = useCallback(
@@ -220,17 +239,15 @@ export function ProductListView() {
             productMeta={products.meta}
             setSearchText={setSearchText}
             searchText={searchText}
-            stockStatus={stockStatus}
-            setStockStatus={setStockStatus}
-            selectedBrand={selectedBrand}
-            setSelectedBrand={setSelectedBrand}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            filter={filter}
+            setFilter={setFilter}
           />
           {canReset && (
             <ProductFiltersState
               searchText={searchText}
               setSearchText={setSearchText}
+              filter={filter}
+              setFilter={setFilter}
               onResetPage={onResetPage}
               totalResults={products.meta.total}
               sx={{ p: 2.5, pt: 0 }}

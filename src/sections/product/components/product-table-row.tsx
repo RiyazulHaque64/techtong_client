@@ -226,7 +226,7 @@ export function RenderCellProduct({
       onClick={onViewRow}
     >
       <Avatar
-        src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${params.row?.thumbnail}`}
+        src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${params.row?.thumbnail}`}
         alt={params.row.name}
         variant="rounded"
         sx={{ width: 64, height: 64, mr: 2 }}

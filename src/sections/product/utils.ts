@@ -182,3 +182,10 @@ export const RATINGS = [
 ];
 
 export type TFilterOption = { value: string; label: string };
+
+export const STOCK_STATUS_DEFAULT_OPTION: TFilterOption = { value: '', label: 'Stock status' };
+export const BRAND_FILTER_DEFAULT_OPTION: TFilterOption = { value: '', label: 'Select brand' };
+export const CATEGORY_FILTER_DEFAULT_OPTION: TFilterOption = {
+  value: '',
+  label: 'Select category',
+};

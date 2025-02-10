@@ -48,7 +48,7 @@ export function BrandTableRow({ row, selected, onSelectRow, onDeleteRow, deleteL
         <TableCell align="center">
           <Stack direction="row" alignItems="center" spacing={2}>
             <img
-              src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${icon}`}
+              src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${icon}`}
               alt={name}
               style={{ borderRadius: '4px', objectFit: 'cover' }}
             />

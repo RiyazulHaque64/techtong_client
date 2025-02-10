@@ -23,7 +23,7 @@ const authApi = baseApi.injectEndpoints({
               token: access_token,
               user: {
                 ...remainingData,
-                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.name}/${remainingData.profile_pic}`,
+                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.user_bucket}/${remainingData.profile_pic}`,
               },
             })
           );
@@ -56,7 +56,7 @@ const authApi = baseApi.injectEndpoints({
               token: access_token,
               user: {
                 ...remainingData,
-                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.name}/${remainingData.profile_pic}`,
+                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.user_bucket}/${remainingData.profile_pic}`,
               },
             })
           );
@@ -80,7 +80,7 @@ const authApi = baseApi.injectEndpoints({
               token: 'prev',
               user: {
                 ...responseData?.data,
-                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.name}/${responseData?.data?.profile_pic}`,
+                profile_pic: `${CONFIG.bucket.url}/${CONFIG.bucket.user_bucket}/${responseData?.data?.profile_pic}`,
               },
             })
           );

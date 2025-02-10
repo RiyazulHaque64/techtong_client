@@ -25,7 +25,7 @@ export function ProductReviewItem({ review }: Props) {
       sx={{ width: { md: 240 }, textAlign: { md: 'center' } }}
     >
       <Avatar
-        src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${review?.user?.profile_pic}`}
+        src={`${CONFIG.bucket.url}/${CONFIG.bucket.user_bucket}/${review?.user?.profile_pic}`}
         sx={{ width: { xs: 48, md: 64 }, height: { xs: 48, md: 64 } }}
       />
 

@@ -107,7 +107,7 @@ export function BrandDetails({ item, open, onClose, onDelete, deleteLoading, ...
           >
             <FileThumbnail
               imageView
-              file={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${icon}`}
+              file={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${icon}`}
               sx={{ width: 'auto', height: 'auto', alignSelf: 'flex-start' }}
               slotProps={{
                 img: {

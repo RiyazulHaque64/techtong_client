@@ -27,7 +27,7 @@ export type ConfigValue = {
   amplify: { userPoolId: string; userPoolWebClientId: string; region: string };
   auth0: { clientId: string; domain: string; callbackUrl: string };
   supabase: { url: string; key: string };
-  bucket: { url: string; name: string };
+  bucket: { url: string; user_bucket: string; general_bucket: string };
   search_query: { limit: number };
 };
 
@@ -88,7 +88,8 @@ export const CONFIG: ConfigValue = {
   },
   bucket: {
     url: import.meta.env.VITE_BUCKET_URL,
-    name: import.meta.env.VITE_BUCKET_NAME,
+    user_bucket: import.meta.env.VITE_USER_BUCKET,
+    general_bucket: import.meta.env.VITE_GENERAL_BUCKET,
   },
   search_query: { limit: 500 },
 };

@@ -232,7 +232,7 @@ export function MediaFileDetails({
           >
             <FileThumbnail
               imageView
-              file={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${path}`}
+              file={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${path}`}
               sx={{ width: 'auto', height: 'auto', alignSelf: 'flex-start' }}
               slotProps={{
                 img: {

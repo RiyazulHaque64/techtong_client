@@ -160,7 +160,7 @@ export function CategoryManageForm({ item, open, onClose, ...other }: Props) {
                 {icon || selectedImages.length > 0 ? (
                   <FileThumbnail
                     imageView
-                    file={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${selectedImages.length > 0 ? selectedImages[0] : icon}`}
+                    file={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${selectedImages.length > 0 ? selectedImages[0] : icon}`}
                     sx={{
                       width: '100%',
                       height: 'auto',

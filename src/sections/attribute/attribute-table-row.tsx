@@ -52,7 +52,13 @@ export function AttributeTableRow({
         <TableCell align="center">{row.category?.title}</TableCell>
         <TableCell align="center">
           {row.value.map((v) => (
-            <Chip key={v} variant="soft" color="info" label={startCase(v)} sx={{ m: 0.5 }} />
+            <Chip
+              key={v}
+              variant="soft"
+              color="info"
+              label={v}
+              sx={{ m: 0.5, textTransform: 'capitalize' }}
+            />
           ))}
         </TableCell>
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>

@@ -36,6 +36,8 @@ import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { usePopover, CustomPopover } from 'src/components/custom-popover';
 
+import { QuickUpdateForm } from '../quick-update-form';
+
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -58,20 +60,28 @@ export function ProductTableRow({ row, selected, onSelectRow, onDeleteRow, delet
     discount_price,
     retailer_price,
     published,
+    featured,
     updated_at,
   } = row;
   const confirm = useBoolean();
+  const quickEdit = useBoolean();
 
-  const details = useBoolean();
-  const manageForm = useBoolean();
   const router = useRouter();
-  const popover = usePopover();
+  const publishedPopover = usePopover();
+  const featuredPopover = usePopover();
 
-  const [updateProduct, { isLoading: updatePublishedLoading }] = useUpdateProductMutation();
+  const [updateProduct, { isLoading: updateLoading }] = useUpdateProductMutation();
 
   const handleViewRow = useCallback(
     (s: string) => {
       router.push(paths.dashboard.details_product(s));
+    },
+    [router]
+  );
+
+  const handleEditRow = useCallback(
+    (s: string) => {
+      router.push(paths.dashboard.edit_product(s));
     },
     [router]
   );
@@ -85,7 +95,20 @@ export function ProductTableRow({ row, selected, onSelectRow, onDeleteRow, delet
       toast.error('Update failed!');
     } else {
       toast.success('Update success!');
-      popover.onClose();
+      publishedPopover.onClose();
+    }
+  };
+
+  const updateFeaturedStatus = async (productId: string, featuredStatus: boolean) => {
+    const res = await updateProduct({
+      id: productId,
+      data: { featured: featuredStatus },
+    });
+    if (res?.error) {
+      toast.error('Update failed!');
+    } else {
+      toast.success('Update success!');
+      featuredPopover.onClose();
     }
   };
 
@@ -100,15 +123,15 @@ export function ProductTableRow({ row, selected, onSelectRow, onDeleteRow, delet
           />
         </TableCell>
 
-        <TableCell align="center">
+        <TableCell>
           <Stack
             direction="row"
             alignItems="center"
-            sx={{ py: 2, width: 1, cursor: 'pointer' }}
+            sx={{ py: 1, width: 1, cursor: 'pointer' }}
             onClick={() => handleViewRow(slug)}
           >
             <Avatar
-              src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${thumbnail}`}
+              src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${thumbnail}`}
               alt={name}
               variant="rounded"
               sx={{ width: 64, height: 64, mr: 2 }}
@@ -182,11 +205,11 @@ export function ProductTableRow({ row, selected, onSelectRow, onDeleteRow, delet
         </TableCell>
         <TableCell align="center">
           <>
-            <Switch checked={published} onClick={popover.onOpen} color="success" />
+            <Switch checked={published} onClick={publishedPopover.onOpen} color="success" />
             <CustomPopover
-              open={popover.open}
-              onClose={popover.onClose}
-              anchorEl={popover.anchorEl}
+              open={publishedPopover.open}
+              onClose={publishedPopover.onClose}
+              anchorEl={publishedPopover.anchorEl}
               slotProps={{ arrow: { placement: 'bottom-right' } }}
             >
               <Box sx={{ p: 2, maxWidth: 280 }}>
@@ -199,8 +222,8 @@ export function ProductTableRow({ row, selected, onSelectRow, onDeleteRow, delet
                     variant="outlined"
                     size="small"
                     color="primary"
-                    onClick={popover.onClose}
-                    disabled={updatePublishedLoading}
+                    onClick={publishedPopover.onClose}
+                    disabled={updateLoading}
                   >
                     Cancel
                   </Button>
@@ -209,8 +232,47 @@ export function ProductTableRow({ row, selected, onSelectRow, onDeleteRow, delet
                     size="small"
                     color="primary"
                     onClick={() => updatePublishedStatus(id, !published)}
-                    disabled={updatePublishedLoading}
-                    loading={updatePublishedLoading}
+                    disabled={updateLoading}
+                    loading={updateLoading}
+                  >
+                    Confirm
+                  </LoadingButton>
+                </Stack>
+              </Box>
+            </CustomPopover>
+          </>
+        </TableCell>
+        <TableCell align="center">
+          <>
+            <Switch checked={featured} onClick={featuredPopover.onOpen} color="success" />
+            <CustomPopover
+              open={featuredPopover.open}
+              onClose={featuredPopover.onClose}
+              anchorEl={featuredPopover.anchorEl}
+              slotProps={{ arrow: { placement: 'bottom-right' } }}
+            >
+              <Box sx={{ p: 2, maxWidth: 280 }}>
+                <Typography variant="subtitle1">Featured</Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary', mt: '4px' }}>
+                  Are you sure want to update featured status?
+                </Typography>
+                <Stack direction="row" justifyContent="flex-end" gap={1} sx={{ mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    onClick={featuredPopover.onClose}
+                    disabled={updateLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <LoadingButton
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => updateFeaturedStatus(id, !featured)}
+                    disabled={updateLoading}
+                    loading={updateLoading}
                   >
                     Confirm
                   </LoadingButton>
@@ -220,13 +282,16 @@ export function ProductTableRow({ row, selected, onSelectRow, onDeleteRow, delet
           </>
         </TableCell>
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
-          <IconButton onClick={details.onTrue}>
+          <IconButton onClick={() => handleViewRow(slug)} title="View Details">
             <Iconify icon="solar:eye-bold" />
           </IconButton>
-          <IconButton onClick={manageForm.onTrue}>
-            <Iconify icon="solar:pen-bold" />
+          <IconButton onClick={quickEdit.onTrue} title="Quick Update">
+            <Iconify icon="ic:outline-edit" />
           </IconButton>
-          <IconButton onClick={confirm.onTrue} sx={{ color: 'error.main' }}>
+          <IconButton onClick={() => handleEditRow(slug)} title="Update">
+            <Iconify icon="lucide:edit" />
+          </IconButton>
+          <IconButton onClick={confirm.onTrue} sx={{ color: 'error.main' }} title="Delete">
             <Iconify icon="solar:trash-bin-trash-bold" />
           </IconButton>
         </TableCell>
@@ -248,6 +313,7 @@ export function ProductTableRow({ row, selected, onSelectRow, onDeleteRow, delet
           </Button>
         }
       />
+      <QuickUpdateForm open={quickEdit.value} onClose={quickEdit.onFalse} product={row} />
     </>
   );
 }

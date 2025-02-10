@@ -60,7 +60,7 @@ export function MediaFileItem({
 
   const handleCopy = useCallback(() => {
     toast.success('Copied!');
-    copy(`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${file.path}`);
+    copy(`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${file.path}`);
   }, [copy, file.path]);
 
   const renderAction = (
@@ -163,7 +163,7 @@ export function MediaFileItem({
             height: '250px',
             objectFit: 'cover',
           }}
-          src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${file.path}`}
+          src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${file.path}`}
           alt={file.alt_text || file.name}
         />
         {renderText}

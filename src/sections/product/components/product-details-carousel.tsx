@@ -29,7 +29,9 @@ export function ProductDetailsCarousel({ images }: Props) {
   });
 
   const slides =
-    images?.map((img) => ({ src: `${CONFIG.bucket.url}/${CONFIG.bucket.name}/${img}` })) || [];
+    images?.map((img) => ({
+      src: `${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${img}`,
+    })) || [];
 
   const lightbox = useLightBox(slides);
 

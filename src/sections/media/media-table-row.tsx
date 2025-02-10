@@ -63,7 +63,7 @@ export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow, deleteL
 
   const handleCopy = useCallback(() => {
     toast.success('Copied!');
-    copy(`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${row.path}`);
+    copy(`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${row.path}`);
   }, [copy, row.path]);
 
   const defaultStyles = {
@@ -111,7 +111,7 @@ export function MediaTableRow({ row, selected, onSelectRow, onDeleteRow, deleteL
         <TableCell onClick={handleClick}>
           <Stack direction="row" alignItems="center" spacing={2}>
             <img
-              src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${row.path}`}
+              src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${row.path}`}
               alt={row.alt_text || row.name}
               style={{ borderRadius: '4px' }}
             />

@@ -79,7 +79,7 @@ export function ImageItem({
         onClick={() => setCurrentSelected(file)}
       >
         <img
-          src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${file.path}`}
+          src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${file.path}`}
           alt={file.alt_text || file.name}
           style={{
             objectFit: 'cover',
@@ -92,44 +92,3 @@ export function ImageItem({
     </Grid>
   );
 }
-
-// {/* <Grid
-//   item
-//   md={3}
-//   sx={{
-//     p: 0,
-//     cursor: 'pointer',
-//     borderRadius: '8px',
-//     position: 'relative',
-//     bgcolor: 'transparent',
-//     flexDirection: 'column',
-//     border: '1px solid red',
-//     // border:
-//     //   currentSelected?.id === file.id ? `3px solid ${grey[300]}` : `2px solid ${grey[100]}`,
-//     alignItems: 'flex-start',
-//     ...((checkbox.value || selected) && {
-//       bgcolor: 'background.paper',
-//       boxShadow: (theme) => theme.customShadows.z20,
-//     }),
-//     ...sx,
-//   }}
-//   {...other}
-//   onClick={() => {
-//     setCurrentSelected(file);
-//   }}
-// >
-//   <Box
-//     component="img"
-//     sx={{
-//       display: 'block',
-//       maxWidth: '100%',
-//       overflow: 'hidden',
-//       borderRadius: '6px',
-//       objectFit: 'cover',
-//       border: '1px solid green',
-//     }}
-//     src={`${CONFIG.bucket.url}/${CONFIG.bucket.name}/${file.path}`}
-//     alt={file.alt_text || file.name}
-//   />
-//   {renderAction}
-// </Grid>; */}
