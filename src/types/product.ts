@@ -17,7 +17,7 @@ export type TProductSpecificationItem = {
   fields: { title: string; value: string }[];
 };
 
-export type TProductAttributeItem = { slug: string; value: string[] };
+export type TProductAttributeItem = { title: string; value: string[] };
 
 export type TProductReview = {
   id: string;

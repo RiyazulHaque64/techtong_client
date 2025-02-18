@@ -13,7 +13,7 @@ export type TProductInfo = {
   discount_price?: number;
   retailer_price?: number;
   stock?: number;
-  attributes?: { slug: string; value: string }[];
+  attributes?: { title: string; value: string }[];
   brand_id?: string;
   categories?: { id: string }[];
   video_url?: string;
@@ -31,19 +31,19 @@ export const attributesFormatter = (attributes: Record<string, any> | undefined)
   const attributesArr = Object.keys(attributes).filter((item) => attributes[item].length !== 0);
 
   const formattedAttributes = attributesArr.map((item) => ({
-    slug: item,
+    title: item,
     value: attributes[item].map((i: { label: string; value: string }) => i.value),
   }));
   return formattedAttributes;
 };
 
 export const attributesParser = (
-  formattedAttributes: { slug: string; value: string[] }[]
+  formattedAttributes: { title: string; value: string[] }[]
 ): Record<string, { label: string; value: string }[]> => {
   const attributes: Record<string, { label: string; value: string }[]> = {};
 
-  formattedAttributes.forEach(({ slug, value }) => {
-    attributes[slug] = value.map((item) => ({
+  formattedAttributes.forEach(({ title, value }) => {
+    attributes[title] = value.map((item) => ({
       label: startCase(item),
       value: item,
     }));
@@ -89,7 +89,6 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
   if (retailer_price > 0) productInfo.retailer_price = retailer_price;
   if (stock > 0) productInfo.stock = stock;
   const formattedAttributes = attributesFormatter(attributes);
-  console.log('formatted attributes: ', formattedAttributes);
   if (formattedAttributes.length) productInfo.attributes = formattedAttributes;
   if (brand) productInfo.brand_id = brand.value;
   if (category.length) productInfo.categories = catgoriesFormatter(category);

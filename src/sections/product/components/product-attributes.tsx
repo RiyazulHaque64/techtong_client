@@ -16,9 +16,9 @@ const ProductAttributes = ({ attributes }: Props) => {
   return (
     <Box sx={{ p: 5 }}>
       {attributes.map((attribute) => (
-        <Stack direction="row" alignItems="center" gap={1} key={attribute.slug}>
+        <Stack direction="row" alignItems="center" gap={1} key={attribute.title}>
           <Typography variant="caption" sx={{ fontSize: '1rem' }}>
-            {startCase(attribute.slug)}:
+            {startCase(attribute.title)}:
           </Typography>
           <Typography variant="caption" sx={{ fontSize: '1rem', color: 'text.secondary' }}>
             {attribute.value.map((v) => startCase(v)).join(', ')}
