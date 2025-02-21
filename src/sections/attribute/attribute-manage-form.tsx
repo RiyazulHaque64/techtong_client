@@ -27,33 +27,6 @@ import { Form, Field } from 'src/components/hook-form';
 
 // ----------------------------------------------------------------------
 
-export const _tags = [
-  `Technology`,
-  `Health and Wellness`,
-  `Travel`,
-  `Finance`,
-  `Education`,
-  `Food and Beverage`,
-  `Fashion`,
-  `Home and Garden`,
-  `Sports`,
-  `Entertainment`,
-  `Business`,
-  `Science`,
-  `Automotive`,
-  `Beauty`,
-  `Fitness`,
-  `Lifestyle`,
-  `Real Estate`,
-  `Parenting`,
-  `Pet Care`,
-  `Environmental`,
-  `DIY and Crafts`,
-  `Gaming`,
-  `Photography`,
-  `Music`,
-];
-
 export type NewAttributeSchemaType = zod.infer<typeof NewAttributeSchema>;
 
 export const NewAttributeSchema = zod.object({

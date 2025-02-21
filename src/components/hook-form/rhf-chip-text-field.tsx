@@ -1,7 +1,6 @@
 import type { FocusEvent, KeyboardEvent } from 'react';
 import type { TextFieldProps } from '@mui/material/TextField';
 
-import { startCase } from 'lodash';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import TextField from '@mui/material/TextField';
@@ -89,11 +88,12 @@ export function RHFChipTextField({ name, helperText, type, ...other }: Props) {
             {values.map((chip, index) => (
               <Chip
                 key={index}
-                label={startCase(chip)}
+                label={chip}
                 size="small"
                 variant="soft"
                 color="info"
                 onDelete={() => handleDeleteChip(chip)}
+                sx={{ textTransform: 'capitalize' }}
               />
             ))}
           </Stack>
