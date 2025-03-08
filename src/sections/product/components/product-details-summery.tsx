@@ -1,18 +1,16 @@
-import type { IProduct } from 'src/types/product';
 import type { ICheckoutItem } from 'src/types/checkout';
+import type { IProduct } from 'src/types/product';
 
 import { startCase } from 'lodash';
 
-import { Box } from '@mui/material';
+import { Box, Divider, Rating } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import Rating from '@mui/material/Rating';
-import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 
 import { intervalDays } from 'src/utils/format-time';
 
-import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
+import { Label } from 'src/components/label';
 
 // ----------------------------------------------------------------------
 
@@ -65,26 +63,38 @@ export function ProductDetailsSummary({
           {stock === 0 ? 'Out of stock' : stock < 5 ? 'Low stock' : 'In stock'}
         </Label>
       </Stack>
-      <Label variant="outlined" sx={{ textTransform: 'uppercase' }}>
-        {code}
-      </Label>
+      {
+        code && (
+          <Label variant="outlined" sx={{ textTransform: 'uppercase' }}>
+            {code}
+          </Label>
+        )
+      }
     </Stack>
   );
 
   const renderPrice = (
     <Stack direction="row" alignItems="center" spacing={1}>
-      <Stack direction="row" alignItems="center">
-        <Typography variant="caption" sx={{ fontWeight: 'medium', fontSize: '0.9rem' }}>
-          Discount Price: {discount_price}
-        </Typography>
-        <Iconify icon="tabler:currency-taka" sx={{ width: 16, height: 16, ml: -0.4 }} />
-      </Stack>
-      <Stack direction="row" alignItems="center">
-        <Typography variant="caption" sx={{ fontWeight: 'medium', fontSize: '0.9rem' }}>
-          Retailer Price: {retailer_price}
-        </Typography>
-        <Iconify icon="tabler:currency-taka" sx={{ width: 16, height: 16, ml: -0.4 }} />
-      </Stack>
+      {
+        discount_price && (
+          <Stack direction="row" alignItems="center">
+            <Typography variant="caption" sx={{ fontWeight: 'medium', fontSize: '0.9rem' }}>
+              Discount Price: {discount_price}
+            </Typography>
+            <Iconify icon="tabler:currency-taka" sx={{ width: 16, height: 16, ml: -0.4 }} />
+          </Stack>
+        )
+      }
+      {
+        retailer_price && (
+          <Stack direction="row" alignItems="center">
+            <Typography variant="caption" sx={{ fontWeight: 'medium', fontSize: '0.9rem' }}>
+              Retailer Price: {retailer_price}
+            </Typography>
+            <Iconify icon="tabler:currency-taka" sx={{ width: 16, height: 16, ml: -0.4 }} />
+          </Stack>
+        )
+      }
       <Stack direction="row" alignItems="center">
         <Typography variant="caption" sx={{ fontWeight: 'medium', fontSize: '0.9rem' }}>
           Regular Price: {price}
@@ -96,24 +106,32 @@ export function ProductDetailsSummary({
 
   const renderTagAndFeatures = (
     <Stack direction="column" gap={2}>
-      <Box>
-        <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
-          Key Features
-        </Typography>
-        {key_features.map((feature) => (
-          <Typography key={feature} variant="body2" sx={{ color: 'text.secondary' }}>
-            {feature}
-          </Typography>
-        ))}
-      </Box>
-      <Stack direction="row" gap={1} alignItems="center">
-        <Typography variant="caption" sx={{ fontSize: '0.9rem' }}>
-          Tags:{' '}
-        </Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.9rem' }}>
-          {tags.map((tag) => startCase(tag)).join(', ')}
-        </Typography>
-      </Stack>
+      {
+        key_features.length > 0 && (
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
+              Key Features
+            </Typography>
+            {key_features.map((feature) => (
+              <Typography key={feature} variant="body2" sx={{ color: 'text.secondary' }}>
+                {feature}
+              </Typography>
+            ))}
+          </Box>
+        )
+      }
+      {
+        tags && tags.length > 0 && (
+          <Stack direction="row" gap={1} alignItems="center">
+            <Typography variant="caption" sx={{ fontSize: '0.9rem' }}>
+              Tags:{' '}
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.9rem' }}>
+              {tags.map((tag) => startCase(tag)).join(', ')}
+            </Typography>
+          </Stack>
+        )
+      }
     </Stack>
   );
 
@@ -121,22 +139,25 @@ export function ProductDetailsSummary({
     <Box sx={{ pt: 3 }} {...other}>
       {renderLabel}
       <Typography variant="h5">{name}</Typography>
-      <Box
+      <Stack
+        direction='row'
+        alignItems='center'
+        gap={0.2}
+        divider={<Iconify icon='pepicons-pop:line-y' sx={{ height: '0.9rem', color: 'grey.300' }} />}
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
           color: 'text.secondary',
         }}
       >
         <Typography sx={{ fontSize: '0.9rem' }}>
           {categories?.map((c) => c.title).join(', ')}
         </Typography>
-        <Divider orientation="vertical" variant="middle" flexItem sx={{ height: '0.9rem' }} />
-        <Typography sx={{ fontSize: '0.9rem' }}>{brand.name}</Typography>
-        <Divider orientation="vertical" variant="middle" flexItem sx={{ height: '0.9rem' }} />
+        {
+          brand && (
+            <Typography sx={{ fontSize: '0.9rem' }}>{brand.name}</Typography>
+          )
+        }
         <Typography sx={{ fontSize: '0.9rem', textTransform: 'uppercase' }}>{model}</Typography>
-      </Box>
+      </Stack>
 
       {renderPrice}
       <Divider sx={{ borderStyle: 'dashed', my: 2 }} />

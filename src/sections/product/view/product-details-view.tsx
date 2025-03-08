@@ -2,28 +2,28 @@ import type { IProduct } from 'src/types/product';
 
 import { useCallback } from 'react';
 
-import { Tab, Box, Card, Tabs, Stack } from '@mui/material';
+import { Box, Card, Stack, Tab, Tabs } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 
 import { useTabs } from 'src/hooks/use-tabs';
 
-import { varAlpha } from 'src/theme/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { useUpdateProductMutation } from 'src/redux/features/product/product-api';
+import { varAlpha } from 'src/theme/styles';
 
 import { toast } from 'src/components/snackbar';
 
-import { PRODUCT_DETAILS_TABS } from '../utils';
-import ProductVideo from '../components/product-video';
+import { ProductAdditionalInformation } from '../components/product-additional-information';
 import ProductAttributes from '../components/product-attributes';
-import ProductSpecification from '../components/product-specification';
-import { ProductDetailsReview } from '../components/product-details-review';
-import { ProductDetailsToolbar } from '../components/product-details-toolbar';
-import { ProductDetailsSummary } from '../components/product-details-summery';
 import { ProductDetailsCarousel } from '../components/product-details-carousel';
 import { ProductDetailsDescription } from '../components/product-details-description';
-import { ProductAdditionalInformation } from '../components/product-additional-information';
+import { ProductDetailsReview } from '../components/product-details-review';
+import { ProductDetailsSummary } from '../components/product-details-summery';
+import { ProductDetailsToolbar } from '../components/product-details-toolbar';
+import ProductSpecification from '../components/product-specification';
+import ProductVideo from '../components/product-video';
+import { PRODUCT_DETAILS_TABS } from '../utils';
 
 // ----------------------------------------------------------------------
 
