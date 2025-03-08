@@ -1,5 +1,6 @@
-import type { IProduct } from 'src/types/product';
 import type { UseFormSetValue } from 'react-hook-form';
+import type { TFilterOption } from 'src/types/common';
+import type { IProduct } from 'src/types/product';
 
 import { startCase } from 'lodash';
 
@@ -134,8 +135,8 @@ export const resetProductForm = (
     product.attributes
       ? attributesParser(product.attributes)
       : {
-          Availability: [],
-        }
+        Availability: [],
+      }
   );
   if (product?.specification) {
     setValue('specification', product.specification);
@@ -179,8 +180,6 @@ export const RATINGS = [
     value: '1',
   },
 ];
-
-export type TFilterOption = { value: string; label: string };
 
 export const STOCK_STATUS_DEFAULT_OPTION: TFilterOption = { value: '', label: 'Stock status' };
 export const BRAND_FILTER_DEFAULT_OPTION: TFilterOption = { value: '', label: 'Select brand' };

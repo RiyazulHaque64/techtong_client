@@ -13,3 +13,5 @@ export type IAddressItem = {
   phoneNumber?: string;
   addressType?: string;
 };
+
+export type TFilterOption = { value: string; label: string };

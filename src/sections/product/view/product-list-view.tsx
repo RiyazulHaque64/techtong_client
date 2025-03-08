@@ -1,59 +1,58 @@
 import type { IErrorResponse } from 'src/redux/interfaces/common';
+import type { TFilterOption } from 'src/types/common';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
 import { Tab, Tabs } from '@mui/material';
-import Tooltip from '@mui/material/Tooltip';
-import TableBody from '@mui/material/TableBody';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
 import IconButton from '@mui/material/IconButton';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import Tooltip from '@mui/material/Tooltip';
 
-import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
+import { paths } from 'src/routes/paths';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
 
-import { varAlpha } from 'src/theme/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
 import {
-  useGetProductsQuery,
   useDeleteProductsMutation,
+  useGetProductsQuery,
 } from 'src/redux/features/product/product-api';
+import { varAlpha } from 'src/theme/styles';
 
-import { Label } from 'src/components/label';
-import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
-import { Scrollbar } from 'src/components/scrollbar';
-import { ConfirmDialog } from 'src/components/custom-dialog';
-import { LoadingScreen } from 'src/components/loading-screen';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { ConfirmDialog } from 'src/components/custom-dialog';
+import { Iconify } from 'src/components/iconify';
+import { Label } from 'src/components/label';
+import { LoadingScreen } from 'src/components/loading-screen';
+import { Scrollbar } from 'src/components/scrollbar';
+import { toast } from 'src/components/snackbar';
 import {
-  useTable,
   emptyRows,
-  TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
+  TableNoData,
   TablePaginationCustom,
+  TableSelectedAction,
+  useTable,
 } from 'src/components/table';
 
 import { FetchingError } from 'src/sections/error/fetching-error';
 
-import { ProductTableRow } from '../components/product-list/product-table-row';
 import { ProductFiltersState } from '../components/product-list/product-filters-state';
+import { ProductTableRow } from '../components/product-list/product-table-row';
 import { ProductTableToolbar } from '../components/product-list/product-table-toolbar';
 import {
-  PRODUCT_TAB_OPTIONS,
   BRAND_FILTER_DEFAULT_OPTION,
-  STOCK_STATUS_DEFAULT_OPTION,
   CATEGORY_FILTER_DEFAULT_OPTION,
+  PRODUCT_TAB_OPTIONS,
+  STOCK_STATUS_DEFAULT_OPTION,
 } from '../utils';
-
-import type { TFilterOption } from '../utils';
 
 // ----------------------------------------------------------------------
 
@@ -125,6 +124,9 @@ export function ProductListView() {
     ...(filter.category.value.length > 0 ? [{ name: 'brand', value: filter.category.value }] : []),
     ...(filter.stock_status.value.length > 0
       ? [{ name: 'stock_status', value: filter.stock_status.value }]
+      : []),
+    ...(selectedTab !== 'all'
+      ? [{ name: 'status', value: selectedTab }]
       : []),
   ]);
 

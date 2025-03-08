@@ -21,6 +21,7 @@ const AddProduct = lazy(() => import('src/pages/dashboard/product/add-product'))
 const EditProduct = lazy(() => import('src/pages/dashboard/product/edit-product'));
 const AllProducts = lazy(() => import('src/pages/dashboard/product/all-product'));
 const DetailsProduct = lazy(() => import('src/pages/dashboard/product/details-product'));
+const Order = lazy(() => import('src/pages/dashboard/order'));
 const ChangePassword = lazy(() => import('src/pages/account/change-password'));
 const UpdateProfile = lazy(() => import('src/pages/account/update-profile'));
 const PageFour = lazy(() => import('src/pages/dashboard/four'));
@@ -53,6 +54,7 @@ export const dashboardRoutes = [
       { path: paths.dashboard.product, element: <AllProducts /> },
       { path: `${paths.dashboard.product}/edit/:slug`, element: <EditProduct /> },
       { path: `${paths.dashboard.product}/:slug`, element: <DetailsProduct /> },
+      { path: `${paths.dashboard.order}`, element: <Order /> },
       {
         path: 'group',
         children: [

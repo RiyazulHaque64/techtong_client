@@ -1,26 +1,26 @@
 import type { Dispatch, SetStateAction } from 'react';
-import type { TMeta } from 'src/redux/interfaces/common';
 import type { UsePopoverReturn } from 'src/components/custom-popover';
+import type { TMeta } from 'src/redux/interfaces/common';
+import type { TFilterOption } from 'src/types/common';
 
 import { Fragment, useCallback } from 'react';
 
+import { Button, MenuItem, MenuList, Typography } from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import { Button, MenuItem, MenuList, Typography } from '@mui/material';
 
 import { CONFIG } from 'src/config-global';
 import { useGetBrandsQuery } from 'src/redux/features/brand/brandApi';
 import { useGetCategoriesQuery } from 'src/redux/features/category/categoryApi';
 
+import { CustomPopover, usePopover } from 'src/components/custom-popover';
 import { Iconify } from 'src/components/iconify';
-import { usePopover, CustomPopover } from 'src/components/custom-popover';
 
 import {
-  type TFilterOption,
   BRAND_FILTER_DEFAULT_OPTION,
-  STOCK_STATUS_DEFAULT_OPTION,
   CATEGORY_FILTER_DEFAULT_OPTION,
+  STOCK_STATUS_DEFAULT_OPTION,
 } from '../../utils';
 
 import type { TProductFilter } from '../../view/product-list-view';

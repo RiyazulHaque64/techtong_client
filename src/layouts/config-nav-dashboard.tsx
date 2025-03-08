@@ -57,6 +57,16 @@ export const navData = [
     ],
   },
   {
+    subheader: 'Business Management',
+    items: [
+      {
+        title: 'Order',
+        path: paths.dashboard.order,
+        icon: ICONS.order,
+      }
+    ],
+  },
+  {
     subheader: 'Product Management',
     items: [
       {
