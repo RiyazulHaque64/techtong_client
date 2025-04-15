@@ -1,25 +1,25 @@
-import type { IBrand } from 'src/types/brand';
 import type { DrawerProps } from '@mui/material/Drawer';
 import type { IErrorResponse } from 'src/redux/interfaces/common';
+import type { IBrand } from 'src/types/brand';
 
-import { z as zod } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { z as zod } from 'zod';
 
-import Box from '@mui/material/Box';
 import { Alert } from '@mui/material';
-import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { useAddBrandMutation, useUpdateBrandMutation } from 'src/redux/features/brand/brandApi';
 
-import { toast } from 'src/components/snackbar';
+import { Field, Form } from 'src/components/hook-form';
 import { Iconify } from 'src/components/iconify';
-import { Form, Field } from 'src/components/hook-form';
+import { toast } from 'src/components/snackbar';
 
 // ----------------------------------------------------------------------
 
@@ -65,8 +65,6 @@ export function BrandManageForm({ item, open, onClose, ...other }: Props) {
     formState: { isSubmitting, errors },
     reset,
   } = methods;
-
-  console.log(errors);
 
   const onSubmit = handleSubmit(async (data) => {
     try {

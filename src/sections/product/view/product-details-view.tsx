@@ -14,15 +14,15 @@ import { varAlpha } from 'src/theme/styles';
 
 import { toast } from 'src/components/snackbar';
 
-import { ProductAdditionalInformation } from '../components/product-additional-information';
-import ProductAttributes from '../components/product-attributes';
-import { ProductDetailsCarousel } from '../components/product-details-carousel';
-import { ProductDetailsDescription } from '../components/product-details-description';
-import { ProductDetailsReview } from '../components/product-details-review';
-import { ProductDetailsSummary } from '../components/product-details-summery';
-import { ProductDetailsToolbar } from '../components/product-details-toolbar';
-import ProductSpecification from '../components/product-specification';
-import ProductVideo from '../components/product-video';
+import { ProductAdditionalInformation } from '../components/product-details/product-additional-information';
+import ProductAttributes from '../components/product-details/product-attributes';
+import { ProductDetailsCarousel } from '../components/product-details/product-details-carousel';
+import { ProductDetailsDescription } from '../components/product-details/product-details-description';
+import { ProductDetailsReview } from '../components/product-details/product-details-review';
+import { ProductDetailsSummary } from '../components/product-details/product-details-summery';
+import { ProductDetailsToolbar } from '../components/product-details/product-details-toolbar';
+import ProductSpecification from '../components/product-details/product-specification';
+import ProductVideo from '../components/product-details/product-video';
 import { PRODUCT_DETAILS_TABS } from '../utils';
 
 // ----------------------------------------------------------------------

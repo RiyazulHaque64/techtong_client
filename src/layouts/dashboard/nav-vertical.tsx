@@ -4,14 +4,14 @@ import type { NavSectionProps } from 'src/components/nav-section';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 
-import { varAlpha, hideScrollY } from 'src/theme/styles';
+import { hideScrollY, varAlpha } from 'src/theme/styles';
 
 import { Logo } from 'src/components/logo';
-import { Scrollbar } from 'src/components/scrollbar';
 import { NavSectionMini, NavSectionVertical } from 'src/components/nav-section';
+import { Scrollbar } from 'src/components/scrollbar';
 
-import { NavUser } from '../components/nav-user';
 import { NavToggleButton } from '../components/nav-toggle-button';
+import { NavUser } from '../components/nav-user';
 
 // ----------------------------------------------------------------------
 

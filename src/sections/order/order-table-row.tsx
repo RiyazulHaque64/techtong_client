@@ -1,17 +1,16 @@
-import type { IProduct, TProductCategory } from 'src/types/product';
 
-import { Fragment, useCallback } from 'react';
+import type { IOrder } from 'src/types/order';
 
-import { LoadingButton } from '@mui/lab';
+import { useCallback } from 'react';
+
 import {
     Avatar,
     Box,
-    Divider,
-    LinearProgress,
+    Collapse,
     Link,
     ListItemText,
+    Paper,
     Stack,
-    Switch,
     Typography,
 } from '@mui/material';
 import Button from '@mui/material/Button';
@@ -25,21 +24,19 @@ import { paths } from 'src/routes/paths';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
+import { paramCase } from 'src/utils/change-case';
 import { fDate, fTime } from 'src/utils/format-time';
-import { stockStatus } from 'src/utils/helper';
 
 import { CONFIG } from 'src/config-global';
-import { useUpdateProductMutation } from 'src/redux/features/product/product-api';
 
 import { ConfirmDialog } from 'src/components/custom-dialog';
-import { CustomPopover, usePopover } from 'src/components/custom-popover';
 import { Iconify } from 'src/components/iconify';
-import { toast } from 'src/components/snackbar';
+import { Label } from 'src/components/label';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-    row: IProduct;
+    row: IOrder;
     selected: boolean;
     onSelectRow: () => void;
     onDeleteRow: (id: string, close: () => void) => void;
@@ -49,238 +46,191 @@ type Props = {
 export function OrderTableRow({ row, selected, onSelectRow, onDeleteRow, deleteLoading }: Props) {
     const {
         id,
-        slug,
-        name,
-        thumbnail,
-        categories,
-        stock,
-        price,
-        discount_price,
-        retailer_price,
-        published,
-        featured,
-        updated_at,
+        order_id,
+        order_items,
+        order_status,
+        payment_status,
+        payable_amount,
+        user,
+        customer_info,
+        created_at,
     } = row;
+
     const confirm = useBoolean();
+    const collapse = useBoolean();
 
     const router = useRouter();
-    const publishedPopover = usePopover();
-    const featuredPopover = usePopover();
-
-    const [updateProduct, { isLoading: updateLoading }] = useUpdateProductMutation();
 
     const handleViewRow = useCallback(
-        (s: string) => {
-            router.push(paths.dashboard.details_product(s));
+        (i: string) => {
+            router.push(paths.dashboard.order_details(i));
         },
         [router]
     );
 
-    const updatePublishedStatus = async (productId: string, publishedStatus: boolean) => {
-        const res = await updateProduct({
-            id: productId,
-            data: { published: publishedStatus },
-        });
-        if (res?.error) {
-            toast.error('Update failed!');
-        } else {
-            toast.success('Update success!');
-            publishedPopover.onClose();
-        }
-    };
+    const renderPrimary = (
+        <TableRow hover selected={selected}>
+            <TableCell padding="checkbox">
+                <Checkbox
+                    checked={selected}
+                    onClick={onSelectRow}
+                    inputProps={{ id: `row-checkbox-${id}`, 'aria-label': `Row checkbox` }}
+                />
+            </TableCell>
+            <TableCell align='center'>
+                <Link color="inherit" onClick={() => handleViewRow(id)} underline="always" sx={{ cursor: 'pointer' }}>
+                    {order_id}
+                </Link>
+            </TableCell>
+            <TableCell>
+                <Stack spacing={2} direction="row" alignItems="center">
+                    {
+                        user ? (
+                            <>
+                                <Avatar alt={user.name} src={user.profile_pic || ''} />
+                                <Stack sx={{ typography: 'body2', flex: '1 1 auto', alignItems: 'flex-start' }}>
+                                    <Box component="span">{user.name}</Box>
+                                    <Box component="span" sx={{ color: 'text.disabled' }}>
+                                        {user.contact_number}
+                                    </Box>
+                                </Stack>
+                            </>
+                        ) : (
+                            <>
+                                <Avatar alt={customer_info.name} src='' />
+                                <Stack sx={{ typography: 'body2', flex: '1 1 auto', alignItems: 'flex-start' }}>
+                                    <Box component="span">{customer_info.name}</Box>
+                                    <Box component="span" sx={{ color: 'text.disabled' }}>
+                                        {customer_info.contact_number}
+                                    </Box>
+                                </Stack>
+                            </>
+                        )
+                    }
+                </Stack>
+            </TableCell>
+            <TableCell>
+                <Stack spacing={0.5}>
+                    <Box component="span">{fDate(created_at)}</Box>
+                    <Box component="span" sx={{ typography: 'caption', color: 'text.secondary' }}>
+                        {fTime(created_at)}
+                    </Box>
+                </Stack>
+            </TableCell>
+            <TableCell align="center"> {order_items.length} </TableCell>
+            <TableCell align='center'>
+                <Stack direction="row" justifyContent='center'>
+                    <Iconify
+                        icon="tabler:currency-taka"
+                        sx={{ width: 20, height: 20, mr: '-2px', mt: '3px' }}
+                    />
+                    <Typography>
+                        {new Intl.NumberFormat('en-US').format(payable_amount)}
+                    </Typography>
 
-    const updateFeaturedStatus = async (productId: string, featuredStatus: boolean) => {
-        const res = await updateProduct({
-            id: productId,
-            data: { featured: featuredStatus },
-        });
-        if (res?.error) {
-            toast.error('Update failed!');
-        } else {
-            toast.success('Update success!');
-            featuredPopover.onClose();
-        }
-    };
+                </Stack>
+            </TableCell>
+            <TableCell align="center">
+                <Label
+                    variant="outlined"
+                    color={payment_status === 'PAID' ? 'success' : 'error'}
+                    sx={{ textTransform: 'capitalize' }}
+                >
+                    {paramCase(payment_status)}
+                </Label>
+            </TableCell>
+            <TableCell align="center">
+                <Label
+                    variant="soft"
+                    color={
+                        (order_status === 'DELIVERED' && 'success') ||
+                        ((order_status === 'PENDING' || order_status === 'PROCESSING' || order_status === 'SHIPPED') && 'warning') ||
+                        (order_status === 'CANCELLED' && 'error') ||
+                        'default'
+                    }
+                    sx={{ textTransform: 'capitalize' }}
+                >
+                    {paramCase(order_status)}
+                </Label>
+            </TableCell>
+            <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
+                <IconButton
+                    color={collapse.value ? 'inherit' : 'default'}
+                    onClick={collapse.onToggle}
+                    sx={{ ...(collapse.value && { bgcolor: 'action.hover' }) }}
+                >
+                    <Iconify icon="eva:arrow-ios-downward-fill" />
+                </IconButton>
+                <IconButton onClick={() => handleViewRow(order_id)} title="View Details">
+                    <Iconify icon="solar:eye-bold" />
+                </IconButton>
+                <IconButton onClick={confirm.onTrue} sx={{ color: 'error.main' }} title="Delete">
+                    <Iconify icon="solar:trash-bin-trash-bold" />
+                </IconButton>
+            </TableCell>
+        </TableRow>
+    )
+
+    const renderSecondary = (
+        <TableRow>
+            <TableCell sx={{ p: 0, border: 'none' }} colSpan={8}>
+                <Collapse
+                    in={collapse.value}
+                    timeout="auto"
+                    unmountOnExit
+                    sx={{ bgcolor: 'background.neutral' }}
+                >
+                    <Paper sx={{ m: 1.5 }}>
+                        {order_items.map((item) => (
+                            <Stack
+                                key={item.product.code}
+                                direction="row"
+                                alignItems="center"
+                                sx={{
+                                    p: (theme) => theme.spacing(1.5, 2, 1.5, 1.5),
+                                    '&:not(:last-of-type)': {
+                                        borderBottom: (theme) => `solid 2px ${theme.vars.palette.background.neutral}`,
+                                    },
+                                }}
+                            >
+                                <Avatar
+                                    src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${item.product.thumbnail}`}
+                                    variant="rounded"
+                                    sx={{ width: 48, height: 48, mr: 2 }}
+                                />
+
+                                <ListItemText
+                                    primary={item.product.name}
+                                    secondary={item.product.code}
+                                    primaryTypographyProps={{ typography: 'body2' }}
+                                    secondaryTypographyProps={{ component: 'span', color: 'text.disabled', mt: 0.5 }}
+                                />
+
+                                <div>{item.price} x {item.quantity} </div>
+
+                                {/* <Box sx={{ width: 110, textAlign: 'right' }}>{item.price * item.quantity}</Box> */}
+                                <Stack direction="row" justifyContent='right' sx={{ width: 110 }}>
+                                    <Iconify
+                                        icon="tabler:currency-taka"
+                                        sx={{ width: 17, height: 17, mr: '-2px', mt: '3px' }}
+                                    />
+                                    <div>
+                                        {new Intl.NumberFormat('en-US').format(item.price * item.quantity)}
+                                    </div>
+
+                                </Stack>
+                            </Stack>
+                        ))}
+                    </Paper>
+                </Collapse>
+            </TableCell>
+        </TableRow>
+    );
 
     return (
         <>
-            <TableRow hover selected={selected}>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        checked={selected}
-                        onClick={onSelectRow}
-                        inputProps={{ id: `row-checkbox-${id}`, 'aria-label': `Row checkbox` }}
-                    />
-                </TableCell>
-
-                <TableCell>
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        sx={{ py: 1, width: 1, cursor: 'pointer' }}
-                        onClick={() => handleViewRow(slug)}
-                    >
-                        <Avatar
-                            src={`${CONFIG.bucket.url}/${CONFIG.bucket.general_bucket}/${thumbnail}`}
-                            alt={name}
-                            variant="rounded"
-                            sx={{ width: 64, height: 64, mr: 2 }}
-                        />
-
-                        <ListItemText
-                            disableTypography
-                            primary={
-                                <Link
-                                    noWrap
-                                    color="inherit"
-                                    variant="subtitle2"
-                                    onClick={() => handleViewRow(slug)}
-                                    sx={{ cursor: 'pointer' }}
-                                >
-                                    {name}
-                                </Link>
-                            }
-                            secondary={
-                                <Box component="div" sx={{ typography: 'body2', color: 'text.disabled' }}>
-                                    {categories?.map((cat: TProductCategory, index: number) => (
-                                        <Fragment key={cat.id}>
-                                            <Typography component="span">{cat.title}</Typography>
-                                            {index < categories.length - 1 && <Divider component="span" sx={{ mx: 1 }} />}
-                                        </Fragment>
-                                    ))}
-                                </Box>
-                            }
-                            sx={{ display: 'flex', flexDirection: 'column' }}
-                        />
-                    </Stack>
-                </TableCell>
-                <TableCell>
-                    <Stack justifyContent="center" sx={{ typography: 'caption', color: 'text.secondary' }}>
-                        <LinearProgress
-                            value={stock}
-                            variant="determinate"
-                            color={(stock === 0 && 'error') || (stock < 5 && 'warning') || 'success'}
-                            sx={{ mb: 1, width: 1, height: 6, maxWidth: 80 }}
-                        />
-                        {!!stock && stock} {stockStatus(stock)}
-                    </Stack>
-                </TableCell>
-                <TableCell align="center">
-                    <Stack>
-                        <Stack direction="row">
-                            <Iconify icon="tabler:currency-taka" sx={{ width: 18, height: 18 }} />
-                            <Typography sx={{ fontSize: '1em' }}>{price} (P)</Typography>
-                        </Stack>
-                        {discount_price && (
-                            <Stack direction="row">
-                                <Iconify icon="tabler:currency-taka" sx={{ width: 18, height: 18 }} />
-                                <Typography sx={{ fontSize: '1em' }}>{discount_price} (D)</Typography>
-                            </Stack>
-                        )}
-                        {retailer_price && (
-                            <Stack direction="row">
-                                <Iconify icon="tabler:currency-taka" sx={{ width: 18, height: 18 }} />
-                                <Typography sx={{ fontSize: '1em' }}>{retailer_price} (R)</Typography>
-                            </Stack>
-                        )}
-                    </Stack>
-                </TableCell>
-                <TableCell>
-                    <Stack spacing={0.5}>
-                        <Box component="span">{fDate(updated_at)}</Box>
-                        <Box component="span" sx={{ typography: 'caption', color: 'text.secondary' }}>
-                            {fTime(updated_at)}
-                        </Box>
-                    </Stack>
-                </TableCell>
-                <TableCell align="center">
-                    <>
-                        <Switch checked={published} onClick={publishedPopover.onOpen} color="success" />
-                        <CustomPopover
-                            open={publishedPopover.open}
-                            onClose={publishedPopover.onClose}
-                            anchorEl={publishedPopover.anchorEl}
-                            slotProps={{ arrow: { placement: 'bottom-right' } }}
-                        >
-                            <Box sx={{ p: 2, maxWidth: 280 }}>
-                                <Typography variant="subtitle1">{published ? 'Unpublish' : 'Publish'}</Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', mt: '4px' }}>
-                                    Are you sure want to {published ? 'unnpublish' : 'publish'} this product?
-                                </Typography>
-                                <Stack direction="row" justifyContent="flex-end" gap={1} sx={{ mt: 2 }}>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        color="primary"
-                                        onClick={publishedPopover.onClose}
-                                        disabled={updateLoading}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <LoadingButton
-                                        variant="contained"
-                                        size="small"
-                                        color="primary"
-                                        onClick={() => updatePublishedStatus(id, !published)}
-                                        disabled={updateLoading}
-                                        loading={updateLoading}
-                                    >
-                                        Confirm
-                                    </LoadingButton>
-                                </Stack>
-                            </Box>
-                        </CustomPopover>
-                    </>
-                </TableCell>
-                <TableCell align="center">
-                    <>
-                        <Switch checked={featured} onClick={featuredPopover.onOpen} color="success" />
-                        <CustomPopover
-                            open={featuredPopover.open}
-                            onClose={featuredPopover.onClose}
-                            anchorEl={featuredPopover.anchorEl}
-                            slotProps={{ arrow: { placement: 'bottom-right' } }}
-                        >
-                            <Box sx={{ p: 2, maxWidth: 280 }}>
-                                <Typography variant="subtitle1">Featured</Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', mt: '4px' }}>
-                                    Are you sure want to update featured status?
-                                </Typography>
-                                <Stack direction="row" justifyContent="flex-end" gap={1} sx={{ mt: 2 }}>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        color="primary"
-                                        onClick={featuredPopover.onClose}
-                                        disabled={updateLoading}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <LoadingButton
-                                        variant="contained"
-                                        size="small"
-                                        color="primary"
-                                        onClick={() => updateFeaturedStatus(id, !featured)}
-                                        disabled={updateLoading}
-                                        loading={updateLoading}
-                                    >
-                                        Confirm
-                                    </LoadingButton>
-                                </Stack>
-                            </Box>
-                        </CustomPopover>
-                    </>
-                </TableCell>
-                <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
-                    <IconButton onClick={() => handleViewRow(slug)} title="View Details">
-                        <Iconify icon="solar:eye-bold" />
-                    </IconButton>
-                    <IconButton onClick={confirm.onTrue} sx={{ color: 'error.main' }} title="Delete">
-                        <Iconify icon="solar:trash-bin-trash-bold" />
-                    </IconButton>
-                </TableCell>
-            </TableRow>
-
+            {renderPrimary}
+            {renderSecondary}
             <ConfirmDialog
                 open={confirm.value}
                 onClose={confirm.onFalse}

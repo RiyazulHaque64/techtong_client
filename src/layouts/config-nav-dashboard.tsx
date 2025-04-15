@@ -41,6 +41,7 @@ const ICONS = {
   brand: icon('ic-brand'),
   category: icon('ic-category'),
   attribute: icon('ic-attribute'),
+  utils: icon('ic-utils'),
 };
 
 // ----------------------------------------------------------------------
@@ -63,6 +64,11 @@ export const navData = [
         title: 'Order',
         path: paths.dashboard.order,
         icon: ICONS.order,
+      },
+      {
+        title: 'Utils',
+        path: paths.dashboard.utils,
+        icon: ICONS.utils,
       }
     ],
   },

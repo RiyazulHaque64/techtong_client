@@ -1,8 +1,9 @@
 import type { SxProps } from '@mui/material';
 
-import { Box, Grid, InputAdornment } from '@mui/material';
+import { Grid, InputAdornment } from '@mui/material';
 
 import { Field } from 'src/components/hook-form';
+import { Iconify } from 'src/components/iconify';
 
 export function PriceInformationForm({ sx }: { sx?: SxProps }) {
   return (
@@ -17,9 +18,7 @@ export function PriceInformationForm({ sx }: { sx?: SxProps }) {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Box component="span" sx={{ color: 'text.disabled' }}>
-                  $
-                </Box>
+                <Iconify icon="tabler:currency-taka" />
               </InputAdornment>
             ),
           }}
@@ -35,9 +34,7 @@ export function PriceInformationForm({ sx }: { sx?: SxProps }) {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Box component="span" sx={{ color: 'text.disabled' }}>
-                  $
-                </Box>
+                <Iconify icon="tabler:currency-taka" />
               </InputAdornment>
             ),
           }}
@@ -53,9 +50,7 @@ export function PriceInformationForm({ sx }: { sx?: SxProps }) {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Box component="span" sx={{ color: 'text.disabled' }}>
-                  $
-                </Box>
+                <Iconify icon="tabler:currency-taka" />
               </InputAdornment>
             ),
           }}

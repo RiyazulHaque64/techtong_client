@@ -1,14 +1,14 @@
 import type { IErrorResponse } from 'src/redux/interfaces/common';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import TableBody from '@mui/material/TableBody';
+import Card from '@mui/material/Card';
 import IconButton from '@mui/material/IconButton';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import Tooltip from '@mui/material/Tooltip';
 
 import { paths } from 'src/routes/paths';
 
@@ -16,29 +16,29 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { useGetBrandsQuery, useDeleteBrandMutation } from 'src/redux/features/brand/brandApi';
+import { useDeleteBrandMutation, useGetBrandsQuery } from 'src/redux/features/brand/brandApi';
 
-import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
-import { Scrollbar } from 'src/components/scrollbar';
-import { ConfirmDialog } from 'src/components/custom-dialog';
-import { LoadingScreen } from 'src/components/loading-screen';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { ConfirmDialog } from 'src/components/custom-dialog';
+import { Iconify } from 'src/components/iconify';
+import { LoadingScreen } from 'src/components/loading-screen';
 import { ImageSelectModal } from 'src/components/modal/image-select-modal';
+import { Scrollbar } from 'src/components/scrollbar';
+import { toast } from 'src/components/snackbar';
 import {
-  useTable,
   emptyRows,
-  TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
+  TableNoData,
   TablePaginationCustom,
+  TableSelectedAction,
+  useTable,
 } from 'src/components/table';
 
 import { FetchingError } from 'src/sections/error/fetching-error';
 
-import { BrandTableRow } from '../brand-table-row';
 import { BrandManageForm } from '../brand-manage-form';
+import { BrandTableRow } from '../brand-table-row';
 import { BrandTableToolbar } from '../brand-table-toolbar';
 
 // ----------------------------------------------------------------------
@@ -164,11 +164,15 @@ export function BrandView() {
             <TableSelectedAction
               numSelected={table.selected.length}
               rowCount={brands.meta.total}
-              onSelectAllRows={(checked) =>
-                table.onSelectAllRows(
-                  checked,
-                  brands.data.map((row) => row.id)
+              onSelectAllRows={(checked) => {
+                console.log(checked);
+                return (
+                  table.onSelectAllRows(
+                    checked,
+                    brands.data.map((row) => row.id)
+                  )
                 )
+              }
               }
               action={
                 <Tooltip title="Delete">

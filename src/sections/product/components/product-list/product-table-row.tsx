@@ -3,40 +3,40 @@ import type { IProduct, TProductCategory } from 'src/types/product';
 import { Fragment, useCallback } from 'react';
 
 import { LoadingButton } from '@mui/lab';
-import Button from '@mui/material/Button';
-import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
-import TableCell from '@mui/material/TableCell';
-import IconButton from '@mui/material/IconButton';
 import {
-  Box,
-  Link,
-  Stack,
   Avatar,
-  Switch,
+  Box,
   Divider,
-  Typography,
-  ListItemText,
   LinearProgress,
+  Link,
+  ListItemText,
+  Stack,
+  Switch,
+  Typography,
 } from '@mui/material';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
 
-import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
+import { paths } from 'src/routes/paths';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
-import { stockStatus } from 'src/utils/helper';
 import { fDate, fTime } from 'src/utils/format-time';
+import { stockStatus } from 'src/utils/helper';
 
 import { CONFIG } from 'src/config-global';
 import { useUpdateProductMutation } from 'src/redux/features/product/product-api';
 
-import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
-import { usePopover, CustomPopover } from 'src/components/custom-popover';
+import { CustomPopover, usePopover } from 'src/components/custom-popover';
+import { Iconify } from 'src/components/iconify';
+import { toast } from 'src/components/snackbar';
 
-import { QuickUpdateForm } from '../quick-update-form';
+import { QuickUpdateForm } from './quick-update-form';
 
 // ----------------------------------------------------------------------
 

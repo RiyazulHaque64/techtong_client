@@ -5,9 +5,11 @@ import { useCallback } from 'react';
 
 import Chip from '@mui/material/Chip';
 
+import { fDate } from 'src/utils/format-time';
+
 import { chipProps, FiltersBlock, FiltersResult } from 'src/components/filters-result';
 
-import { STOCK_STATUS_DEFAULT_OPTION } from './utils';
+import { PAYMENT_STATUS_DEFAULT_OPTION, STOCK_STATUS_DEFAULT_OPTION } from './utils';
 
 import type { TOrderFilter } from './view';
 
@@ -56,17 +58,41 @@ export function OrderFiltersState({
         onResetPage();
         setSearchText('');
         setFilter({
-            stock_status: STOCK_STATUS_DEFAULT_OPTION
+            ...filter,
+            payment_status: PAYMENT_STATUS_DEFAULT_OPTION,
+            from_date: undefined,
+            to_date: undefined
         });
-    }, [setSearchText, onResetPage, setFilter]);
+    }, [setSearchText, onResetPage, setFilter, filter]);
 
     return (
         <FiltersResult totalResults={totalResults} onReset={handleReset} sx={sx}>
-            <FiltersBlock label="Keyword:" isShow={!!filter.stock_status.value}>
+            <FiltersBlock label="Keyword:" isShow={!!filter.payment_status.value}>
                 <Chip
                     {...chipProps}
-                    label={filter.stock_status.label}
+                    label={filter.payment_status.label}
                     onDelete={() => handleRemoveFilter('stock_status')}
+                />
+            </FiltersBlock>
+            <FiltersBlock
+                label="From:"
+                isShow={!!filter.from_date}
+            >
+                <Chip
+                    {...chipProps}
+                    label={fDate(filter.from_date)}
+                    onDelete={() => setFilter({ ...filter, from_date: undefined })}
+                />
+            </FiltersBlock>
+
+            <FiltersBlock
+                label="To:"
+                isShow={!!filter.to_date}
+            >
+                <Chip
+                    {...chipProps}
+                    label={fDate(filter.to_date)}
+                    onDelete={() => setFilter({ ...filter, to_date: undefined })}
                 />
             </FiltersBlock>
             <FiltersBlock label="Keyword:" isShow={!!searchText}>

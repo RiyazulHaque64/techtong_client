@@ -4,6 +4,8 @@ export const tags = {
   category: 'category',
   attribute: 'attribute',
   product: 'product',
+  order: 'order',
+  courier: 'courier'
 };
 
 export const tagTypes: string[] = Object.values(tags);

@@ -1,5 +1,6 @@
 import { Grid } from '@mui/material';
 
+import { CONFIG } from 'src/config-global';
 import { useGetBrandsQuery } from 'src/redux/features/brand/brandApi';
 import { useGetCategoriesQuery } from 'src/redux/features/category/categoryApi';
 
@@ -7,12 +8,12 @@ import { Field } from 'src/components/hook-form';
 
 export default function GeneralInformationForm() {
   const { data: categories } = useGetCategoriesQuery([
-    { name: 'limit', value: 500 },
+    { name: 'limit', value: CONFIG.search_query.limit },
     { name: 'sortBy', value: 'title' },
     { name: 'sortOrder', value: 'asc' },
   ]);
   const { data: brands } = useGetBrandsQuery([
-    { name: 'limit', value: 500 },
+    { name: 'limit', value: CONFIG.search_query.limit },
     { name: 'sortBy', value: 'name' },
     { name: 'sortOrder', value: 'asc' },
   ]);

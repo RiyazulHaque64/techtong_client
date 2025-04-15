@@ -1,24 +1,24 @@
-import type { IProduct } from 'src/types/product';
 import type { DialogProps } from '@mui/material/Dialog';
+import type { IProduct } from 'src/types/product';
 
-import { z as zod } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { z as zod } from 'zod';
 
+import LoadingButton from '@mui/lab/LoadingButton';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import LoadingButton from '@mui/lab/LoadingButton';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import { useUpdateProductMutation } from 'src/redux/features/product/product-api';
 
-import { toast } from 'src/components/snackbar';
 import { Form } from 'src/components/hook-form';
+import { toast } from 'src/components/snackbar';
 
-import { PriceInformationForm } from './price-information-form';
+import { PriceInformationForm } from '../add-product/price-information-form';
 
 // ----------------------------------------------------------------------
 

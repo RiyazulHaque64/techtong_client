@@ -2,11 +2,12 @@ import type { Control } from 'react-hook-form';
 
 import { useFieldArray } from 'react-hook-form';
 
-import { Stack, Button } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 
 import SpecificationSection from './specification-section';
 
-import type { ProductValidationSchemaType } from '../manage-product-form';
+import type { ProductValidationSchemaType } from './manage-product-form';
+
 
 export default function SpecificationForm({
   control,

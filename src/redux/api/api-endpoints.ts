@@ -6,6 +6,8 @@ const features = {
   category: '/category',
   attribute: '/attribute',
   product: '/product',
+  order: '/order',
+  courier: '/courier',
 };
 
 const api_endpoint = {
@@ -47,6 +49,18 @@ const api_endpoint = {
     get_single_product: `${features.product}`,
     update_product: `${features.product}/update-product`,
     delete_products: `${features.product}/delete-products`,
+  },
+  order: {
+    get_orders: `${features.order}`,
+    get_single_order: `${features.order}`,
+    update_order: `${features.order}/admin`,
+    delete_orders: `${features.order}/delete-order`,
+  },
+  courier: {
+    add_courier: `${features.courier}/add-courier`,
+    get_couriers: `${features.courier}`,
+    update_courier: `${features.courier}`,
+    delete_couriers: `${features.courier}/delete-courier`,
   },
 };
 

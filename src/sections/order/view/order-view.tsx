@@ -18,10 +18,7 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import {
-    useDeleteProductsMutation,
-    useGetProductsQuery,
-} from 'src/redux/features/product/product-api';
+import { useDeleteOrdersMutation, useGetOrdersQuery } from 'src/redux/features/order/order-api';
 import { varAlpha } from 'src/theme/styles';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
@@ -46,28 +43,27 @@ import { FetchingError } from 'src/sections/error/fetching-error';
 import { OrderFiltersState } from '../order-filters-state';
 import { OrderTableRow } from '../order-table-row';
 import { OrderTableToolbar } from '../order-table-toolbar';
-import { ORDER_TAB_OPTIONS, STOCK_STATUS_DEFAULT_OPTION } from '../utils';
+import { ORDER_TAB_OPTIONS, PAYMENT_STATUS_DEFAULT_OPTION } from '../utils';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-    { id: 'name', label: 'Product', width: 180 },
-    { id: 'stock', label: 'Stock', width: 120 },
-    { id: 'price', label: 'Price', width: 90 },
-    { id: 'updated_at', label: 'Updated at', align: 'center', width: 90 },
+    { id: 'order_id', label: 'Order', width: 80, align: 'center' },
+    { id: 'customer', label: 'Customer', width: 160, noSort: true },
+    { id: 'created_at', label: 'Date', width: 100 },
+    { id: 'item', label: 'Items', width: 50, noSort: true, align: 'center' },
+    { id: 'price', label: 'Price', width: 80, align: 'center' },
     {
-        id: 'published',
-        label: 'Published',
-        width: 80,
-        align: 'center',
-        noSort: true,
+        id: 'payment_status',
+        label: 'Payment',
+        width: 60,
+        align: 'center'
     },
     {
-        id: 'featured',
-        label: 'Featured',
-        width: 80,
-        align: 'center',
-        noSort: true,
+        id: 'order_status',
+        label: 'Status',
+        width: 60,
+        align: 'center'
     },
     { id: '', label: 'Actions', align: 'center', width: 80 },
 ];
@@ -75,14 +71,18 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export type TOrderFilter = {
-    stock_status: TFilterOption;
+    payment_status: TFilterOption;
+    from_date: string | undefined;
+    to_date: string | undefined;
 };
 
 export function OrderView() {
     const [searchText, setSearchText] = useState<string>('');
-    const [selectedTab, setSelectedTab] = useState('all');
+    const [selectedTab, setSelectedTab] = useState('ALL');
     const [filter, setFilter] = useState<TOrderFilter>({
-        stock_status: STOCK_STATUS_DEFAULT_OPTION
+        payment_status: PAYMENT_STATUS_DEFAULT_OPTION,
+        from_date: undefined,
+        to_date: undefined
     });
 
     const confirm = useBoolean();
@@ -92,13 +92,13 @@ export function OrderView() {
     const { page, rowsPerPage, orderBy, order, selected, setSelected, onResetPage } = table;
 
     // Fetcher
-    const [deleteProducts, { isLoading: deleteLoading }] = useDeleteProductsMutation();
+    const [deleteOrders, { isLoading: deleteLoading }] = useDeleteOrdersMutation();
     const {
-        data: products,
-        isLoading: getProductsLoading,
+        data: orders,
+        isLoading: getOrdersLoading,
         isError,
         error,
-    } = useGetProductsQuery([
+    } = useGetOrdersQuery([
         { name: 'page', value: page + 1 },
         { name: 'limit', value: rowsPerPage },
         {
@@ -110,22 +110,28 @@ export function OrderView() {
             value: order,
         },
         ...(searchTerm.length > 0 ? [{ name: 'searchTerm', value: searchTerm }] : []),
-        ...(filter.stock_status.value.length > 0
-            ? [{ name: 'stock_status', value: filter.stock_status.value }]
+        ...(filter.payment_status.value.length > 0
+            ? [{ name: 'payment_status', value: filter.payment_status.value }]
             : []),
-        ...(selectedTab !== 'all'
-            ? [{ name: 'status', value: selectedTab }]
+        ...(filter.from_date
+            ? [{ name: 'from_date', value: filter.from_date }]
+            : []),
+        ...(filter.to_date
+            ? [{ name: 'to_date', value: filter.to_date }]
+            : []),
+        ...(selectedTab !== 'ALL'
+            ? [{ name: 'order_status', value: selectedTab }]
             : []),
     ]);
 
     const canReset =
-        !!searchText || !!filter.stock_status.value;
+        !!searchText || !!filter.payment_status.value || !!filter.from_date || !!filter.to_date;
 
     // Handlers
     const handleDeleteRow = useCallback(
         async (id: string, close: () => void) => {
             try {
-                const res = await deleteProducts({ ids: [id] });
+                const res = await deleteOrders({ ids: [id] });
                 if (res?.error) {
                     toast.error((res?.error as IErrorResponse)?.data?.message || 'Delete failed!');
                 } else {
@@ -136,12 +142,12 @@ export function OrderView() {
                 toast.error('Delete failed!');
             }
         },
-        [deleteProducts]
+        [deleteOrders]
     );
 
     const handleDeleteRows = useCallback(async () => {
         try {
-            const res = await deleteProducts({ ids: selected });
+            const res = await deleteOrders({ ids: selected });
             if (res?.error) {
                 toast.error((res?.error as IErrorResponse)?.data?.message || 'Delete failed!');
             } else {
@@ -151,16 +157,16 @@ export function OrderView() {
         } catch (err) {
             toast.error('Delete failed!');
         }
-    }, [selected, deleteProducts, setSelected]);
+    }, [selected, deleteOrders, setSelected]);
 
     // JSX
-    if (getProductsLoading) {
+    if (getOrdersLoading) {
         return (
             <LoadingScreen sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
         );
     }
 
-    if (isError || !products) {
+    if (isError || !orders) {
         return (
             <FetchingError
                 errorResponse={(error as IErrorResponse).data}
@@ -196,27 +202,22 @@ export function OrderView() {
                                 label={t.label}
                                 icon={
                                     <Label
-                                        variant={((t.value === 'all' || t.value === selectedTab) && 'filled') || 'soft'}
+                                        variant={((t.value === 'ALL' || t.value === selectedTab) && 'filled') || 'soft'}
                                         color={
-                                            (t.value === 'published' && 'success') ||
-                                            (t.value === 'draft' && 'warning') ||
+                                            (t.value === 'PENDING' && 'warning') ||
+                                            (t.value === 'DELIVERED' && 'success') ||
+                                            (t.value === 'CANCELLED' && 'error') ||
                                             'default'
                                         }
                                     >
-                                        {t.value === 'published'
-                                            ? products.meta.published
-                                            : t.value === 'draft'
-                                                ? products.meta.draft
-                                                : t.value === 'featured'
-                                                    ? products.meta.featured
-                                                    : products.meta.all}
+                                        {(t.value === 'ALL' ? orders.meta.total : orders.meta[t.value.toLowerCase()]) || 0}
                                     </Label>
                                 }
                             />
                         ))}
                     </Tabs>
                     <OrderTableToolbar
-                        productMeta={products.meta}
+                        orderMeta={orders.meta}
                         setSearchText={setSearchText}
                         searchText={searchText}
                         filter={filter}
@@ -229,7 +230,7 @@ export function OrderView() {
                             filter={filter}
                             setFilter={setFilter}
                             onResetPage={onResetPage}
-                            totalResults={products.meta.total}
+                            totalResults={orders.meta.total}
                             sx={{ p: 2.5, pt: 0 }}
                         />
                     )}
@@ -237,11 +238,11 @@ export function OrderView() {
                     <Box sx={{ position: 'relative' }}>
                         <TableSelectedAction
                             numSelected={table.selected.length}
-                            rowCount={products.meta.total}
+                            rowCount={orders.meta.total}
                             onSelectAllRows={(checked) =>
                                 table.onSelectAllRows(
                                     checked,
-                                    products.data.map((row) => row.id)
+                                    orders.data.map((row) => row.id)
                                 )
                             }
                             action={
@@ -259,19 +260,19 @@ export function OrderView() {
                                     order={table.order}
                                     orderBy={table.orderBy}
                                     headLabel={TABLE_HEAD}
-                                    rowCount={products.meta.total}
+                                    rowCount={orders.meta.total}
                                     numSelected={table.selected.length}
                                     onSort={table.onSort}
                                     onSelectAllRows={(checked) =>
                                         table.onSelectAllRows(
                                             checked,
-                                            products.data.map((row) => row.id)
+                                            orders.data.map((row) => row.id)
                                         )
                                     }
                                 />
 
                                 <TableBody>
-                                    {products.data.map((row) => (
+                                    {orders.data.map((row) => (
                                         <OrderTableRow
                                             key={row.id}
                                             row={row}
@@ -284,10 +285,10 @@ export function OrderView() {
 
                                     <TableEmptyRows
                                         height={table.dense ? 56 : 56 + 20}
-                                        emptyRows={emptyRows(table.page, table.rowsPerPage, products.data.length)}
+                                        emptyRows={emptyRows(table.page, table.rowsPerPage, orders.data.length)}
                                     />
 
-                                    <TableNoData notFound={!!(products.data.length === 0)} title="No product found" />
+                                    <TableNoData notFound={!!(orders.data.length === 0)} title="No order found" />
                                 </TableBody>
                             </Table>
                         </Scrollbar>
@@ -295,7 +296,7 @@ export function OrderView() {
 
                     <TablePaginationCustom
                         page={table.page}
-                        count={products.meta.total}
+                        count={orders.meta.total}
                         rowsPerPage={table.rowsPerPage}
                         onPageChange={table.onChangePage}
                         onRowsPerPageChange={table.onChangeRowsPerPage}

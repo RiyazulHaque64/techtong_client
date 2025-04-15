@@ -6,7 +6,7 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
-import { ManageProductForm } from '../manage-product-form';
+import { ManageProductForm } from '../components/add-product/manage-product-form';
 
 export function AddProductView() {
   return (

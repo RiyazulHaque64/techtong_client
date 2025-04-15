@@ -1,7 +1,7 @@
 import type { StackProps } from '@mui/material/Stack';
 
-import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 // ----------------------------------------------------------------------
@@ -47,7 +47,7 @@ export function TableSelectedAction({
         indeterminate={!!numSelected && numSelected < rowCount}
         checked={!!rowCount && numSelected === rowCount}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          onSelectAllRows(event.target.checked)
+          onSelectAllRows(false)
         }
       />
 

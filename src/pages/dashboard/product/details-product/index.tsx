@@ -5,19 +5,19 @@ import { useParams } from 'react-router-dom';
 
 import { Button } from '@mui/material';
 
-import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
+import { paths } from 'src/routes/paths';
 
 import { CONFIG } from 'src/config-global';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { useGetSingleProductQuery } from 'src/redux/features/product/product-api';
 
-import { Iconify } from 'src/components/iconify';
 import { EmptyContent } from 'src/components/empty-content';
+import { Iconify } from 'src/components/iconify';
 
-import { ProductDetailsView } from 'src/sections/product/view';
 import { FetchingError } from 'src/sections/error/fetching-error';
-import { ProductDetailsSkeleton } from 'src/sections/product/components/product-skeleton';
+import { ProductDetailsSkeleton } from 'src/sections/product/components/product-details/product-skeleton';
+import { ProductDetailsView } from 'src/sections/product/view';
 
 // ----------------------------------------------------------------------
 

@@ -1,14 +1,14 @@
 import type { IErrorResponse } from 'src/redux/interfaces/common';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import TableBody from '@mui/material/TableBody';
+import Card from '@mui/material/Card';
 import IconButton from '@mui/material/IconButton';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import Tooltip from '@mui/material/Tooltip';
 
 import { paths } from 'src/routes/paths';
 
@@ -17,33 +17,33 @@ import { useDebounce } from 'src/hooks/use-debounce';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import {
-  useGetCategoriesQuery,
   useDeleteCategoriesMutation,
+  useGetCategoriesQuery,
 } from 'src/redux/features/category/categoryApi';
 
-import { toast } from 'src/components/snackbar';
-import { Iconify } from 'src/components/iconify';
-import { Scrollbar } from 'src/components/scrollbar';
-import { ConfirmDialog } from 'src/components/custom-dialog';
-import { LoadingScreen } from 'src/components/loading-screen';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { ConfirmDialog } from 'src/components/custom-dialog';
+import { Iconify } from 'src/components/iconify';
+import { LoadingScreen } from 'src/components/loading-screen';
 import { ImageSelectModal } from 'src/components/modal/image-select-modal';
+import { Scrollbar } from 'src/components/scrollbar';
+import { toast } from 'src/components/snackbar';
 import {
-  useTable,
   emptyRows,
-  TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
+  TableNoData,
   TablePaginationCustom,
+  TableSelectedAction,
+  useTable,
 } from 'src/components/table';
 
 import { FetchingError } from 'src/sections/error/fetching-error';
 
-import { CategoryTableRow } from '../category-table-row';
-import { CategoryManageForm } from '../category-manage-form';
-import { CategoryTableToolbar } from '../category-table-toolbar';
 import { CategoryFiltersResult } from '../category-filters-result';
+import { CategoryManageForm } from '../category-manage-form';
+import { CategoryTableRow } from '../category-table-row';
+import { CategoryTableToolbar } from '../category-table-toolbar';
 
 // ----------------------------------------------------------------------
 

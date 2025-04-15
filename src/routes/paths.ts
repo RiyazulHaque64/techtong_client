@@ -19,7 +19,9 @@ export const paths = {
     edit_product: (slug: string) => `/product/edit/${slug}`,
     details_product: (id: string) => `/product/${id}`,
     order: `/order`,
+    order_details: (order_id: string) => `/order/${order_id}`,
     attribute: `/attribute`,
+    utils: `/utils`,
     three: `/three`,
     group: {
       root: `/group`,

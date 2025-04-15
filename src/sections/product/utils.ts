@@ -4,7 +4,7 @@ import type { IProduct } from 'src/types/product';
 
 import { startCase } from 'lodash';
 
-import type { ProductValidationSchemaType } from './manage-product-form';
+import type { ProductValidationSchemaType } from './components/add-product/manage-product-form';
 
 export type TProductInfo = {
   name: string;

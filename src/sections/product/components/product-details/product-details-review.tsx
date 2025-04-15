@@ -1,21 +1,21 @@
 import type { TProductReview } from 'src/types/product';
 
+import { LinearProgress } from '@mui/material';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import Rating from '@mui/material/Rating';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import { LinearProgress } from '@mui/material';
+import Rating from '@mui/material/Rating';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
-import { useAppSelector } from 'src/redux/hooks';
 import { selectCurrentUser } from 'src/redux/features/auth/authSlice';
+import { useAppSelector } from 'src/redux/hooks';
 
 import { Iconify } from 'src/components/iconify';
 
-import { RATINGS } from '../utils';
+import { RATINGS } from '../../utils';
 import { ProductReviewList } from './product-review-list';
 import { ProductReviewNewForm } from './product-review-new-form';
 

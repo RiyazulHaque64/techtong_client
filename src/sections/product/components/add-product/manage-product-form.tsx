@@ -1,15 +1,15 @@
-import type { IProduct } from 'src/types/product';
-import type { IErrorResponse } from 'src/redux/interfaces/common';
 import type { TOptionItem } from 'src/components/hook-form/rhf-auto-complete';
+import type { IErrorResponse } from 'src/redux/interfaces/common';
+import type { IProduct } from 'src/types/product';
 
-import { z as zod } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { z as zod } from 'zod';
 
 import { LoadingButton } from '@mui/lab';
-import { Stack, Alert, Button } from '@mui/material';
+import { Alert, Button, Stack } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 
@@ -21,18 +21,18 @@ import {
   useUpdateProductMutation,
 } from 'src/redux/features/product/product-api';
 
-import { toast } from 'src/components/snackbar';
 import { Form } from 'src/components/hook-form';
 import { Iconify } from 'src/components/iconify';
+import { toast } from 'src/components/snackbar';
 
-import { AttributesForm } from './components/attributes-form';
-import SpecificationForm from './components/specification-form';
-import { resetProductForm, productInfoFormatter } from './utils';
-import ProductFormSection from './components/product-form-section';
-import MediaInformationForm from './components/media-information-form';
-import { PriceInformationForm } from './components/price-information-form';
-import GeneralInformationForm from './components/general-information-form';
-import { DetailsInformationForm } from './components/details-information-form';
+import { productInfoFormatter, resetProductForm } from '../../utils';
+import { AttributesForm } from './attributes-form';
+import { DetailsInformationForm } from './details-information-form';
+import GeneralInformationForm from './general-information-form';
+import MediaInformationForm from './media-information-form';
+import { PriceInformationForm } from './price-information-form';
+import ProductFormSection from './product-form-section';
+import SpecificationForm from './specification-form';
 
 export const ProductValidationSchema = zod.object({
   name: zod.string().min(1, { message: 'Name is required!' }),
