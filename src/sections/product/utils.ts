@@ -1,6 +1,6 @@
-import type { UseFormSetValue } from 'react-hook-form';
-import type { TFilterOption } from 'src/types/common';
 import type { IProduct } from 'src/types/product';
+import type { TFilterOption } from 'src/types/common';
+import type { UseFormSetValue } from 'react-hook-form';
 
 import { startCase } from 'lodash';
 
@@ -10,6 +10,7 @@ export type TProductInfo = {
   name: string;
   model: string;
   code?: string;
+  warranty?: string;
   price: number;
   discount_price?: number;
   retailer_price?: number;
@@ -63,6 +64,7 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
     name,
     model,
     code,
+    warranty,
     price,
     discount_price,
     retailer_price,
@@ -86,6 +88,7 @@ export const productInfoFormatter = (productData: ProductValidationSchemaType) =
   };
 
   if (code) productInfo.code = code;
+  if (warranty) productInfo.warranty = warranty;
   if (discount_price > 0) productInfo.discount_price = discount_price;
   if (retailer_price > 0) productInfo.retailer_price = retailer_price;
   if (stock > 0) productInfo.stock = stock;
@@ -112,6 +115,7 @@ export const resetProductForm = (
   setValue('name', product.name);
   setValue('model', product.model);
   setValue('code', product.code);
+  setValue('warranty', product.warranty);
   setValue('price', product.price);
   setValue('discount_price', product?.discount_price || 0);
   setValue('retailer_price', product?.retailer_price || 0);
@@ -135,8 +139,8 @@ export const resetProductForm = (
     product.attributes
       ? attributesParser(product.attributes)
       : {
-        Availability: [],
-      }
+          Availability: [],
+        }
   );
   if (product?.specification) {
     setValue('specification', product.specification);

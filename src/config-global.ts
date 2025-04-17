@@ -29,6 +29,13 @@ export type ConfigValue = {
   supabase: { url: string; key: string };
   bucket: { url: string; user_bucket: string; general_bucket: string };
   search_query: { limit: number };
+  company: {
+    name: string;
+    email?: string;
+    primary_contact_number: string;
+    secondary_contact_number?: string;
+    address: string;
+  };
 };
 
 // ----------------------------------------------------------------------
@@ -92,4 +99,12 @@ export const CONFIG: ConfigValue = {
     general_bucket: import.meta.env.VITE_GENERAL_BUCKET,
   },
   search_query: { limit: 500 },
+  company: {
+    name: 'TECHTONG',
+    email: 'info@techtong.com',
+    primary_contact_number: '01812435157',
+    secondary_contact_number: '01840452116',
+    address:
+      'Shop #308, Level #3, Multiplan Computer City Centre, 69-71 New Elephant Road, Dhaka-1205',
+  },
 };

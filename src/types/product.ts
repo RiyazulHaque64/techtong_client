@@ -38,6 +38,7 @@ export type IProduct = {
   slug: string;
   model: string;
   code?: string;
+  warranty?: string;
   price: number;
   discount_price?: number;
   retailer_price?: number;

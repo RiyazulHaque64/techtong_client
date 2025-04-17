@@ -126,6 +126,7 @@ export function ImageSelectModal({
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
       } else {
         setSelectedTab('library');
+        setFiles([]);
       }
     } catch (err) {
       setErrorMsg(typeof err === 'string' ? err : err.message);
@@ -302,7 +303,7 @@ export function ImageSelectModal({
                     />
                   ))}
                 </Grid>
-                {images?.meta?.total && images?.meta?.total > limit && (
+                {!!images?.meta?.total && images?.meta?.total > limit && (
                   <Stack direction="row" justifyContent="center" sx={{ mt: 4 }}>
                     <Button variant="outlined" onClick={() => setLimit((prev) => prev + 50)}>
                       Show more
@@ -472,6 +473,7 @@ export function ImageSelectModalByRHF({
         setErrorMsg((res?.error as IErrorResponse)?.data?.message);
       } else {
         setSelectedTab('library');
+        setFiles([]);
       }
     } catch (err) {
       setErrorMsg(typeof err === 'string' ? err : err.message);
@@ -648,7 +650,7 @@ export function ImageSelectModalByRHF({
                     />
                   ))}
                 </Grid>
-                {images?.meta?.total && images?.meta?.total > limit && (
+                {!!images?.meta?.total && images?.meta?.total > limit && (
                   <Stack direction="row" justifyContent="center" sx={{ mt: 4 }}>
                     <Button variant="outlined" onClick={() => setLimit((prev) => prev + 50)}>
                       Show more

@@ -28,11 +28,14 @@ export default function GeneralInformationForm() {
       <Grid item xs={12}>
         <Field.Text name="name" label="Name*" />
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={4}>
         <Field.Text name="model" label="Model*" />
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={4}>
         <Field.Text name="code" label="Code" />
+      </Grid>
+      <Grid item xs={12} md={4}>
+        <Field.Text name="warranty" label="Warranty" />
       </Grid>
       <Grid item xs={12} md={6}>
         <Field.AutoComplete name="category" options={categoriesOptions} label="Category" multiple />
